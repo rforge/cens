@@ -52,6 +52,7 @@ public class ShapeFileLoader extends FileSelector{
 			JOptionPane.showMessageDialog(this, "This does not appear to be a shape file.\nAcceptable extensions are: .shp,.dbf,.prj,.sbx,.sbn");
 			return false;
 		}
+		path = path.substring(0, path.length()-4);
 		Deducer.execute(rName +" <- readShapeSpatial(\""+path+"\", proj=CRS('"+proj.getText()+"'))");
 		return true;
 	}

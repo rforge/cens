@@ -103,8 +103,10 @@ public class CoordView extends DataViewerTab {
 
 		public void valueChanged(ListSelectionEvent arg0) {
 			String index = lis.getSelectedIndex()+"";
+			int i = -1;
 			//System.out.println("index:"+index);
-			RObject o = new RObject("coordinates("+dat+")[["+(index+1)+"]][[1]]","matrix",false);
+			i = Integer.parseInt(index);
+			RObject o = new RObject("coordinates("+dat+")[["+(i+1)+"]][[1]]","matrix",false);
 			org.rosuda.ibase.SVarSet vs = RController.newSet(o);
 			new DataTable(vs, o.getType(), false);
 		}

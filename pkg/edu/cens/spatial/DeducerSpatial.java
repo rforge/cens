@@ -11,6 +11,8 @@ import org.rosuda.JGR.JGR;
 import org.rosuda.deducer.data.DataViewerController;
 import org.rosuda.ibase.toolkit.EzMenuSwing;
 
+import edu.cens.spatial.plots.SpatialPlotBuilder;
+
 
 public class DeducerSpatial {
 	
@@ -23,6 +25,7 @@ public class DeducerSpatial {
 		insertMenu(JGR.MAINRCONSOLE,"Spatial",menuIndex);
 		EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial", "Load shape file", "shape", cListener);
 		EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial", "Convert data.frame", "conv_pnt", cListener);
+		EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial", "Spatial plot builder", "builder", cListener);
 		DataViewerController.init();
 		DataViewerController.addDataType("SpatialPointsDataFrame", "sp-p");
 		DataViewerController.addTabFactory("SpatialPointsDataFrame","Data View", new SpatialDataViewFactory());
@@ -74,6 +77,9 @@ class SpatialMenuListener implements ActionListener{
 		}else if(cmd.equals("conv_pnt")){
 			DFPointConvertDialog conv= DFPointConvertDialog.getInstance();;
 			conv.run();
+		}else if(cmd.equals("builder")){
+			SpatialPlotBuilder b = new SpatialPlotBuilder();
+			b.setVisible(true);
 		}
 	}
 	
