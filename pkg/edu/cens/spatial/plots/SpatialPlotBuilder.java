@@ -58,6 +58,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
 
     private JCheckBoxMenuItem _axes1 = new JCheckBoxMenuItem("Axes");
     private ButtonGroup _backgroundGroup = new ButtonGroup();
+	private ViewPanel _vp;
 
 
     public SpatialPlotBuilder() {
@@ -414,16 +415,17 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
     }
 
     public void plot(final String cmd){
-        if(cmd ==null || "".equals(cmd))
-            return;
+        //if(cmd ==null || "".equals(cmd))
+        //    return;
         if(_device ==null){
             _plotHolder.removeAll();
             //initMap();
             _device = new PlotPanel(_plotHolder.getWidth(), _plotHolder.getHeight());
             _device.setTransferHandler(new PanelTransferHandler());
             DeviceInterface.register(_device);
-            ViewPanel vp = new ViewPanel(_device);
-            _plotHolder.add(vp);
+            _vp = new ViewPanel(_device,this);
+            _plotHolder.add(_vp);
+            _vp.printBBox();
         }
 
         _okayCancel.getApproveButton().setEnabled(false);
@@ -437,11 +439,12 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
         _pane.setLayer(lab, 100);
         _pane.validate();
         _pane.repaint();
-
+        final ViewPanel tmp = _vp;
         new Thread(new Runnable(){
             public void run() {
                 try{
-                    plotInternal(cmd, SpatialPlotBuilder.this._device.devNr);
+                    plotInternal(cmd, SpatialPlotBuilder.this._device.devNr,tmp);
+                    tmp.printBBox();
                 }catch(Exception e){e.printStackTrace();}
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -458,7 +461,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
 
     }
 
-    public static void plotInternal(String call, int devNr){
+    public static void plotInternal(String call, int devNr,ViewPanel vp){
         try{
 //            Deducer.eval("print('" + call + "')");
             Deducer.eval("Sys.setenv(\"JAVAGD_CLASS_NAME\"=\"edu/cens/spatial/plots/DeviceInterface\")");
@@ -468,10 +471,15 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
             }else{
                 Deducer.eval("dev.set(" + (devNr+1) + ")");
             }
-
-            String cmd = call; //call.replaceAll("[\\n\\t]", " ");
-            //System.out.println(cmd);
+            Vector<Double> ul = vp.getUpperLeftCoordinate();
+            Vector<Double> lr = vp.getLowerRightCoordinate();
+            String cmd = "plot.new()\npar(mar=c(0,0,0,0))\nplot.window(c(" +ul.get(0)+","+lr.get(0)+"),c("+lr.get(1)+","+ul.get(1) +"), xaxs = 'i', yaxs = 'i')";
+            System.out.println(cmd);
             Deducer.eval(cmd);
+            Deducer.eval("plot(states,add=TRUE)");
+            //String cmd = call; //call.replaceAll("[\\n\\t]", " ");
+            //System.out.println(cmd);
+            //Deducer.eval(cmd);
             Deducer.eval("Sys.setenv(\"JAVAGD_CLASS_NAME\"=\"org/rosuda/JGR/toolkit/JavaGD\")");
         }catch(Exception e){e.printStackTrace();}
 
@@ -481,8 +489,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
     public void updatePlot(){
         if(_fromMain) return; //eg not in R
         String c = _model.getCall();
-        if( c!=null)
-            plot(c);
+        plot(c);
     }
 
     public void addElement(SpatialPlotComponent pe){

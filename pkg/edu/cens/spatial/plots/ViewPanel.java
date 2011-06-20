@@ -2,39 +2,45 @@ package edu.cens.spatial.plots;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.io.IOException;
+import java.util.Vector;
 
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 
+import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.OsmFileCacheTileLoader;
 import org.openstreetmap.gui.jmapviewer.tilesources.OsmTileSource;
 import org.rosuda.JGR.layout.AnchorConstraint;
 import org.rosuda.JGR.layout.AnchorLayout;
+import org.rosuda.REngine.REXP;
 import org.rosuda.deducer.Deducer;
 import org.rosuda.javaGD.PlotPanel;
 
 public class ViewPanel extends JPanel{
 	JLayeredPane pane = new JLayeredPane();
-	JMapViewer map;
+	MapPanel map;
 	JPanel plotPanel;
 	
+	SpatialPlotBuilder parent;
 	
-	public ViewPanel(int w,int h){
+	public ViewPanel(int w,int h,SpatialPlotBuilder par){
 		super();
+		parent = par;
 		this.setLayout(new BorderLayout());
 		this.add(pane);
 		initMap();
 		plotPanel = new PlotPanel(w,h);
 		plotPanel.setOpaque(false);
 		plotPanel.setBackground(null);
-		pane.setLayer(plotPanel, 2);
 	}
 	
-	public ViewPanel(PlotPanel p){
+	public ViewPanel(PlotPanel p, SpatialPlotBuilder par){
 		super();
+		parent=par;
 		this.setLayout(new BorderLayout());
 		pane.setLayout(new AnchorLayout());		
 		plotPanel = p;
@@ -47,7 +53,8 @@ public class ViewPanel extends JPanel{
 		tmp.add(new JLabel("blaa blaa"));
 		pane.add(plotPanel, new AnchorConstraint(0, 0, 0, 0,
                 AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_ABS,
-                AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_ABS), 0);	
+                AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_ABS), 1);	
+		pane.setLayer(plotPanel, 1);
 		initMap();
 		this.add(pane);
 		this.validate();
@@ -55,10 +62,13 @@ public class ViewPanel extends JPanel{
 	}
 	
     public void initMap(){
-        map = new JMapViewer();
-
+        map = new MapPanel(pane);
         map.setTileSource(new OsmTileSource.Mapnik());
-
+        MapController mapContr = new MapController(map,parent);
+        map.addPlusListener(mapContr);
+        map.addMinusListener(mapContr);
+        map.addSliderListener(mapContr);
+        mapContr.addListenersTo(plotPanel);
         try {
 			map.setTileLoader(new OsmFileCacheTileLoader(map));
 		} catch (SecurityException e) {
@@ -72,6 +82,55 @@ public class ViewPanel extends JPanel{
         map.setZoomContolsVisible(true);
         pane.add(map,new AnchorConstraint(0, 0, 0, 0,
                 AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_ABS,
-                AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_ABS), 1);
+                AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_ABS), 0);
+        pane.setLayer(map, 0);
+
     }
+    
+    public void printBBox(){
+        Coordinate c = map.getPosition(0,0);
+        System.out.println(c.getLat() + "  " + c.getLon());
+        Dimension d = this.getSize();
+        c = map.getPosition(0+getWidth(),0+getHeight());
+        System.out.println(c.getLat() + "  " + c.getLon());
+    }
+    
+    public Vector<Double> getUpperLeftCoordinate(){
+    	Vector<Double> d = new Vector<Double>(2);
+    	Coordinate c = map.getPosition(0,0);
+    	if(c.getLon()>180.0 || c.getLon()< -180.0 || c.getLat()>85.0 || c.getLat()< -85.0){
+    		d.add(0.0);
+    		d.add(0.0);
+    		return d;
+    	}
+    	String cmd = "project_mercator("+c.getLat()+","+c.getLon()+")";
+    	System.out.println(cmd);
+    	REXP ul = Deducer.eval(cmd);
+    	try{
+    		double[] vals = ul.asDoubles();
+    		d.add(vals[0]);
+    		d.add(vals[1]);
+    	}catch(Exception e){e.printStackTrace();}
+    	return d;
+    }
+
+    public Vector<Double> getLowerRightCoordinate(){
+    	Vector<Double> d = new Vector<Double>(2);
+    	Coordinate c = map.getPosition(0+plotPanel.getWidth(),0+plotPanel.getHeight());
+    	if(c.getLon()>180.0 || c.getLon()< -180.0 || c.getLat()>85.0 || c.getLat()< -85.0){
+    		d.add(0.0);
+    		d.add(0.0);
+    		return d;
+    	}
+    	String cmd = "project_mercator("+c.getLat()+","+c.getLon()+")";
+    	System.out.println(cmd);
+    	REXP ul = Deducer.eval(cmd);
+    	try{
+    		double[] vals = ul.asDoubles();
+    		d.add(vals[0]);
+    		d.add(vals[1]);
+    	}catch(Exception e){e.printStackTrace();}
+    	return d;
+    }
+    
 }
