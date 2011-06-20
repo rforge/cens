@@ -5,7 +5,7 @@ Title: Deducer for spatial data analysis
 Author: Ian Fellows and Neal Fultz
 Maintainer: Ian Fellows <thefell@gmail.com>
 Description: A Deducer plug-in for spatial data analysis
-Depends: Deducer, sp
+Depends: Deducer, sp, rgdal
 SystemRequirements: Java (>= 1.5), JRI
 License: LGPL-2.1
 URL: http://www.deducer.org/manual.html 

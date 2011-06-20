@@ -59,7 +59,7 @@ public class PlotPanel extends JGDBufferedPanel {
         while (i<j) {
             GDObject o=(GDObject) l.elementAt(i++);
             o.paint(this, gs, g);
-            System.out.println(o.toString());
+            //System.out.println(o.toString());
         }
     }
 
