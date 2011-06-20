@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.OsmFileCacheTileLoader;
+import org.openstreetmap.gui.jmapviewer.tilesources.BingAerialTileSource;
 import org.openstreetmap.gui.jmapviewer.tilesources.OsmTileSource;
 import org.rosuda.JGR.layout.AnchorConstraint;
 import org.rosuda.JGR.layout.AnchorLayout;
@@ -131,6 +132,14 @@ public class ViewPanel extends JPanel{
     		d.add(vals[1]);
     	}catch(Exception e){e.printStackTrace();}
     	return d;
+    }
+    
+    public void setTileSource(String type){
+    	if("bing".equals(type)){
+    		map.setTileSource(new BingAerialTileSource());
+    	}else if("osm".equals(type)){
+    		map.setTileSource(new OsmTileSource.Mapnik());
+    	}
     }
     
 }

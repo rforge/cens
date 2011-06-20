@@ -159,7 +159,8 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
                                 list.setCellRenderer(new DefaultListCellRenderer(){
 
                                     @Override
-                                    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                                    public Component getListCellRendererComponent(JList list, Object value, 
+                                    		int index, boolean isSelected, boolean cellHasFocus) {
                                         JPanel panel = ((SpatialPlotComponentType) value).renderForList(true);
                                         setPanelBgIfSelected(list, isSelected, panel);
                                         return panel;
@@ -227,7 +228,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
                             AnchorConstraint.ANCHOR_NONE, AnchorConstraint.ANCHOR_REL));
                     editButton.setPreferredSize(new java.awt.Dimension(21, 21));
                 }
-
+            
                 {
                     JPanel elementsPanel = new JPanel();
                     BorderLayout elementsPanelLayout = new BorderLayout();
@@ -241,21 +242,20 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
                         JScrollPane elementsScroller = new JScrollPane();
                         elementsPanel.add(elementsScroller, BorderLayout.CENTER);
                         {
-
+                        
                             elementsScroller.setViewportView(_elementsList);
-
                             _elementsList.setCellRenderer(new DefaultListCellRenderer(){
-                                @Override
-                                public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                                public Component getListCellRendererComponent(JList list, Object value, 
+                                		int index, boolean isSelected, boolean cellHasFocus) {
                                     SpatialPlotComponent value1 = (SpatialPlotComponent) value;
                                     JPanel 	panel = value1.renderForList();
-                                    if(!value1.isActive())
-                                    {
+                                    if(!value1.isActive()){
                                         panel.setBackground(Color.GRAY);
                                     }
                                     setPanelBgIfSelected(list, isSelected, panel);
 
-                                    return panel;                                }
+                                    return panel;                                
+                                }
                             });
 
                             _elementsList.setDragEnabled(true);
@@ -324,43 +324,10 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
             }
 
             String[] Menu = { "+", "File", "@N New","new", "-", //"@O Open","open", "@S Save","save","-",
-                          "+", "Options", "Title", "title", "Bounding Box", "bbox",
+                          "+", "Map types", "Open street map", "osm", "Bing Aerial images", "bing",
                           "+","Tools","View call","call",
                           "~Window","0" };
             JMenuBar ezMenu = EzMenuSwing.getEzMenu(this, new MenuListener(), Menu);
-
-            JMenu optionMenu = ezMenu.getMenu(1);
-
-            _axes1.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    _model.setAxes(_axes1.isSelected());
-                    updatePlot();
-                }
-            });
-
-            optionMenu.add(_axes1);
-
-            JMenu bg = new JMenu("Background");
-
-            for(final SpatialPlotModel.MapType mt : SpatialPlotModel.MapType.values() )
-            {
-                final JRadioButtonMenuItem menu = new JRadioButtonMenuItem(mt.name());
-                menu.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        _backgroundGroup.setSelected(menu.getModel(), true);
-                        _model.setMapType(mt);
-                        updatePlot();
-                    }
-                });
-                menu.setSelected(mt == _model.getMapType());
-                bg.add(menu);
-                _backgroundGroup.add(menu);
-            }
-
-
-
-            optionMenu.add(bg);
-
 
             setContentPane(_pane);
             pack();
@@ -372,7 +339,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
             e.printStackTrace();
         }
     }
-    
+
 
 
     private void setPanelBgIfSelected(JList list, boolean isSelected, JPanel panel) {
@@ -891,87 +858,21 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
         public void actionPerformed(ActionEvent ae) {
             String cmd = ae.getActionCommand();
             if("save".equals(cmd)) {
-                FileSelector fileDialog = new FileSelector(SpatialPlotBuilder.this,
-                        "Save plot", FileSelector.SAVE, null, true);
-                JPanel dataPanel = new JPanel();
-                dataPanel.setLayout(new FlowLayout());
-                JCheckBox saveData = new JCheckBox("Save with data");
-                saveData.setSelected(true);
-                dataPanel.add(saveData);
-                fileDialog.addFooterPanel(dataPanel);
-                fileDialog.setVisible(true);
-                if(fileDialog.getFile() !=null){
-                    File f = fileDialog.getSelectedFile();
-                    if(!f.getName().endsWith(".spb"))
-                        f = new File(f.getPath() + ".spb");
-                    if(f.exists()){
-                        int o =JOptionPane.showConfirmDialog(null, "File exists: Overwrite: " + f.getName() + "?");
-                        if(o != JOptionPane.OK_OPTION)
-                            return;
-                    }
-//                    _model.saveToFile(f,saveData.isSelected());
-                }
-            } else if("open".equals(cmd)){
-                FileSelector fileDialog = new FileSelector(SpatialPlotBuilder.this,
-                        "Open plot", FileSelector.LOAD, null, true);
-                fileDialog.setVisible(true);
-                if(fileDialog.getFile() != null){
-                    File f = fileDialog.getSelectedFile();
-                    if(!f.getName().endsWith(".spb")){
-                        JOptionPane.showMessageDialog(null, "This does not appear to be a"
-                                +" ggplot2 PlotBuilder file (extension .spb)");
-                        return;
-                    }
-                    if(f!=null && f.exists()){
-                        SpatialPlotModel newModel = new SpatialPlotModel();
-//                        newModel.setFromFile(f);
-                        setModel(newModel);
-                        updatePlot();
-                    }
-                }
             } else if("new".equals(cmd)) {
                 SpatialPlotBuilder spb = new SpatialPlotBuilder(new SpatialPlotModel());
                 spb.setVisible(true);
                 WindowTracker.addWindow(spb);
             } else if("call".equals(cmd)) {
-                JFrame f = new JFrame("Call");
-                f.setSize(700, 200);
-                f.setLayout(new BorderLayout());
-                f.add(new JScrollPane(new JTextArea(_model.getCall()+"\n")));
-                f.setLocationRelativeTo(SpatialPlotBuilder.this);
-                f.setVisible(true);
-            }
-            else if("title".equals(cmd)) {
-                String title = _model.getTitle();
-                String s = JOptionPane.showInputDialog("Enter a title:", title);
-                if((s ==  null && title != null) || (s != null &&  !s.equals(title)))
-                {
-                    _model.setTitle(s);
-                    updatePlot();
-                }
-            }
-            else if("bbox".equals(cmd)) {
-                OptionsComponentPanel panel = new OptionsComponentPanel(_model.getBoundingBox());
-
-                showComponentDialog(panel);
-
-
-                if(panel.isOk()){
-
-                    _model.setBoundingBox(panel.getBox());
-                    updatePlot();
-                }
-
+            } else if("bing".equals(cmd)){
+            	_vp.setTileSource("bing");
+            }else if("osm".equals(cmd)){
+            	_vp.setTileSource("osm");
             }
         }
     }
 
     private static boolean _fromMain = false;
-    public static void main(String[] args){
-        _fromMain = true;
-        new SpatialPlotBuilder().setVisible(true);
 
-    }
 
 }
 

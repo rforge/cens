@@ -30,7 +30,7 @@ public enum SpatialPlotComponentType  implements IPlotComponentType {
 //    },
 
 
-    points("Points", "/icons/geo_point.png") {
+    points("Points", "icons/geo_point.png") {
         @Override
         public PointComponentPanel getPanel(Map<String, String> args) {
             return new PointComponentPanel(args);
@@ -51,7 +51,7 @@ public enum SpatialPlotComponentType  implements IPlotComponentType {
         }
     },
 
-    paths("Paths", "/icons/geo_path.png") {
+    paths("Paths", "icons/geo_path.png") {
         @Override
         public PathComponentPanel getPanel(Map<String, String> args) {
             return new PathComponentPanel(args);
@@ -125,7 +125,7 @@ public enum SpatialPlotComponentType  implements IPlotComponentType {
 //        }
 //    },
 
-    bubbles("Bubble", "/icons/geo_bubble.png") {
+    bubbles("Bubble", "icons/geo_bubble.png") {
         @Override
         public String getCall(Map<String, String> args) {
 
@@ -195,7 +195,7 @@ public enum SpatialPlotComponentType  implements IPlotComponentType {
 //    },
 
 
-    shape("Shapes", "/icons/geo_choropleth.png"){
+    shape("Shapes", "icons/geo_choropleth.png"){
 
         public String getCall(Map<String, String> args) {
             String shape = args.remove("shapefile");
@@ -240,8 +240,9 @@ public enum SpatialPlotComponentType  implements IPlotComponentType {
     }
 
     public final ImageIcon getIcon() {
-    	//System.out.println(_iconPath);
-        return new ImageIcon(_iconPath);
+    	System.out.println(_iconPath);
+        //return new ImageIcon(_iconPath);
+    	return new ImageIcon(getClass().getResource(_iconPath));
     }
 
 
