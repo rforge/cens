@@ -67,5 +67,50 @@ bubble_plot <- function(x,z,minRadius=.01,
 	dd <- dd[order(-r),];
 	symbols(dd$x, dd$y, circles=dd$r,
 			inches=maxRadius,add=TRUE, fg="white", bg=color, ...);
-	legend(legend.loc,,leg.val,col=leg.col,pch=pch,title=legend.title,...)
 }
+
+text_plot <- function(x,text,...){
+	coord <- coordinates(x)
+	text(coord[,1],coord[,2],text,...)
+}
+
+
+#'lifted from choropleth in the USCensus2000 package
+choro_plot <- function (sp, dem , cuts = list("quantile", seq(0, 
+						1, 0.25)), alpha=.5,
+		main = NULL, sub = "", legend.loc = "bottomleft", 
+				legend.title = "",add=TRUE, ...) 
+{
+	color.map <- function(x, dem, y = NULL) {
+		l.poly <- length(x@polygons)
+		dem.num <- cut(dem, breaks = ceiling(do.call(cuts[[1]], 
+								list(x = dem, probs = cuts[[2]]))), dig.lab = 6)
+		dem.num[which(is.na(dem.num) == TRUE)] <- levels(dem.num)[1]
+		l.uc <- length(table(dem.num))
+		if (is.null(y)) {
+			col.heat <- do.call(color$fun, color$attr)
+		}
+		else {
+			col.heat <- y
+		}
+		dem.col <- cbind(col.heat, names(table(dem.num)))
+		colors.dem <- vector(length = l.poly)
+		for (i in 1:l.uc) {
+			colors.dem[which(dem.num == dem.col[i, 2])] <- dem.col[i, 
+					1]
+		}
+		out <- list(colors = colors.dem, dem.cut = dem.col[, 
+						2], table.colors = dem.col[, 1])
+		out
+	}
+	color <- list(fun = "hsv", attr = list(h = c(0.4, 
+							0.5, 0.6, 0.7), s = 0.6, v = 0.6, alpha = alpha))
+	colors.use <- color.map(sp, dem)
+	col <- colors.use$color
+	args <- list(x = sp, ..., col = colors.use$color,add=add,border="transparent")
+	do.call("plot", args)
+	title(main = main, sub = sub)
+	legend(legend.loc, legend = colors.use$dem.cut, fill = colors.use$table.colors, 
+			bty = "o", title = legend.title, bg = "white")
+}
+
