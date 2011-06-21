@@ -53,7 +53,10 @@ public class ShapeFileLoader extends FileSelector{
 			return false;
 		}
 		path = path.substring(0, path.length()-4);
-		Deducer.execute(rName +" <- readShapeSpatial(\""+path+"\", proj=CRS('"+proj.getText()+"'))");
+		String command =rName +" <- readShapeSpatial(\""+path+"\", proj=CRS('"+proj.getText()+"'))\n";
+		command += rName +" <- spTransform("+rName+",osm())";
+		Deducer.execute(command);
+		
 		return true;
 	}
 	

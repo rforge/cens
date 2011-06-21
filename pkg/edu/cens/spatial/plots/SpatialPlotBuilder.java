@@ -59,6 +59,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
     private JCheckBoxMenuItem _axes1 = new JCheckBoxMenuItem("Axes");
     private ButtonGroup _backgroundGroup = new ButtonGroup();
 	private ViewPanel _vp;
+	private boolean firstPlot = true;
 
 
     public SpatialPlotBuilder() {
@@ -66,6 +67,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
     }
 
     public SpatialPlotBuilder(SpatialPlotModel pbm) {
+    	super("Spatial Builder",false,1911);
         try{
             setModel(pbm);
             init();
@@ -77,12 +79,14 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
     }
 
     private void init(){
-        for(SpatialPlotComponentType o : SpatialPlotComponentType.values()) {
-            String category = o.getCategory();
-            DefaultListModel lm = (DefaultListModel) _addElementListModels.get(category);
-            if(lm == null) _addElementListModels.put(category, lm = new DefaultListModel());
-            lm.addElement(o);
-        }
+    	DefaultListModel lm = (DefaultListModel) _addElementListModels.get("Spatial");
+    	 if(lm == null) _addElementListModels.put("Spatial", lm = new DefaultListModel());
+    	 
+    	 lm.addElement(new PlottingElement(new PointsElementModel()));
+    	 lm.addElement(new PlottingElement(new ColoredPointsElementModel()));
+    	 lm.addElement(new PlottingElement(new BubbleElementModel()));
+    	 lm.addElement(new PlottingElement(new LinesElementModel()));
+    	 lm.addElement(new PlottingElement(new PolyElementModel()));
     }
 
 
@@ -161,7 +165,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
                                     @Override
                                     public Component getListCellRendererComponent(JList list, Object value, 
                                     		int index, boolean isSelected, boolean cellHasFocus) {
-                                        JPanel panel = ((SpatialPlotComponentType) value).renderForList(true);
+                                        JPanel panel = ((PlottingElement) value).makeComponent();
                                         setPanelBgIfSelected(list, isSelected, panel);
                                         return panel;
                                     }
@@ -247,8 +251,8 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
                             _elementsList.setCellRenderer(new DefaultListCellRenderer(){
                                 public Component getListCellRendererComponent(JList list, Object value, 
                                 		int index, boolean isSelected, boolean cellHasFocus) {
-                                    SpatialPlotComponent value1 = (SpatialPlotComponent) value;
-                                    JPanel 	panel = value1.renderForList();
+                                	PlottingElement value1 = (PlottingElement) value;
+                                    JPanel 	panel = value1.makeComponent();
                                     if(!value1.isActive()){
                                         panel.setBackground(Color.GRAY);
                                     }
@@ -265,7 +269,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
                             _elementsList.addMouseListener(new MouseListener(){
                                 public void mouseClicked(MouseEvent e) {
                                     if(e.getClickCount()==2 && _elementsList.getSelectedIndex() >= 0){
-                                        SpatialPlotComponent selectedValue = (SpatialPlotComponent) _elementsList.getSelectedValue();
+                                        PlottingElement selectedValue = (PlottingElement) _elementsList.getSelectedValue();
                                         editElement(selectedValue, SpatialPlotBuilder.this);
                                     }
                                 }
@@ -307,7 +311,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
                         AnchorConstraint.ANCHOR_REL, AnchorConstraint.ANCHOR_REL));
                 bottomPanel.setPreferredSize(new java.awt.Dimension(688, 59));
                 {
-                    HelpButton helpButton = new HelpButton("pmwiki.php?n=Main.PlotBuilder");
+                    HelpButton helpButton = new HelpButton("pmwiki.php?n=Main.SpatialPlotBuilder");
                     bottomPanel.add(helpButton, new AnchorConstraint(364, 51, 872, 19,
                             AnchorConstraint.ANCHOR_NONE, AnchorConstraint.ANCHOR_NONE,
                             AnchorConstraint.ANCHOR_REL, AnchorConstraint.ANCHOR_REL));
@@ -355,35 +359,35 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
     public void setModel(SpatialPlotModel m){
         _model = m;
         _elementsList.setModel(m);
-        _axes1.setSelected(m.isAxes());
-
-        Enumeration<AbstractButton> elements = _backgroundGroup.getElements();
-        int i = 0;
-
-        _backgroundGroup.clearSelection();
-        while(elements.hasMoreElements()) {
-
-            _backgroundGroup.setSelected(elements.nextElement().getModel(), i++ == _model.getMapType().ordinal());
-
-        }
-
     }
 
     public SpatialPlotModel getModel(){return _model;}
 
     // stubs for the expanding side panel (not implemented)
 
-    public void openLayerSheet(SpatialPlotComponent element){
+    public void openLayerSheet(PlottingElement element){
 
     }
 
     public void closeLayerSheet(){
 
     }
+    
+    public String formatCall(){
+    	String modelCall = _model.getCall();
+    	if(modelCall==null || "".equals(modelCall))
+    		return "";
+    	if(_vp==null || _model==null)
+    		return "";
+        Vector<Double> ul = _vp.getUpperLeftCoordinate();
+        Vector<Double> lr = _vp.getLowerRightCoordinate();
+        String cmd = "plot.new()\npar(mar=c(0,0,0,0))\nplot.window(c(" +ul.get(0)+","+lr.get(0)+"),c("+lr.get(1)+","+ul.get(1) +"), xaxs = 'i', yaxs = 'i')";
+
+    	cmd += modelCall;
+    	return cmd;
+    }
 
     public void plot(final String cmd){
-        //if(cmd ==null || "".equals(cmd))
-        //    return;
         if(_device ==null){
             _plotHolder.removeAll();
             //initMap();
@@ -392,9 +396,9 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
             DeviceInterface.register(_device);
             _vp = new ViewPanel(_device,this);
             _plotHolder.add(_vp);
-            _vp.printBBox();
         }
-
+        if(cmd ==null || "".equals(cmd))
+            return;
         _okayCancel.getApproveButton().setEnabled(false);
         final JLabel lab = new JLabel("plotting...");
         lab.setHorizontalAlignment(JLabel.CENTER);
@@ -407,11 +411,11 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
         _pane.validate();
         _pane.repaint();
         final ViewPanel tmp = _vp;
+        final boolean first=firstPlot;
         new Thread(new Runnable(){
             public void run() {
                 try{
-                    plotInternal(cmd, SpatialPlotBuilder.this._device.devNr,tmp);
-                    tmp.printBBox();
+                    plotInternal(cmd, SpatialPlotBuilder.this._device.devNr,first,tmp);
                 }catch(Exception e){e.printStackTrace();}
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -419,16 +423,17 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
                         _okayCancel.getApproveButton().setEnabled(true);
                         _device.repaint();
                         _pane.validate();
+                        
                     }
                 });
 
             }
 
         }).start();
-
+        firstPlot=false;
     }
 
-    public static void plotInternal(String call, int devNr,ViewPanel vp){
+    public static void plotInternal(String call, int devNr,boolean first,ViewPanel tmp){
         try{
 //            Deducer.eval("print('" + call + "')");
             Deducer.eval("Sys.setenv(\"JAVAGD_CLASS_NAME\"=\"edu/cens/spatial/plots/DeviceInterface\")");
@@ -438,15 +443,16 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
             }else{
                 Deducer.eval("dev.set(" + (devNr+1) + ")");
             }
-            Vector<Double> ul = vp.getUpperLeftCoordinate();
-            Vector<Double> lr = vp.getLowerRightCoordinate();
-            String cmd = "plot.new()\npar(mar=c(0,0,0,0))\nplot.window(c(" +ul.get(0)+","+lr.get(0)+"),c("+lr.get(1)+","+ul.get(1) +"), xaxs = 'i', yaxs = 'i')";
+
+           // Deducer.eval(call);
+
+            String cmd = call; //call.replaceAll("[\\n\\t]", " ");
             System.out.println(cmd);
             Deducer.eval(cmd);
-            Deducer.eval("plot(states,add=TRUE)");
-            //String cmd = call; //call.replaceAll("[\\n\\t]", " ");
-            //System.out.println(cmd);
-            //Deducer.eval(cmd);
+            if(first){
+            	System.out.println("refreshing...");
+            	tmp.refreshPlot();
+            }
             Deducer.eval("Sys.setenv(\"JAVAGD_CLASS_NAME\"=\"org/rosuda/JGR/toolkit/JavaGD\")");
         }catch(Exception e){e.printStackTrace();}
 
@@ -455,19 +461,19 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
 
     public void updatePlot(){
         if(_fromMain) return; //eg not in R
-        String c = _model.getCall();
+        String c = formatCall();
         plot(c);
     }
 
-    public void addElement(SpatialPlotComponent pe){
-
-        AbstractComponentPanel panel = pe.getPanel();
-
-        showComponentDialog(panel);
-
-
-        if(panel.isOk() && _model.validate()){
-            pe.setArgs(panel.getArgs());
+    public void addElement(PlottingElement pe){
+    	pe = (PlottingElement) pe.clone();
+        JDialog d = pe.getJDialog();
+        d.setLocationRelativeTo(this);
+        d.setModal(true);
+        d.setVisible(true);
+        
+        System.out.println(pe.getModel().checkValid());
+        if(pe.getModel().checkValid()==null){
             _model.add(pe);
             if(!_model.validate())
             {
@@ -485,23 +491,11 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
 
     }
 
-    private void showComponentDialog(final AbstractComponentPanel panel) {
-        final JDialog jDialog = new JDialog(this, "Configure Component", true);
-        jDialog.add(panel);
-        jDialog.setModal(true);
-        jDialog.setResizable(false);
-        jDialog.setLocationRelativeTo(this);
-        jDialog.pack();
-
-        panel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if(panel.isOk() || panel.isCancel())
-                    jDialog.dispose();
-                else JOptionPane.showMessageDialog(panel, panel.getErrorMsg());
-            }
-        });
-
-        jDialog.setVisible(true);
+    private void showComponentDialog(PlottingElement element) {
+    	JDialog d = element.getJDialog();
+    	d.setLocationRelativeTo(this);    	
+    	d.setModal(true);
+    	d.setVisible(true);
     }
 
 
@@ -533,7 +527,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
     class PanelTransferHandler extends TransferHandler{
 
         public boolean canImport(JComponent comp,DataFlavor[] d) {
-            return d.length == 1 && d[0].equals(SpatialPlotComponentType.getFlavor());
+            return d.length == 1 && d[0].equals(PlottingElement.getFlavor());
         }
 
         public int getSourceActions(JComponent c) {
@@ -542,10 +536,10 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
 
         public boolean importData(JComponent comp, Transferable t) {
             try {
-                final SpatialPlotComponentType  type= (SpatialPlotComponentType) t.getTransferData(
-                        SpatialPlotComponentType.getFlavor());
+                final PlottingElement  type= (PlottingElement) t.getTransferData(
+                		PlottingElement.getFlavor());
 
-                addElement(new SpatialPlotComponent(type));
+                addElement(type);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -559,7 +553,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
         public int lastIndex = -1;
 
         public boolean canImport(JComponent comp,DataFlavor[] d) {
-            return super.canImport(comp, d) || d.length==1 && d[0].equals(SpatialPlotComponent.getFlavor());
+            return super.canImport(comp, d) || d.length==1 && d[0].equals(PlottingElement.getFlavor());
         }
 
         public boolean importData(JComponent comp, Transferable t) {
@@ -570,17 +564,10 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
                 final JList l = (JList) comp;
                 final SpatialPlotModel model = _model;
 
-                final SpatialPlotComponent p = (SpatialPlotComponent) t.getTransferData(SpatialPlotComponent.getFlavor());
-                        if(!model.validate()){
-//                            PlottingElementDialog d =
-//                                new PlottingElementDialog(SpatialPlotBuilder.this,p);
-//                            d.setModal(true);
-//                            d.setLocationRelativeTo(SpatialPlotBuilder.this);
-//                            d.setVisible(true);
-                            //todo
-                            if(!model.validate())
-                                return false;
-                        }
+                final PlottingElement p = (PlottingElement) t.getTransferData(PlottingElement.getFlavor());
+                        
+                	if(p.getModel().checkValid()==null)
+                		return false;
 
                         int ind = l.getSelectedIndex();
                         //if(ind+1 < lastIndex)
@@ -594,9 +581,9 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
                         }
 
                     if(ind<0)
-                        model.add(p);
+                        model.add((PlottingElement) p.clone());
                     else
-                        model.insertElementAt(p, ind);
+                        model.insertElementAt((PlottingElement) p.clone(), ind);
 
 
                 SwingUtilities.invokeLater(new Runnable(){
@@ -628,8 +615,8 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
 
          public Icon getVisualRepresentation(Transferable t){
             try {
-                SpatialPlotComponent p = (SpatialPlotComponent) t.getTransferData(SpatialPlotComponent.getFlavor());
-                return p.getType().getIcon();
+            	PlottingElement p = (PlottingElement) t.getTransferData(PlottingElement.getFlavor());
+                return new ImageIcon(p.getImage());
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
@@ -645,7 +632,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
     }
 
     static class ElementPopupMenu {
-        private static SpatialPlotComponent element;
+        private static PlottingElement element;
         private static JList elList;
         private static SpatialPlotBuilder plot;
 
@@ -692,23 +679,6 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
             });
             popup.add(menuItem);
 
-            menuItem = new JMenuItem("Color...");
-            menuItem.addActionListener(new ActionListener(){
-
-                public void actionPerformed(ActionEvent e) {
-                    //todo rewrite this crap
-                    ColorOptionPanel panel = new ColorOptionPanel(element.getArgs());
-                    plot.showComponentDialog(panel);
-                    if(panel.isOk()) {
-                        element.setArgs(panel.getArgs());
-                        plot.updatePlot();
-                    }
-                }
-
-            });
-
-            if(element.getType() != SpatialPlotComponentType.shape)
-                popup.add(menuItem);
 
 
             return popup;
@@ -717,16 +687,10 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
 
     }
 
-        private static void editElement(SpatialPlotComponent element, SpatialPlotBuilder plot) {
-            AbstractComponentPanel panel = element.getPanel();
-
-            plot.showComponentDialog(panel);
-
-
-            if(panel.isOk() && plot.getModel().validate()){
-                element.setArgs(panel.getArgs());
-                plot.updatePlot();
-            }
+        private static void editElement(PlottingElement element, SpatialPlotBuilder plot) {
+        	
+            plot.showComponentDialog(element);
+            plot.updatePlot();
         }
 
     class AddMouseListener implements MouseListener{
@@ -746,15 +710,15 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
             if(e.isPopupTrigger()){
                 if(i<0)
                     return;
-                AddElementPopupMenu.element = (SpatialPlotComponentType)
+                AddElementPopupMenu.element = (PlottingElement)
                                             list.getModel().getElementAt(i);
                 AddElementPopupMenu.pBuilder = SpatialPlotBuilder.this;
                 AddElementPopupMenu.getPopup().show(e.getComponent(),
                         e.getX(),e.getY());
             }else if(e.getClickCount() == 2 && pressed){
-                SpatialPlotComponentType elementAt = (SpatialPlotComponentType)
+            	PlottingElement elementAt = (PlottingElement)
                         list.getModel().getElementAt(i);
-                addElement(new SpatialPlotComponent(elementAt));
+                addElement((PlottingElement) elementAt.clone());
             }
         }
 
@@ -762,7 +726,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
 
     static class AddElementPopupMenu{
         private static JPopupMenu popup;
-        private static SpatialPlotComponentType element;
+        private static PlottingElement element;
         private static SpatialPlotBuilder pBuilder;
         private static JPopupMenu getPopup(){
             if(popup==null){
@@ -772,7 +736,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
                 menuItem.addActionListener(new ActionListener(){
 
                     public void actionPerformed(ActionEvent e) {
-                        pBuilder.addElement(new SpatialPlotComponent(element));
+                        pBuilder.addElement((PlottingElement) element.clone());
                     }
 
                 });
@@ -781,7 +745,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
                 menuItem.addActionListener(new ActionListener(){
 
                     public void actionPerformed(ActionEvent e) {
-                        String url = element.getHelpURL();
+                        String url = "http://www.deducer.org";
                         if(url!=null && url.length()>0)
                             HelpButton.showInBrowser(url);
                     }
@@ -818,15 +782,12 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
         } else {
             int i = _elementsList.getSelectedIndex();
             if(i == -1) return;
-            SpatialPlotComponent spc = _model.getElementAt(i);
+            PlottingElement spc = _model.getElementAt(i);
 
             if("remove".equals(cmd)) {
                     _model.remove(i);
             } else if("edit".equals(cmd)){
-                AbstractComponentPanel panel = spc.getPanel();
-                showComponentDialog(panel);
-                if(panel.isOk() && _model.validate())
-                        spc.setArgs(panel.getArgs());
+                showComponentDialog(spc);
             } else if("active".equals(cmd)){
                 spc.setActive(!spc.isActive());
                 _model.validate();

@@ -24,7 +24,7 @@ import org.rosuda.javaGD.PlotPanel;
 public class ViewPanel extends JPanel{
 	JLayeredPane pane = new JLayeredPane();
 	MapPanel map;
-	JPanel plotPanel;
+	PlotPanel plotPanel;
 	
 	SpatialPlotBuilder parent;
 	
@@ -37,6 +37,10 @@ public class ViewPanel extends JPanel{
 		plotPanel = new PlotPanel(w,h);
 		plotPanel.setOpaque(false);
 		plotPanel.setBackground(null);
+	}
+	
+	public void refreshPlot(){
+		plotPanel.initRefresh();
 	}
 	
 	public ViewPanel(PlotPanel p, SpatialPlotBuilder par){

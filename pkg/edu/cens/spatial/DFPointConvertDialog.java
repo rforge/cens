@@ -77,7 +77,7 @@ public class DFPointConvertDialog extends RDialog implements ActionListener{
 			}
 			
 			String command = name + " <- SpatialPointsDataFrame("+data+"[,c('"+xvar+"', '"+yvar+"')], data="+data+",proj4string=CRS('+proj=longlat'))";
-			
+			command += "\n"+name+" <- spTransform("+name+",osm())";
 			Deducer.execute(command);		//execute command as if it had been entered into the console
 			this.setVisible(false);
 			completed();	//dialog completed
