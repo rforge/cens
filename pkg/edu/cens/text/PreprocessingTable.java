@@ -12,6 +12,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -57,8 +58,14 @@ import edu.cens.text.OptionsButtonPanel;
 
 public class PreprocessingTable extends JTable
 {
+	protected static final int ENABLED_CHECKBOX_COLUMN = 1;
+	protected static final int ACTION_COLUMN = 2;
+	protected static final int OPTIONS_COLUMN = 3;
+	protected static final int REORDER_COLUMN = 0;
+	
 	private Object [][] tableContents;
-	public PreprocessingTable()
+	int nActions;
+	public PreprocessingTable(int nActions)
 	{	
 		super();
 		
@@ -71,27 +78,35 @@ public class PreprocessingTable extends JTable
 		menu2.add(new JMenuItem("Stem"));
 		menu2.add(new JMenuItem("Pointless"));
 		menu2.add(new JMenuItem("Words"));
+		this.nActions = nActions;
 		
-		tableContents = new Object [][]
-		                      		{ 
-		                      			{ new UpDownButtonPanel(), new Boolean(false), "Stop Words", new OptionsButtonPanel(menu1) },
-		                      			{ new UpDownButtonPanel(), new Boolean(true), "Stem", new OptionsButtonPanel(menu2) },
-		                      			{ new UpDownButtonPanel(), new Boolean(true), "Magic", new OptionsButtonPanel(menu1) },
-		                      		};
+		tableContents = new Object [nActions][4];
+		
+		for (int i = 0; i < nActions; i++)
+		{
+			tableContents[i][0] = new UpDownButtonPanel();
+			tableContents[i][1] = new Boolean(true);
+			tableContents[i][2] = "Action " + i;
+			tableContents[i][3] = new OptionsButtonPanel(null);
+		}
+		
 		setModel(new PreproListModel(tableContents));
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		getColumn("Options").setCellRenderer(new OptionsColumnRenderer());
-		getColumn("Options").setCellEditor(new OptionsColumnEditor());
+		getColumn("Options").setCellRenderer(new PrepoCellRenderer());
+		getColumn("Options").setCellEditor(new PrepoCellEditor());
 		
-		getColumn("Reorder").setCellRenderer(new OptionsColumnRenderer());
-		getColumn("Reorder").setCellEditor(new OptionsColumnEditor());
+		getColumn("Reorder").setCellRenderer(new PrepoCellRenderer());
+		getColumn("Reorder").setCellEditor(new PrepoCellEditor());
+		
+		getColumn("Action").setCellRenderer(new PrepoCellRenderer());
+		
 		setRowHeight(30);
 		this.setCellSelectionEnabled(false);
 		this.setColumnSelectionAllowed(false);
 		this.setRowSelectionAllowed(false);
 		this.setFocusable(false);
 	
-		//this.setBorder(new LineBorder(Color.BLACK));
+		this.setBorder(new LineBorder(Color.BLACK));
 		this.setGridColor(Color.BLACK);
 		this.setIntercellSpacing(new Dimension(3,3));
 		this.getTableHeader().setReorderingAllowed(false);
@@ -105,10 +120,35 @@ public class PreprocessingTable extends JTable
 		getColumn("Reorder").setPreferredWidth(25);
 		
 		//Action name
-		getColumn("Action").setPreferredWidth(125);
+		getColumn("Action").setPreferredWidth(150);
 		
 		//Options button
 		getColumn("Options").setPreferredWidth(25);
+	}
+	
+	public void setOptionsMenu(JPopupMenu menu, int row)
+	{
+		((OptionsButtonPanel)tableContents[row][OPTIONS_COLUMN]).setMenu(menu);
+	}
+	
+	public void setAction(Object action, int row)
+	{
+		tableContents[row][ACTION_COLUMN] = action;
+	}
+	
+	public void setHasOption(boolean hasOptions, int row)
+	{
+		((OptionsButtonPanel) tableContents[row][OPTIONS_COLUMN]).setButtonVisible(hasOptions);
+	}
+	
+	public Object getAction(int row)
+	{
+		return tableContents[row][ACTION_COLUMN];
+	}
+	
+	public boolean isEnabled(int row)
+	{
+		return (Boolean) tableContents[row][ENABLED_CHECKBOX_COLUMN];
 	}
 	
 	@Override
@@ -138,14 +178,13 @@ public class PreprocessingTable extends JTable
 	{
 		Object [] rowA =  this.tableContents[a];
 		Object [] rowB =  this.tableContents[b];
-		System.out.println("Row A : " + rowA[2]);
-		System.out.println("Row B : " + rowB[2]);
-		System.out.println("");
 		tableContents[a] = rowB;
 		tableContents[b] = rowA;
 		//table.setModel(new PreproListModel(tableContents));
 		this.repaint();
 	}
+	
+
 	
 	public static void main(String[] args)
 	{
@@ -162,13 +201,15 @@ public class PreprocessingTable extends JTable
 	
 }
 
-class OptionsColumnRenderer implements TableCellRenderer
+class PrepoCellRenderer implements TableCellRenderer
 {
 	private UpDownButtonPanel reorderPanel;
-	public OptionsColumnRenderer() 
+	private JLabel lab;
+	public PrepoCellRenderer() 
 	{
 		super();
 		reorderPanel = new UpDownButtonPanel();
+		lab = new JLabel();
 	}
 	
     public void setValue(Object value) 
@@ -180,21 +221,34 @@ class OptionsColumnRenderer implements TableCellRenderer
 			boolean isSelected, boolean hasFocus, int row, int column)
 	{
 		//return JRadioButtonTableExample.panels[row];
-		if (table.getColumnName(column).equalsIgnoreCase("Reorder"))
+		
+		
+		if (column == PreprocessingTable.REORDER_COLUMN)
 		{
 			return reorderPanel;
+		}
+		else if (column == PreprocessingTable.ACTION_COLUMN)
+		{
+			//JLabel lab = new JLabel(value.toString());
+			lab.setText(value.toString());
+			boolean enabled = (Boolean)table.getModel().getValueAt(row, PreprocessingTable.ENABLED_CHECKBOX_COLUMN);
+			
+			//Color foreground = (enabled) ? SystemColor.textText : SystemColor.textInactiveText;
+			//retComponent.setForeground(foreground);
+			lab.setEnabled(enabled);
+			return lab;
 		}
 		return (Component) table.getModel().getValueAt(row, column);
 	}
 }
 
-class OptionsColumnEditor extends AbstractCellEditor implements ItemListener, TableCellEditor
+class PrepoCellEditor extends AbstractCellEditor implements ItemListener, TableCellEditor
 {
 	// private JRadioButton button;
 	private OptionsButtonPanel panel;
 	private JButton button;
 	
-	public OptionsColumnEditor()
+	public PrepoCellEditor()
 	{
 		super();
 		 //panel = new OptionsButtonPanel2();
@@ -334,6 +388,16 @@ class OptionsButtonPanel extends JPanel
 		};
 		button.addActionListener(al);
 	}
+	
+	public void setButtonVisible(boolean visible)
+	{
+		this.button.setVisible(visible);
+	}
+	
+	public void setMenu(JPopupMenu menu)
+	{
+		this.men = menu;
+	}
 }
 
 class PreprocessingDialog extends JFrame
@@ -360,7 +424,7 @@ class PreprocessingDialog extends JFrame
 		
 		final PreprocessingDialog thisDialog = this;
 
-		table = new PreprocessingTable();
+		table = new PreprocessingTable(3);
 			/*new JTable(new PreproListModel(tableContents))
 		{
 			@Override

@@ -19,6 +19,8 @@ import java.util.Enumeration;
 public class ProcessDialog extends JDialog
 {
 
+	PreprocessingTable _table;
+	
 	private ObjectChooserWidget _source = new ObjectChooserWidget(
 			"Source Corpus:", new JFrame() //TODO replace with JGR.MAINRCONSOLE 
 			//JGR.MAINRCONSOLE
@@ -50,6 +52,11 @@ public class ProcessDialog extends JDialog
 			maybeShowPopup(e);
 		}
 
+		public String toString()
+		{
+			return _command.getLabel();
+		}
+		
 		@Override
 		public void mouseReleased(MouseEvent e)
 		{
@@ -271,15 +278,46 @@ public class ProcessDialog extends JDialog
 
 				add(_source, c);
 
-				c.gridy++;
-				add(_target, c);
+				//c.gridy++;
+				//add(_target, c);
 
 				c.gridy++;
 
-				add(_list, c);
-				PreprocessingTable table = new PreprocessingTable();
-				table.setBorder(BorderFactory.createTitledBorder("Actions:"));
-				//add(table, c); //this is the new prepocessing table
+				
+				///////////////////////////////////////////////////////
+				/////////// Build the table of actions ////////////////
+				///////////////////////////////////////////////////////
+				
+				int nActions = ProcessCmd.values().length;
+		
+				_table = new PreprocessingTable(nActions);
+				
+				for (int i = 0; i < nActions; i++)
+				{
+					//Set the action's name
+					new ProcessActionPanel(ProcessCmd.values()[i]);
+					//_table.setActionName(ProcessCmd.values()[i].getLabel(), i);
+					_table.setAction(new ProcessActionPanel(ProcessCmd.values()[i]), i);
+					
+					//Add any relevant options to the action
+					JPopupMenu ithMenu =  new JPopupMenu();
+					JMenuItem [] items = ProcessCmd.values()[i].getExtraOptions();
+					
+					for (JMenuItem item : items)
+					{
+						ithMenu.add(item);
+					}
+					_table.setHasOption(items.length > 0, i);
+					_table.setOptionsMenu(ithMenu, i);
+				}
+				
+				JPanel p = new JPanel();
+				p.setBackground(Color.WHITE);
+				p.setBorder(BorderFactory.createTitledBorder("Actions:"));
+				p.add(_table);
+				
+				add(p, c); //this is the new prepocessing table
+				//add(_list, c); // this is the old one
 
 				c.weighty = 1;
 				c.weightx = 1;
@@ -303,7 +341,9 @@ public class ProcessDialog extends JDialog
 
 	public static void main(String[] args)
 	{
-		new ProcessDialog().setVisible(true);
+		ProcessDialog d = new ProcessDialog();
+		d.debugForceShow = true;
+		d.setVisible(true);
 	}
 
 	public boolean doCancel()
@@ -312,27 +352,82 @@ public class ProcessDialog extends JDialog
 		return true;
 	}
 
+	private boolean debugForceShow = false;
+	
+	@Override
+	public void setVisible(boolean arg0)
+	{
+		if (_source.getModel() == null && !debugForceShow)
+		{
+		Toolkit.getDefaultToolkit().beep();
+		JOptionPane.showMessageDialog(getContentPane(),
+			    "You have not yet created any corpuses."
+				+
+				"\nCreate a corpus with \"Extract Corpus\" in the Text menu.",
+			    "Warning",
+			    JOptionPane.WARNING_MESSAGE);
+			dispose();
+		}
+		else
+		{
+			super.setVisible(arg0);
+		}
+	}
+	
 	public boolean doOK()
 	{
-
 		String s = _source.getModel().toString();
-		String t = _target.getText();
+		
+		//Just overwrite the unprocessed  corpus
+		String t = _source.getModel().toString();//_target.getText();
 
-		Enumeration<?> e = _model.elements();
-
-		while (e.hasMoreElements())
+		int nEnabled = 0;
+		
+		for (int i = 0; i < ProcessCmd.values().length ; i++)
 		{
-			ProcessActionPanel p = (ProcessActionPanel) e.nextElement();
-			if (p.isEnabled())
+			if (_table.isEnabled(i))
 			{
+				nEnabled ++;
+				ProcessActionPanel p = (ProcessActionPanel) _table.getAction(i);
 				Deducer.execute(t + "<- " + p._command.getRCmd(s) + ";\n");
+				//System.out.println(t + "<- " + p._command.getRCmd(s) + ";\n");
 				s = t;
 			}
+			
 		}
+		
 
-		dispose();
+		
+//		
+//		 Enumeration<?> e = _model.elements();
+//		
+//		while (e.hasMoreElements())
+//		{
+//			ProcessActionPanel p = (ProcessActionPanel) e.nextElement();
+//			if (p.isEnabled())
+//			{
+//				//Deducer.execute
+//				System.out.println(t + "<- " + p._command.getRCmd(s) + ";\n");
+//				s = t;
+//			}
+//		}
+		
 
-		return true;
+		if (nEnabled == 0)
+		{
+			Toolkit.getDefaultToolkit().beep();
+			JOptionPane.showMessageDialog(getContentPane(),
+				    "You must enable at least 1 prepocessing action." +
+				    "\nYou can enable an action by checking the box next to its name.",
+				    "Warning",
+				    JOptionPane.WARNING_MESSAGE);
+			return false;
+		}
+		else
+		{
+			dispose(); //TODO restore this line
+			return true;
+		}
 	}
 
 }
