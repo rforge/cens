@@ -15,6 +15,7 @@ import org.rosuda.JGR.layout.AnchorLayout;
 import org.rosuda.JGR.toolkit.FileSelector;
 import org.rosuda.deducer.Deducer;
 import org.rosuda.deducer.WindowTracker;
+import org.rosuda.deducer.plots.PlotBuilder;
 import org.rosuda.deducer.toolkit.HelpButton;
 import org.rosuda.deducer.toolkit.IconButton;
 import org.rosuda.deducer.toolkit.OkayCancelPanel;
@@ -85,8 +86,11 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
     	 lm.addElement(new PlottingElement(new PointsElementModel()));
     	 lm.addElement(new PlottingElement(new ColoredPointsElementModel()));
     	 lm.addElement(new PlottingElement(new BubbleElementModel()));
+    	 lm.addElement(new PlottingElement(new TextElementModel()));
     	 lm.addElement(new PlottingElement(new LinesElementModel()));
     	 lm.addElement(new PlottingElement(new PolyElementModel()));
+    	 lm.addElement(new PlottingElement(new PolygonLabelsElementModel()));
+    	 lm.addElement(new PlottingElement(new ChoroElementModel()));
     }
 
 
@@ -373,7 +377,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
 
     }
     
-    public String formatCall(){
+    public String formatCall(boolean run){
     	String modelCall = _model.getCall();
     	if(modelCall==null || "".equals(modelCall))
     		return "";
@@ -382,7 +386,14 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
         Vector<Double> ul = _vp.getUpperLeftCoordinate();
         Vector<Double> lr = _vp.getLowerRightCoordinate();
         String cmd = "plot.new()\npar(mar=c(0,0,0,0))\nplot.window(c(" +ul.get(0)+","+lr.get(0)+"),c("+lr.get(1)+","+ul.get(1) +"), xaxs = 'i', yaxs = 'i')";
-
+        
+        if(run){
+        	ul = _vp.getUpperLeftLatLong();
+        	lr = _vp.getLowerRightLatLong();
+        	int zoom = _vp.getZoom();
+        	cmd +="\nplot(openmap(c("+ul.get(0)+","+ul.get(1)+"),c("+lr.get(0)+","+lr.get(1)+"),"+zoom+",'"+_vp.getTileSourceType()+"'),add=TRUE)";
+        }
+        
     	cmd += modelCall;
     	return cmd;
     }
@@ -447,10 +458,11 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
            // Deducer.eval(call);
 
             String cmd = call; //call.replaceAll("[\\n\\t]", " ");
-            System.out.println(cmd);
+            //System.out.println(cmd);
             Deducer.eval(cmd);
             if(first){
-            	System.out.println("refreshing...");
+            	Thread.sleep(500);
+            	//System.out.println("refreshing...");
             	tmp.refreshPlot();
             }
             Deducer.eval("Sys.setenv(\"JAVAGD_CLASS_NAME\"=\"org/rosuda/JGR/toolkit/JavaGD\")");
@@ -461,7 +473,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
 
     public void updatePlot(){
         if(_fromMain) return; //eg not in R
-        String c = formatCall();
+        String c = formatCall(false);
         plot(c);
     }
 
@@ -472,7 +484,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
         d.setModal(true);
         d.setVisible(true);
         
-        System.out.println(pe.getModel().checkValid());
+        //System.out.println(pe.getModel().checkValid());
         if(pe.getModel().checkValid()==null){
             _model.add(pe);
             if(!_model.validate())
@@ -761,7 +773,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
         String cmd = arg0.getActionCommand();
 
         if("Run".equals(cmd)) {
-            String call = _model.getCall();
+            String call = formatCall(true);
             if(_model.getSize() == 0 || call==null) {
                 JOptionPane.showMessageDialog(this, "Plot contains no components.");
                 return;
@@ -824,6 +836,14 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
                 spb.setVisible(true);
                 WindowTracker.addWindow(spb);
             } else if("call".equals(cmd)) {
+				JFrame f = new JFrame("Call");
+				f.setSize(700, 200);
+				f.setLayout(new BorderLayout());
+				JTextArea t = new JTextArea();
+				f.add(t);
+				t.setText(formatCall(true)+"\n");
+				f.setLocationRelativeTo(SpatialPlotBuilder.this);
+				f.setVisible(true);
             } else if("bing".equals(cmd)){
             	_vp.setTileSource("bing");
             }else if("osm".equals(cmd)){

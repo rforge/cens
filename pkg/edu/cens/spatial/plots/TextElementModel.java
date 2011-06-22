@@ -14,49 +14,45 @@ import org.rosuda.deducer.widgets.param.RFunctionDialog;
 import edu.cens.spatial.plots.widgets.ParamSpatialVariable;
 import edu.cens.spatial.plots.widgets.RPointFunction;
 
-public class BubbleElementModel extends ElementModel{
+public class TextElementModel extends ElementModel{
 	RFunction rf;
 	
 	
 
-	public BubbleElementModel(){
+	public TextElementModel(){
 		init();
 	}
 	
 	public void init(){
-		rf = new RPointFunction("bubble_plot");
+		rf = new RPointFunction("text_plot");
 		rf.setViewType(null);
-		ParamSpatialVariable pv = new ParamSpatialVariable("z");
+		ParamSpatialVariable pv = new ParamSpatialVariable("text");
 		pv.setFormat(ParamSpatialVariable.FORMAT_WITH_DATA);
-		pv.setTitle("Point size");
+		pv.setTitle("Text");
 		rf.add(pv);
 		
-		
-		
-		ParamNumeric pn = new ParamNumeric("minRadius");
-		pn.setTitle("Minimum size");
-		pn.setDefaultValue(.01);
-		pn.setLowerBound(0.0);
-		pn.setValue(.01);
+		ParamNumeric pn = new ParamNumeric("cex");
+		pn.setTitle("Size");
+		pn.setDefaultValue(1);
+		pn.setLowerBound(0);
+		pn.setValue(1.0);
 		rf.add(pn);
 		
-		pn = new ParamNumeric("maxRadius");
-		pn.setTitle("Maximum size");
-		pn.setDefaultValue(.05);
-		pn.setLowerBound(0.0);
-		pn.setValue(.05);
+		pn = new ParamNumeric("adj");
+		pn.setTitle("Position");
+		pn.setDefaultValue(.5);
+		pn.setLowerBound(0);
+		pn.setUpperBound(1);
+		pn.setValue(.5);
 		rf.add(pn);
 		
-		ParamColor pc = new ParamColor("color");
+		ParamColor pc = new ParamColor("col");
 		pc.setTitle("Color");
-		pc.setDefaultValue(Color.decode("#F75252"));
-		pc.setValue(Color.decode("#F75252"));
 		pc.setRequired(false);
 		rf.add(pc);
 		
-		
-		iconLocation = "icons/geo_bubble.png";
-		name = "Bubble";
+		iconLocation = "icons/geo_text.png";
+		name = "Text";
 	}
 	
 	public JDialog getView() {
@@ -74,8 +70,8 @@ public class BubbleElementModel extends ElementModel{
 		return rf.checkValid();
 	}
 
-	public BubbleElementModel clone(){
-		BubbleElementModel newM = new BubbleElementModel();
+	public TextElementModel clone(){
+		TextElementModel newM = new TextElementModel();
 		newM.rf = (RFunction) rf.clone();
 		return newM;
 	}

@@ -1,62 +1,57 @@
 package edu.cens.spatial.plots;
 
-import java.awt.Color;
-
 import javax.swing.JDialog;
 
 import org.rosuda.deducer.widgets.param.Param;
 import org.rosuda.deducer.widgets.param.ParamCharacter;
-import org.rosuda.deducer.widgets.param.ParamColor;
 import org.rosuda.deducer.widgets.param.ParamNumeric;
 import org.rosuda.deducer.widgets.param.RFunction;
 import org.rosuda.deducer.widgets.param.RFunctionDialog;
 
 import edu.cens.spatial.plots.widgets.ParamSpatialVariable;
 import edu.cens.spatial.plots.widgets.RPointFunction;
+import edu.cens.spatial.plots.widgets.RPolyFunction;
 
-public class BubbleElementModel extends ElementModel{
+public class ChoroElementModel extends ElementModel{
 	RFunction rf;
 	
 	
 
-	public BubbleElementModel(){
+	public ChoroElementModel(){
 		init();
 	}
 	
 	public void init(){
-		rf = new RPointFunction("bubble_plot");
+		rf = new RPolyFunction("choro_plot");
 		rf.setViewType(null);
-		ParamSpatialVariable pv = new ParamSpatialVariable("z");
+		ParamSpatialVariable pv = new ParamSpatialVariable("dem");
 		pv.setFormat(ParamSpatialVariable.FORMAT_WITH_DATA);
-		pv.setTitle("Point size");
+		pv.setTitle("Color");
 		rf.add(pv);
 		
-		
-		
-		ParamNumeric pn = new ParamNumeric("minRadius");
-		pn.setTitle("Minimum size");
-		pn.setDefaultValue(.01);
-		pn.setLowerBound(0.0);
-		pn.setValue(.01);
+		ParamNumeric pn = new ParamNumeric("alpha");
+		pn.setTitle("Alpha");
+		pn.setDefaultValue(.5);
+		pn.setLowerBound(0);
+		pn.setUpperBound(1);
+		pn.setValue(.5);
 		rf.add(pn);
 		
-		pn = new ParamNumeric("maxRadius");
-		pn.setTitle("Maximum size");
-		pn.setDefaultValue(.05);
-		pn.setLowerBound(0.0);
-		pn.setValue(.05);
-		rf.add(pn);
-		
-		ParamColor pc = new ParamColor("color");
-		pc.setTitle("Color");
-		pc.setDefaultValue(Color.decode("#F75252"));
-		pc.setValue(Color.decode("#F75252"));
-		pc.setRequired(false);
+		ParamCharacter pc = new ParamCharacter("legend.loc");
+		pc.setTitle("Legend location");
+		pc.setOptions(new String[]{"bottomleft","bottomright","topleft","topright"
+			});
+		pc.setViewType(Param.VIEW_COMBO);
+		pc.setDefaultValue("bottomleft");
+		pc.setValue("bottomleft");
 		rf.add(pc);
 		
+		pc = new ParamCharacter("legend.title");
+		pc.setTitle("Legend title");
+		rf.add(pc);
 		
-		iconLocation = "icons/geo_bubble.png";
-		name = "Bubble";
+		iconLocation = "icons/geo_choropleth.png";
+		name = "Choropleth";
 	}
 	
 	public JDialog getView() {
@@ -74,8 +69,8 @@ public class BubbleElementModel extends ElementModel{
 		return rf.checkValid();
 	}
 
-	public BubbleElementModel clone(){
-		BubbleElementModel newM = new BubbleElementModel();
+	public ChoroElementModel clone(){
+		ChoroElementModel newM = new ChoroElementModel();
 		newM.rf = (RFunction) rf.clone();
 		return newM;
 	}

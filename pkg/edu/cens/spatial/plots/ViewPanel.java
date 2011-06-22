@@ -25,7 +25,7 @@ public class ViewPanel extends JPanel{
 	JLayeredPane pane = new JLayeredPane();
 	MapPanel map;
 	PlotPanel plotPanel;
-	
+	String tp = "osm";
 	SpatialPlotBuilder parent;
 	
 	public ViewPanel(int w,int h,SpatialPlotBuilder par){
@@ -109,7 +109,7 @@ public class ViewPanel extends JPanel{
     		return d;
     	}
     	String cmd = "project_mercator("+c.getLat()+","+c.getLon()+")";
-    	System.out.println(cmd);
+    	//System.out.println(cmd);
     	REXP ul = Deducer.eval(cmd);
     	try{
     		double[] vals = ul.asDoubles();
@@ -128,7 +128,7 @@ public class ViewPanel extends JPanel{
     		return d;
     	}
     	String cmd = "project_mercator("+c.getLat()+","+c.getLon()+")";
-    	System.out.println(cmd);
+    	//System.out.println(cmd);
     	REXP ul = Deducer.eval(cmd);
     	try{
     		double[] vals = ul.asDoubles();
@@ -138,12 +138,34 @@ public class ViewPanel extends JPanel{
     	return d;
     }
     
+    public Vector<Double> getLowerRightLatLong(){
+    	Coordinate c = map.getPosition(0+plotPanel.getWidth(),0+plotPanel.getHeight());
+    	Vector<Double> d = new Vector<Double>(2);
+    	d.add(c.getLat());
+    	d.add(c.getLon());
+    	return d;
+    }
+    public Vector<Double> getUpperLeftLatLong(){
+    	Coordinate c = map.getPosition(0,0);
+    	Vector<Double> d = new Vector<Double>(2);
+    	d.add(c.getLat());
+    	d.add(c.getLon());
+    	return d;
+    }    
+    public int getZoom(){
+    	return map.getZoom();
+    }
     public void setTileSource(String type){
     	if("bing".equals(type)){
+    		tp = "bing";
     		map.setTileSource(new BingAerialTileSource());
     	}else if("osm".equals(type)){
+    		tp="osm";
     		map.setTileSource(new OsmTileSource.Mapnik());
     	}
+    }
+    public String getTileSourceType(){
+    	return tp;
     }
     
 }

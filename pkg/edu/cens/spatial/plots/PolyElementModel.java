@@ -34,7 +34,7 @@ public class PolyElementModel extends ElementModel{
 		rf.add(pl);
 		
 		ParamNumeric pn = new ParamNumeric("lty");
-		pn.setTitle("Line type");
+		pn.setTitle("Type");
 		pn.setLowerBound(.5);
 		pn.setUpperBound(25.5);
 		pn.setOptions(new String[]{"0.0","1.0","2.0","3.0","4.0","5.0","6.0"
@@ -48,14 +48,14 @@ public class PolyElementModel extends ElementModel{
 		rf.add(pn);
 		
 		pn = new ParamNumeric("lwd");
-		pn.setTitle("Line width");
+		pn.setTitle("Width");
 		pn.setDefaultValue(1);
 		pn.setLowerBound(0);
 		pn.setValue(1.0);
 		rf.add(pn);
 		
 		ParamColor pc = new ParamColor("border");
-		pc.setTitle("Line color");
+		pc.setTitle("Color");
 		pc.setRequired(false);
 		rf.add(pc);
 

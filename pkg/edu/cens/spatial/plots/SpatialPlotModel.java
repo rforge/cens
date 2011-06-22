@@ -16,19 +16,15 @@ public class SpatialPlotModel extends AbstractListModel  {
 
 
     // Options
-    private String _title = null;
     private double[][] _boundingBox = {{Double.NaN, Double.NaN}, {Double.NaN, Double.NaN}};
-    private boolean _axes =false;
 
-    public enum MapType{None, Mobile, Satellite, Hybrid};
-    private MapType _maptype = MapType.None;
+    private String _maptype = "osm";
 
 
     public SpatialPlotModel() {}
 
-    private SpatialPlotModel(Collection<PlottingElement> spc, String title, double[][] boundingBox ) {
+    private SpatialPlotModel(Collection<PlottingElement> spc, double[][] boundingBox ) {
         _components.addAll(spc);
-        _title = title;
         _boundingBox = new double[][]{ boundingBox[0].clone(), boundingBox[1].clone()  }; //hacky deep copy
     }
 
@@ -41,7 +37,9 @@ public class SpatialPlotModel extends AbstractListModel  {
     }
 
     public SpatialPlotModel clone() {
-        return new SpatialPlotModel(_components, _title, _boundingBox);
+    	SpatialPlotModel spm = new SpatialPlotModel(_components,  _boundingBox);
+    	spm._maptype = _maptype;
+    	return spm;
     }
 
     //********************
