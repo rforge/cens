@@ -8,6 +8,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
 import org.rosuda.JGR.JGR;
+import org.rosuda.deducer.Deducer;
 import org.rosuda.deducer.data.DataViewerController;
 import org.rosuda.ibase.toolkit.EzMenuSwing;
 
@@ -20,27 +21,28 @@ public class DeducerSpatial {
 	
 	public static void init(){
 		try{
-		int menuIndex=6;
-		
-		insertMenu(JGR.MAINRCONSOLE,"Spatial",menuIndex);
-		EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial", "Load shape file", "shape", cListener);
-		EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial", "Convert data.frame", "conv_pnt", cListener);
-		EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial", "Spatial plot builder", "builder", cListener);
-		DataViewerController.init();
-		DataViewerController.addDataType("SpatialPointsDataFrame", "sp-p");
-		DataViewerController.addTabFactory("SpatialPointsDataFrame","Data View", new SpatialDataViewFactory());
-		DataViewerController.addTabFactory("SpatialPointsDataFrame","Variable View", new SpatialVariableViewFactory());
-		DataViewerController.addTabFactory("SpatialPointsDataFrame","Coordinates", new CoordViewFactory(false));
+			if(Deducer.isJGR()){
+				int menuIndex=6;
+				insertMenu(JGR.MAINRCONSOLE,"Spatial",menuIndex);
+				EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial", "Load shape file", "shape", cListener);
+				EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial", "Convert data.frame", "conv_pnt", cListener);
+				EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial", "Spatial plot builder", "builder", cListener);
+			}
+			DataViewerController.init();
+			DataViewerController.addDataType("SpatialPointsDataFrame", "sp-p");
+			DataViewerController.addTabFactory("SpatialPointsDataFrame","Data View", new SpatialDataViewFactory());
+			DataViewerController.addTabFactory("SpatialPointsDataFrame","Variable View", new SpatialVariableViewFactory());
+			DataViewerController.addTabFactory("SpatialPointsDataFrame","Coordinates", new CoordViewFactory(false));
 
-		DataViewerController.addDataType("SpatialPolygonsDataFrame", "sp-py");
-		DataViewerController.addTabFactory("SpatialPolygonsDataFrame","Data View", new SpatialDataViewFactory());
-		DataViewerController.addTabFactory("SpatialPolygonsDataFrame","Variable View", new SpatialVariableViewFactory());
-		DataViewerController.addTabFactory("SpatialPolygonsDataFrame","Centroids", new CoordViewFactory(false));
+			DataViewerController.addDataType("SpatialPolygonsDataFrame", "sp-py");
+			DataViewerController.addTabFactory("SpatialPolygonsDataFrame","Data View", new SpatialDataViewFactory());
+			DataViewerController.addTabFactory("SpatialPolygonsDataFrame","Variable View", new SpatialVariableViewFactory());
+			DataViewerController.addTabFactory("SpatialPolygonsDataFrame","Centroids", new CoordViewFactory(false));
 		
-		DataViewerController.addDataType("SpatialLinesDataFrame", "sp-l");
-		DataViewerController.addTabFactory("SpatialLinesDataFrame","Data View", new SpatialDataViewFactory());
-		DataViewerController.addTabFactory("SpatialLinesDataFrame","Variable View", new SpatialVariableViewFactory());
-		DataViewerController.addTabFactory("SpatialLinesDataFrame","Paths", new CoordViewFactory(true));
+			DataViewerController.addDataType("SpatialLinesDataFrame", "sp-l");
+			DataViewerController.addTabFactory("SpatialLinesDataFrame","Data View", new SpatialDataViewFactory());
+			DataViewerController.addTabFactory("SpatialLinesDataFrame","Variable View", new SpatialVariableViewFactory());
+			DataViewerController.addTabFactory("SpatialLinesDataFrame","Paths", new CoordViewFactory(true));
 		
 		
 		}catch(Exception e){

@@ -109,7 +109,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
                         AnchorConstraint.ANCHOR_REL, AnchorConstraint.ANCHOR_ABS,
                         AnchorConstraint.ANCHOR_NONE, AnchorConstraint.ANCHOR_REL));
                 _pane.setLayer(_topPanel, 10);
-                _topPanel.setPreferredSize(new java.awt.Dimension(683, 102));
+                _topPanel.setPreferredSize(new java.awt.Dimension(683, 122));
 
 
 
