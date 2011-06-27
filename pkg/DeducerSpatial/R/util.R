@@ -5,12 +5,14 @@
 
 
 #' open street map (and google) mercator projection
-#'
 osm <- function(){
 	CRS("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs")
 }
 
-#' maps long lat values to the open street map mercator projection
+#'maps long lat values to the open street map mercator projection
+#' @param lat a vector of latitudes
+#' @param long a vector of longitudes
+#' @param drop drop to lowest dimension
 project_mercator <- function(lat,long,drop=TRUE){
 	df <- data.frame(long=long,lat=lat)
 	coordinates(df) <- ~long+lat
@@ -25,6 +27,12 @@ project_mercator <- function(lat,long,drop=TRUE){
 
 
 #'plot spatial points with colors
+#' @param x a SpatialPointsDataFrame
+#' @param color_var a vector
+#' @param pch plotting symbol
+#' @param legend.loc the location of the legend
+#' @param legend.title title
+#' @param ... additional parameters for plot and legend
 colored_points<-function(x,color_var,pch=1,legend.loc="bottomleft",
 		legend.title=NULL,...){
 	if(is.character(color_var))
@@ -35,7 +43,7 @@ colored_points<-function(x,color_var,pch=1,legend.loc="bottomleft",
 		org <- levels(color_var) 
 		levels(color_var) <- clrs
 		color_var <- as.character(color_var)
-		plot(x,y,col=color_var,add=TRUE,...)
+		plot(x,col=color_var,add=TRUE,...)
 		legend(legend.loc,,org,col=clrs,pch=pch,title=legend.title,...)
 	}else{
 		color_var <- as.numeric(color_var)
@@ -53,9 +61,16 @@ colored_points<-function(x,color_var,pch=1,legend.loc="bottomleft",
 }
 
 
-#'bubbleplot
+
 #Plot Bubble
 
+#'bubble plot
+#' @param x a SpatialPointsDataFrame
+#' @param z a vector to be mapped to size
+#' @param minRadius smallest point size
+#' @param maxRadius largest point size
+#' @param color the color of the points
+#' @param ... additional parameters for symbol
 bubble_plot <- function(x,z,minRadius=.01,
 		maxRadius=.05,color="#F75252", ...){
 	mat <- coordinates(x)
@@ -69,6 +84,10 @@ bubble_plot <- function(x,z,minRadius=.01,
 			inches=maxRadius,add=TRUE, fg="white", bg=color, ...);
 }
 
+#'Plot text
+#' @param x a spatial data frame (points or polygon
+#' @param text the labels
+#' @param ... additional parameters for text
 text_plot <- function(x,text,...){
 	coord <- coordinates(x)
 	text(coord[,1],coord[,2],text,...)
@@ -76,6 +95,16 @@ text_plot <- function(x,text,...){
 
 
 #'lifted from choropleth in the USCensus2000 package
+#' @param sp a SpatialPolygonsDataFrame
+#' @param dem the variable to map to color
+#' @param cuts how to cut dem
+#' @param alpha transparency
+#' @param main title
+#' @param sub subtitle
+#' @param legend.loc legend location
+#' @param legend.title title
+#' @param add add to current plor
+#' @param ... additional parameters for plot
 choro_plot <- function (sp, dem , cuts = list("quantile", seq(0, 
 						1, 0.25)), alpha=.5,
 		main = NULL, sub = "", legend.loc = "bottomleft", 

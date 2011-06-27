@@ -1,11 +1,15 @@
 Package: DeducerSpatial
-Version: 0.1
-Date: 2011-06-21
-Title: Deducer for spatial data analysis
-Author: Ian Fellows and Neal Fultz
 Maintainer: Ian Fellows <thefell@gmail.com>
-Description: A Deducer plug-in for spatial data analysis
-Depends: Deducer, sp, rgdal
-SystemRequirements: Java (>= 1.5), JRI
 License: LGPL-2.1
-URL: http://www.deducer.org/manual.html 
+Title: Deducer for spatial data analysis
+Author: Ian Fellows with contributions from Neal Fultz using the
+    JMapViewer library by Jan Peter Stotz
+Description: A Deducer plug-in for spatial data analysis. Includes The
+    ability to plot and explore open street map and Bing satellite
+    images.
+SystemRequirements: Java (>= 1.5), JRI
+Version: 0.1
+URL: http://www.deducer.org/manual.html
+Date: 2011-06-21
+Depends: Deducer (>= 0.4-5), sp, rgdal
+Collate: 'DeducerSpatial-package.R' 'osm.R' 'util.R' 'zzz.R'

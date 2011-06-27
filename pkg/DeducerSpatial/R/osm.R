@@ -6,6 +6,11 @@
 
 
 #'get an open street map tile. tpe can be "osm" or "bing"
+#' @param x location in osm native coordinates
+#' @param y location in osm native coordinates
+#' @param zoom zoom level
+#' @param type osm for mapnik open street map, or 'bing' for bing aerial
+#' @return a tile
 osmtile <- function(x,y,zoom,type="osm"){
 	x <- as.double(x)
 	y <- as.double(y)
@@ -30,15 +35,23 @@ osmtile <- function(x,y,zoom,type="osm"){
 }
 
 #'add tile to plot
+#' @param x the tile
+#' @param y ignored
+#' @param add add to current plot
+#' @param ... additional parameters to image
 plot.osmtile <- function(x,y=NULL,add=TRUE,...){
 	image(x=seq(x$bbox$p1[1],x$bbox$p2[1],length=255),
 			y=seq(x$bbox$p2[2],x$bbox$p1[2],length=255),
 			z=matrix(1:(255*255),ncol=255)[,255:1],
-			col=x$colorData,add=add)
+			col=x$colorData,add=add,...)
 	
 }
 
 #' get a map based on lat long coordinates 
+#' @param upperLeft the upper left lat and long
+#' @param lowerRight the lower right lat and long
+#' @param zoom the zoom level
+#' @param type osm for mapnik open street map, or 'bing' for bing aerial
 openmap <- function(upperLeft,lowerRight,zoom,type="osm"){
 	zoom <- as.integer(zoom)
 	ts <- new(J("org.openstreetmap.gui.jmapviewer.tilesources.BingAerialTileSource"))
@@ -61,6 +74,10 @@ openmap <- function(upperLeft,lowerRight,zoom,type="osm"){
 }
 
 #'plot the map in mercator coordinates. see osm().
+#' @param x the OpenStreetMap
+#' @param y ignored
+#' @param add add to current plot
+#' @param ... additional parameters to be passed to plot
 plot.OpenStreetMap <- function(x,y=NULL,add=FALSE,...){
 	if(add==FALSE){
 		plot.new()
@@ -69,7 +86,7 @@ plot.OpenStreetMap <- function(x,y=NULL,add=FALSE,...){
 				xaxs = 'i', yaxs = 'i',asp=abs((x$bbox$p2[2]-x$bbox$p1[2])/(x$bbox$p1[1]-x$bbox$p2[1])))
 	}
 	for(tile in x$tiles)
-		plot(tile)
+		plot(tile,...)
 }
 
 #m <- c(25.7738889,-80.1938889)
