@@ -11,5 +11,5 @@ SystemRequirements: Java (>= 1.5), JRI
 Version: 0.1
 URL: http://www.deducer.org/manual.html
 Date: 2011-06-21
-Depends: Deducer (>= 0.4-5), sp, rgdal
+Depends: Deducer (>= 0.4-5), sp, rgdal, maptools
 Collate: 'DeducerSpatial-package.R' 'osm.R' 'util.R' 'zzz.R'
