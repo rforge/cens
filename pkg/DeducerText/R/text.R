@@ -1,7 +1,7 @@
 
 cens.term_freq <- function(d, percent=0, sorted=c("none", "alpha", "freq"),
                                                         decreasing=FALSE) {
-  x <- apply(DocumentTermMatrix(d),2,sum);
+  x <- apply(DocumentTermMatrix(d, control = list(tolower=FALSE)),2,sum);
 
   sorted <- match.arg(sorted);
 
@@ -11,10 +11,10 @@ cens.term_freq <- function(d, percent=0, sorted=c("none", "alpha", "freq"),
   }
 
   if(sorted == "alpha") {
-    x <- x[order(names(x), decreasing=decreasing)];
+    #x <- x[order(names(x), decreasing=decreasing)];
   }
   else if (sorted == "freq") {
-    x <- sort(x, decreasing=decreasing);
+    #x <- sort(x, decreasing=decreasing);
   }
 
   return(x);
