@@ -1,20 +1,35 @@
 
-cens.term_freq <- function(d, percent=0, sorted=c("none", "alpha", "freq"),
-                                                        decreasing=FALSE) {
-  x <- apply(DocumentTermMatrix(d, control = list(tolower=FALSE)),2,sum);
+cens.term_freq <- function(
+		d, 
+		percent=0,
+		topN=0, #only include the first 'topN' terms
+		sorted=c("none", "alpha", "freq"),
+		minFreq=1,
+        decreasing=FALSE) {
+	
+	dtm <- DocumentTermMatrix(d, control = list(tolower=FALSE, minWordLength=1));
+	
+	#remove terms whose total ocurrences < minFreq
+	dtm <- dtm[ ,findFreqTerms(dtm, minFreq)];
+	
+  #could clamp freqs of dtm between 0 and 1 for doc. frequency
+	x <- apply(dtm,2,sum);
 
   sorted <- match.arg(sorted);
 
-  if(percent > 0) {
+  if(percent > 0) { #use percentage of terms
     o <- order(x, decreasing=TRUE)[1:(length(x) * percent / 100)];
     x <- x[o];
+  } else if (topN > 0) { #use absolute number of terms
+	  o <- order(x, decreasing=TRUE)[1:topN];
+	  x <- x[o];
   }
 
   if(sorted == "alpha") {
-    #x <- x[order(names(x), decreasing=decreasing)];
+    x <- x[order(names(x), decreasing=decreasing)];
   }
   else if (sorted == "freq") {
-    #x <- sort(x, decreasing=decreasing);
+    x <- sort(x, decreasing=decreasing);
   }
 
   return(x);

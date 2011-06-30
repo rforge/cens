@@ -1,6 +1,7 @@
 package edu.cens.text;
 
 import org.rosuda.JGR.JGR;
+import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.deducer.Deducer;
 import org.rosuda.deducer.WindowTracker;
 import org.rosuda.ibase.toolkit.EzMenuSwing;
@@ -20,6 +21,8 @@ import java.awt.event.ActionListener;
 public class Text
 {
 
+	private static TermFrequencyDialog viewOptionsDialog = new TermFrequencyDialog(JGR.MAINRCONSOLE);
+	
 	private enum Menu implements ActionListener
 	{
 		transform("Preprocess corpus...")
@@ -45,7 +48,10 @@ public class Text
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				Deducer.eval("cens.choose_and_do(print);");
+				//Deducer.eval("cens.choose_and_do(print);");
+				viewOptionsDialog.setViewMethod(TermFrequencyDialog.TOTAL_FREQUENCIES);
+				viewOptionsDialog.setCopora(getCorpora());
+				viewOptionsDialog.setVisible(true);
 			}
 		},
 		wc("Word Cloud")
@@ -61,7 +67,13 @@ public class Text
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				Deducer.eval("cens.choose_and_do(cens.txt_barplot);");
+				//Deducer.eval("cens.choose_and_do(cens.txt_barplot);");
+				viewOptionsDialog.setViewMethod(TermFrequencyDialog.BAR_CHART);
+				viewOptionsDialog.setCopora(getCorpora());
+				viewOptionsDialog.setVisible(true);
+				
+				//String[]
+				//do as much in Java as possible.
 			}
 		},
 
@@ -73,6 +85,7 @@ public class Text
 		;
 
 		private final String _label;
+		
 
 		private Menu(String label)
 		{
@@ -80,7 +93,22 @@ public class Text
 		}
 
 	}
-
+public static String[] getCorpora()
+{
+	org.rosuda.REngine.REXP corpora = Deducer.eval("cens.getCorpusNames()");//.asList().keys();
+	
+	String[] v = {""};
+	try
+	{
+		v = corpora.asStrings();
+	}
+	catch (REXPMismatchException e1)
+	{
+		e1.printStackTrace();
+	}
+	return v;
+	
+}
 	public static class MenuTest extends JFrame
 	{
 		public MenuTest()
@@ -166,14 +194,14 @@ public class Text
 	{
 		JFrame frame = new MenuTest();
 		frame.setSize(300, 300);
-		frame.show();
+		frame.setVisible(true);
 	}
 
 	public void initJGR()
 	{
 
 		String text = "Text";
-
+		
 		// EzMenuSwing.addMenu(JGR.MAINRCONSOLE, text);
 		// EzMenuSwing.addMenuBefore(JGR.MAINRCONSOLE, text, "Help");
 
@@ -201,6 +229,9 @@ public class Text
 		JMenu main = EzMenuSwing.getMenu(JGR.MAINRCONSOLE, text);
 		// final JMenu im = new JMenu("Extract Corpus");
 
+		
+		final JMenuItem extractCorpusMenuItem = new JMenuItem("Extract Corpus");
+		
 		final ActionListener extractCorpusListener = new ActionListener()
 		{
 			@Override
@@ -214,11 +245,28 @@ public class Text
 				WindowTracker.addWindow(inst);
 			}
 		};
+		extractCorpusMenuItem.addActionListener(extractCorpusListener);
+		main.add(extractCorpusMenuItem);
+		
 
-		final JMenuItem im = new JMenuItem("Extract Corpus");
-		// final JMenu im = new JMenu("Extract Corpus");
-		im.addActionListener(extractCorpusListener);
-		main.add(im);
+		// final JMenuItem createDocTermMatrixMenuItem = new JMenuItem("Create Document-Term Matrix");
+//		final ActionListener createDocTermListener = new ActionListener()
+//		{
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent e)
+//			{
+//			
+//				TermFrequencyDialog createDocTermMatrixDialog = new TermFrequencyDialog(JGR.MAINRCONSOLE, 
+//						new String[]{"exquisite", "corpus"});
+//				createDocTermMatrixDialog.setLocationRelativeTo(null);
+//				createDocTermMatrixDialog.setVisible(true);
+//				WindowTracker.addWindow(createDocTermMatrixDialog);
+//			}
+//		};
+//		createDocTermMatrixMenuItem.addActionListener(createDocTermListener);
+		//main.add(createDocTermMatrixMenuItem);
+		
 
 		for (Menu m : Menu.values())
 		{
@@ -226,58 +274,6 @@ public class Text
 					m.name(), m);
 			// todo accelerator keys
 		}
-
-		final MenuListener extractListener = new MenuListener()
-		{
-			@Override
-			public void menuSelected(MenuEvent e)
-			{
-				final JMenu source = (JMenu) e.getSource();
-				source.removeAll();
-				try
-				{
-					for (final String s : Deducer.eval(
-							"names(" + source.getText() + ")").asStrings())
-					{
-						source.add(new JMenuItem(s)).addActionListener(
-								new ActionListener()
-								{
-									@Override
-									public void actionPerformed(ActionEvent e)
-									{
-										Deducer.execute(String
-												.format("%s.Corpus <- Corpus(VectorSource(%s$%s))",
-														s, source.getText(), s));
-									}
-								});
-					}
-				}
-				catch (Exception exception)
-				{
-				}
-			}
-
-			@Override
-			public void menuDeselected(MenuEvent e)
-			{
-			}
-
-			@Override
-			public void menuCanceled(MenuEvent e)
-			{
-			}
-		};
-
-		/*
-		 * * /im.addMenuListener(new MenuListener() { public void
-		 * menuSelected(MenuEvent e) { im.removeAll(); for(Object o :
-		 * Deducer.getData()) { RObject rObject = (RObject) o; final JMenu child
-		 * = new JMenu(rObject.getName());
-		 * child.addMenuListener(extractListener); im.add(child); } }
-		 * 
-		 * public void menuDeselected(MenuEvent e) {} public void
-		 * menuCanceled(MenuEvent e) {} }); /*
-		 */
 
 	}
 

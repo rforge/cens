@@ -47,6 +47,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.plaf.basic.BasicArrowButton;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -58,16 +59,16 @@ import edu.cens.text.OptionsButtonPanel;
 
 public class PreprocessingTable extends JTable
 {
-	protected static final int ENABLED_CHECKBOX_COLUMN = 1;
-	protected static final int ACTION_COLUMN = 2;
-	protected static final int OPTIONS_COLUMN = 3;
-	protected static final int REORDER_COLUMN = 0;
+	protected static final int ENABLED_CHECKBOX_COLUMN = 0;
+	protected static final int ACTION_COLUMN = 1;
+	protected static final int OPTIONS_COLUMN = 2;
+	protected static final int REORDER_COLUMN = 3;
 	
 	private Object [][] tableContents;
 	int nActions;
 	public PreprocessingTable(int nActions)
 	{	
-		super();
+		super(nActions,4);
 		
 		JPopupMenu menu1 = new JPopupMenu();
 		menu1.add(new JMenuItem("Stop!"));
@@ -84,21 +85,22 @@ public class PreprocessingTable extends JTable
 		
 		for (int i = 0; i < nActions; i++)
 		{
-			tableContents[i][0] = new UpDownButtonPanel();
-			tableContents[i][1] = new Boolean(true);
-			tableContents[i][2] = "Action " + i;
-			tableContents[i][3] = new OptionsButtonPanel(null);
+			tableContents[i][REORDER_COLUMN] = new UpDownButtonPanel();
+			tableContents[i][ENABLED_CHECKBOX_COLUMN] = new Boolean(true);
+			tableContents[i][ACTION_COLUMN] = "Action " + i;
+			tableContents[i][OPTIONS_COLUMN] = new OptionsButtonPanel(null);
 		}
 		
 		setModel(new PreproListModel(tableContents));
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		getColumn("Options").setCellRenderer(new PrepoCellRenderer());
-		getColumn("Options").setCellEditor(new PrepoCellEditor());
 		
-		getColumn("Reorder").setCellRenderer(new PrepoCellRenderer());
-		getColumn("Reorder").setCellEditor(new PrepoCellEditor());
+		this.getColumnModel().getColumn(PreprocessingTable.OPTIONS_COLUMN).setCellRenderer(new PrepoCellRenderer());
+		this.getColumnModel().getColumn(PreprocessingTable.OPTIONS_COLUMN).setCellEditor(new PrepoCellEditor());
 		
-		getColumn("Action").setCellRenderer(new PrepoCellRenderer());
+		this.getColumnModel().getColumn(PreprocessingTable.REORDER_COLUMN).setCellRenderer(new PrepoCellRenderer());
+		this.getColumnModel().getColumn(PreprocessingTable.REORDER_COLUMN).setCellEditor(new PrepoCellEditor());
+		
+		this.getColumnModel().getColumn(PreprocessingTable.ACTION_COLUMN).setCellRenderer(new PrepoCellRenderer());
 		
 		setRowHeight(30);
 		this.setCellSelectionEnabled(false);
@@ -114,16 +116,16 @@ public class PreprocessingTable extends JTable
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
 		//checkbox width
-		getColumn("Enable").setPreferredWidth(35);
+		this.getColumnModel().getColumn(ENABLED_CHECKBOX_COLUMN).setPreferredWidth(35);
 		
 		//Reorder arrow buttons
-		getColumn("Reorder").setPreferredWidth(25);
+		this.getColumnModel().getColumn(REORDER_COLUMN).setPreferredWidth(25);
 		
 		//Action name
-		getColumn("Action").setPreferredWidth(150);
+		this.getColumnModel().getColumn(ACTION_COLUMN).setPreferredWidth(150);
 		
 		//Options button
-		getColumn("Options").setPreferredWidth(25);
+		this.getColumnModel().getColumn(OPTIONS_COLUMN).setPreferredWidth(25);
 	}
 	
 	public void setOptionsMenu(JPopupMenu menu, int row)
@@ -230,11 +232,13 @@ class PrepoCellRenderer implements TableCellRenderer
 		else if (column == PreprocessingTable.ACTION_COLUMN)
 		{
 			//JLabel lab = new JLabel(value.toString());
-			lab.setText(value.toString());
+			lab.setText(value.toString() + "  "); // Remove {+ "  "} if other type of alignment.
 			boolean enabled = (Boolean)table.getModel().getValueAt(row, PreprocessingTable.ENABLED_CHECKBOX_COLUMN);
 			
 			//Color foreground = (enabled) ? SystemColor.textText : SystemColor.textInactiveText;
 			//retComponent.setForeground(foreground);
+			
+			lab.setHorizontalAlignment(SwingConstants.RIGHT);
 			lab.setEnabled(enabled);
 			return lab;
 		}
@@ -264,7 +268,8 @@ class PrepoCellEditor extends AbstractCellEditor implements ItemListener, TableC
 		//return panel;
 		
 		//return JRadioButtonTableExample.panels[row];
-		if (table.getColumnName(column).equalsIgnoreCase("Reorder"))
+		//if (table.getColumnName(column).equalsIgnoreCase("Reorder"))
+		if (column == PreprocessingTable.REORDER_COLUMN)
 		{
 			((UpDownButtonPanel) value).setRow(row);
 			((UpDownButtonPanel) value).setTable((PreprocessingTable) table);
@@ -288,7 +293,7 @@ class PrepoCellEditor extends AbstractCellEditor implements ItemListener, TableC
 
 class PreproListModel extends AbstractTableModel
 {
-	String[] columnNames = { "Reorder", "Enable", "Action", "Options" };
+	String[] columnNames;
 	
 	Object[][] tableContents;
 
@@ -296,6 +301,12 @@ class PreproListModel extends AbstractTableModel
 	public PreproListModel(Object [][] tableContents)
 	{
 		this.tableContents = tableContents;
+		
+		columnNames = new String[4];
+		columnNames[PreprocessingTable.REORDER_COLUMN] = "Reorder";
+		columnNames[PreprocessingTable.ACTION_COLUMN] = "Action";
+		columnNames[PreprocessingTable.OPTIONS_COLUMN] = "Options";
+		columnNames[PreprocessingTable.ENABLED_CHECKBOX_COLUMN] = "Enable";
 	}
 	
     public int getColumnCount() 
@@ -356,22 +367,29 @@ class OptionsButtonPanel extends JPanel
 	private JButton button;
 	JPopupMenu men;
 	OptionsButtonPanel thePanel;
+	private static final boolean FACE_RIGHT = false;// if false, face down
 
 	public OptionsButtonPanel(JPopupMenu menu)
 	{
 		super();
 		thePanel = this;
 		this.setBackground(Color.WHITE);
+		
+		//Add a label saying "options"
 		//this.add(new JLabel("options"), BorderLayout.CENTER);
 
-		men = menu;//new JPopupMenu(menu);
-		// men.setSelectionModel(new Sin)
+		men = menu;
 
-		//men.add(new JMenuItem("nothing"));
-		//men.add(new JMenuItem("to"));
-		//men.add(new JMenuItem("see"));
-
-		button = new BasicArrowButton(SwingConstants.EAST);
+		
+		if (FACE_RIGHT)
+		{
+			button = new BasicArrowButton(SwingConstants.EAST);
+		}
+		else
+		{
+			button = new BasicArrowButton(SwingConstants.SOUTH);
+		}
+		
 		this.add(button, BorderLayout.EAST);
 		ActionListener al = new ActionListener()
 		{
@@ -380,8 +398,16 @@ class OptionsButtonPanel extends JPanel
 			{
 
 				Point p = button.getLocationOnScreen();
-				men.setLocation((int) p.getX() + button.getWidth(),
-						(int) p.getY());
+				
+				if (FACE_RIGHT)
+				{
+					men.setLocation((int) p.getX() + button.getWidth(), (int) p.getY());
+				}
+				else
+				{
+					men.setLocation((int) p.getX(), (int) p.getY() + + button.getHeight());
+				}
+				
 				men.setInvoker(thePanel);
 				men.setVisible(true);
 			}
