@@ -51,6 +51,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.rosuda.JGR.layout.AnchorConstraint;
 import org.rosuda.JGR.layout.AnchorLayout;
@@ -69,8 +71,8 @@ import com.sun.xml.internal.ws.Closeable;
 public class ExtractCorpusDialog extends JDialog implements ActionListener
 {
 	private VariableSelector variableSelector;
-	private SingletonDJList factor;
-	private SingletonAddRemoveButton addTextButton;
+	//private SingletonDJList factor;
+	//private SingletonAddRemoveButton addTextButton;
 	private TextFieldWidget newCorpusNameField;
 	private OkayCancelPanel okayCancelPanel;
 
@@ -104,7 +106,7 @@ public class ExtractCorpusDialog extends JDialog implements ActionListener
 		c.gridy = 0;
 		c.weightx = 0.8;
 		c.weighty = 1;
-		c.gridheight = 2;
+		c.gridheight = 1;
 		c.anchor = GridBagConstraints.LINE_START;
 		//messagePane.add(new JButton("Button 1"), c);
 		variableSelector = new VariableSelector();
@@ -113,57 +115,18 @@ public class ExtractCorpusDialog extends JDialog implements ActionListener
 		c = new GridBagConstraints(); //reset;
 		c.insets = new Insets(insetVal, insetVal, insetVal, insetVal);
 
-		// ====== The selected variable text field =======
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.ipadx = 0;
-		c.ipady = 0;
-		c.gridx = 2;
-		c.gridy = 0;
-		c.weightx = .2;
-		c.weighty = 1;
-		c.anchor = GridBagConstraints.CENTER;
-
-		JPanel factorPanel = new JPanel(new BorderLayout());
-		factorPanel.setPreferredSize(new Dimension(100,50));
-		factorPanel.setBorder(BorderFactory.createTitledBorder("Text Variable"));
-		factor = new SingletonDJList();
-		//factor.setSize(new Dimension(100,25));
-		//factor.setPreferredSize(new Dimension(100,25));
-		factorPanel.add(factor, BorderLayout.CENTER);
-		messagePane.add(factorPanel, c);
-		c = new GridBagConstraints(); //reset;
-		c.insets = new Insets(insetVal, insetVal, insetVal, insetVal);
-
-		// ====== The arrow button =======================
-
-		c.fill = GridBagConstraints.NONE;
-		c.ipadx = 0;
-		c.ipady = 0;
-		c.gridx = 1;
-		c.gridy = 0;
-		c.weightx = 0;
-		c.weighty = 1;
-		c.anchor = GridBagConstraints.CENTER;
-		addTextButton = new SingletonAddRemoveButton(
-				new String[]{"Add Factor","Remove Factor"},
-				new String[]{"Add Factor","Remove Factor"}, factor,variableSelector);
-		addTextButton.setPreferredSize(new java.awt.Dimension(34, 34));
-		messagePane.add(addTextButton, c);
-
-		c = new GridBagConstraints(); //reset;
-		c.insets = new Insets(insetVal, insetVal, insetVal, insetVal);
 
 		// ====== The new corpus name text field =======================
 
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.ipadx = 0;
 		c.ipady = 2;
-		c.gridx = 2;
+		c.gridx = 0;
 		c.gridy = 1;
 		c.weightx = .2;
 		c.weighty = 0;
 		c.anchor = GridBagConstraints.CENTER;
-		newCorpusNameField = new TextFieldWidget("Corpus Name");
+		newCorpusNameField = new TextFieldWidget("Save Corpus As:");
 		//newCorpusNameField.setSize(new Dimension(100,25));
 		newCorpusNameField.setPreferredSize(new Dimension(100,50));
 		messagePane.add(newCorpusNameField, c);
@@ -177,6 +140,7 @@ public class ExtractCorpusDialog extends JDialog implements ActionListener
 		JPanel footerPanel = new JPanel(new GridBagLayout());
 		okayCancelPanel = new OkayCancelPanel(false,true,this);
 		okayCancelPanel.setPreferredSize(new Dimension(250,25));
+		okayCancelPanel.getApproveButton().setText("Save");
 		c.fill = GridBagConstraints.NONE;
 		c.anchor = GridBagConstraints.FIRST_LINE_START;
 		//messagePane.add(okayCancelPanel, c);
@@ -187,7 +151,7 @@ public class ExtractCorpusDialog extends JDialog implements ActionListener
 		c.gridx = 0;
 		c.gridy = 0;
 		c.weightx = 0.8;
-		c.weighty = 1;
+		c.weighty = 0;
 		c.anchor = GridBagConstraints.LINE_END;
 
 		footerPanel.add(okayCancelPanel, c);
@@ -205,14 +169,27 @@ public class ExtractCorpusDialog extends JDialog implements ActionListener
 		////////////////////////////////////////
 		///// Register action listeners ////////
 		////////////////////////////////////////
-		addTextButton.addActionListener(new ActionListener() 
-		{	
-			public void actionPerformed(ActionEvent e) 
+//		addTextButton.addActionListener(new ActionListener() 
+//		{	
+//			public void actionPerformed(ActionEvent e) 
+//			{
+//				if (variableSelector.getJList().getSelectedValue() != null && factor.getModel().getSize() == 0)
+//				//(factor.getModel().getSize() > 0)
+//				{
+//					//newCorpusNameField.getTextField().setText("something there: " + factor.getModel().getElementAt(0));
+//					newCorpusNameField.getTextField().setText(variableSelector.getJList().getSelectedValue()+".corpus");
+//				}
+//			}
+//		});
+		
+		variableSelector.getJList().addListSelectionListener(new ListSelectionListener()
+		{
+			
+			@Override
+			public void valueChanged(ListSelectionEvent arg0)
 			{
-				if (variableSelector.getJList().getSelectedValue() != null && factor.getModel().getSize() == 0)
-				//(factor.getModel().getSize() > 0)
+				if (variableSelector.getJList().getSelectedValue() != null)
 				{
-					//newCorpusNameField.getTextField().setText("something there: " + factor.getModel().getElementAt(0));
 					newCorpusNameField.getTextField().setText(variableSelector.getJList().getSelectedValue()+".corpus");
 				}
 			}
@@ -310,14 +287,15 @@ public class ExtractCorpusDialog extends JDialog implements ActionListener
 	
 	public String getSelectedVariable()
 	{
-		if (factor.getModel().getSize() > 0)
-		{
-			return factor.getModel().getElementAt(0).toString();
-		}
-		else
-		{
-			return null;
-		}
+		return (String) variableSelector.getJList().getSelectedValue();//this.variableSelector.getSelectedData();
+//		if (factor.getModel().getSize() > 0)
+//		{
+//			return factor.getModel().getElementAt(0).toString();
+//		}
+//		else
+//		{
+//			return null;
+//		}
 		//variableSelector.getJList().getSelectedValue().toString();
 	}
 	

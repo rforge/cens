@@ -54,14 +54,14 @@ public class Text
 				viewOptionsDialog.setVisible(true);
 			}
 		},
-		wc("Word Cloud")
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				Deducer.eval("cens.choose_and_do(cens.word_cloud);");
-			}
-		},
+//		wc("Word Cloud")
+//		{
+//			@Override
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				Deducer.eval("cens.choose_and_do(cens.word_cloud);");
+//			}
+//		},
 		barplot("Bar Chart")
 		{
 			@Override
