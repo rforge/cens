@@ -3,6 +3,10 @@ package edu.cens.spatial.plots;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -21,7 +25,7 @@ import org.rosuda.REngine.REXP;
 import org.rosuda.deducer.Deducer;
 import org.rosuda.javaGD.PlotPanel;
 
-public class ViewPanel extends JPanel{
+public class ViewPanel extends JPanel implements ComponentListener{
 	JLayeredPane pane = new JLayeredPane();
 	MapPanel map;
 	PlotPanel plotPanel;
@@ -31,6 +35,7 @@ public class ViewPanel extends JPanel{
 	public ViewPanel(int w,int h,SpatialPlotBuilder par){
 		super();
 		parent = par;
+		parent.addComponentListener(this);
 		this.setLayout(new BorderLayout());
 		this.add(pane);
 		initMap();
@@ -46,6 +51,7 @@ public class ViewPanel extends JPanel{
 	public ViewPanel(PlotPanel p, SpatialPlotBuilder par){
 		super();
 		parent=par;
+		parent.addComponentListener(this);
 		this.setLayout(new BorderLayout());
 		pane.setLayout(new AnchorLayout());		
 		plotPanel = p;
@@ -167,5 +173,17 @@ public class ViewPanel extends JPanel{
     public String getTileSourceType(){
     	return tp;
     }
+
+	public void componentHidden(ComponentEvent arg0) {}
+
+	public void componentMoved(ComponentEvent arg0) {}
+
+	public void componentResized(ComponentEvent arg0) {
+		parent.updatePlot();
+	}
+
+	public void componentShown(ComponentEvent arg0) {}
+
+
     
 }
