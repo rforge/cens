@@ -11,90 +11,138 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Neal
- * Date: 5/23/11
- * Time: 7:59 AM
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: Neal Date: 5/23/11 Time: 7:59 AM To change
+ * this template use File | Settings | File Templates.
  */
-public class CorpusViewer extends JDialog 
+public class CorpusViewer extends JDialog
 {
 
-    String _corpus;
+	String _corpus;
 
-    int _maxLength;
+	int _maxLength;
 
-    final JTextArea _text = new JTextArea(10,60)
-    {{
-        setEnabled(true);
-        setEditable(false);
-        setBorder(BorderFactory.createRaisedBevelBorder());
-    }};
+	final JTextArea _text = new JTextArea(10, 35)
+	{
+		{
+			setEnabled(true);
+			setEditable(false);
+			setBorder(BorderFactory.createRaisedBevelBorder());
+		}
+	};
 
-    final JComboBox _corpuses = new JComboBox();
+	final JComboBox _corpuses = new JComboBox();
 
-    final JSpinner _indexSpinner = new JSpinner();
+	final JSpinner _indexSpinner = new JSpinner();
 
+	public CorpusViewer(String[] corpuses) throws REXPMismatchException
+	{
+		super((Frame) null, "Viewing ", true);
 
-    public CorpusViewer(String[] corpuses) throws REXPMismatchException {
-        super((Frame)null, "Viewing ", true);
+		for (String co : corpuses)
+		{
+			_corpuses.addItem(co);
+		}
 
-        for(String co : corpuses)
-            _corpuses.addItem(co);
+		_corpuses.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				setCorpus();
+			}
+		});
 
-        _corpuses.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setCorpus();
-            }
-        });
+		_indexSpinner.addChangeListener(new ChangeListener()
+		{
+			@Override
+			public void stateChanged(ChangeEvent e)
+			{
+				viewDocument(_indexSpinner.getValue().hashCode());
+			}
+		});
 
-        _indexSpinner.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e){
-                viewDocument(_indexSpinner.getValue().hashCode());
-            }
-        });
+		setPreferredSize(new Dimension(560, 350));
 
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-        setPreferredSize(new Dimension(560,350));
+		JPanel jPanel = new JPanel();
+		GridBagLayout layout = new GridBagLayout();
+		jPanel.setLayout(layout);
+		GridBagConstraints cc = new GridBagConstraints();
+		cc.gridx = cc.gridy = 1;
 
-        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		jPanel.add(_corpuses, cc);
+		cc.gridx++;
+		jPanel.add(_indexSpinner, cc);
+		cc.gridy++;
+		cc.gridx = 1;
+		cc.gridwidth = 2;
+		cc.weightx = 1;
+		cc.weighty = 1;
+		cc.fill = cc.BOTH;
+		cc.insets = new Insets(10, 25, 25, 25);
+		jPanel.add(new JScrollPane(_text), cc);
+		cc.gridy++;
 
+		setContentPane(jPanel);
 
-        JPanel jPanel = new JPanel();
-        GridBagLayout layout = new GridBagLayout();
-        jPanel.setLayout(layout);
-        GridBagConstraints cc = new GridBagConstraints();
-        cc.gridx = cc.gridy = 1;
+		setCorpus();
 
-        jPanel.add(_corpuses,cc); cc.gridx++;
-        jPanel.add(_indexSpinner,cc); cc.gridy++;
-        cc.gridx = 1; cc.gridwidth = 2; cc.weightx=1; cc.weighty=1;
-        jPanel.add(new JScrollPane(_text),cc); cc.gridy++;
+		pack();
+		this.setMinimumSize(this.getSize());
 
-        setContentPane(jPanel);
+	}
 
-        setCorpus();
+	private void setCorpus()
+	{
+		try
+		{
+			_corpus = _corpuses.getSelectedItem().toString();
+			if (_corpus != null && !_corpus.equals(""))
+			{
+			setTitle("Viewing " + _corpus);
+			_maxLength = Deducer.eval(String.format("length(%s)", _corpus)).asInteger();
+			_indexSpinner.setModel(new SpinnerNumberModel(1, 1, _maxLength, 1));
+			viewDocument(1);
+			}
+			else
+			{
+				setTitle("No Corpus to View");
+			}
+		}
+		catch (REXPMismatchException rexpm)
+		{
+		}
+	}
 
-        pack();
+	private void viewDocument(int idx)
+	{
+		try
+		{
+			_text.setText(Deducer.eval(
+					String.format("%s[%s][[1]]", _corpus, idx)).asString());
+		}
+		catch (REXPMismatchException rexpm)
+		{
+		}
 
-    }
+	}
 
-    private void setCorpus() {
-        try {
-            _corpus = _corpuses.getSelectedItem().toString();
-            setTitle("Viewing " + _corpus);
-            _maxLength = Deducer.eval(String.format("length(%s)", _corpus)).asInteger();
-            _indexSpinner.setModel(new SpinnerNumberModel(1,1,_maxLength,1));
-            viewDocument(1);
-        }
-        catch (REXPMismatchException rexpm) {}
-    }
+	public static void main(String[] args)
+	{
+		CorpusViewer cv;
+		try
+		{
+			cv = new CorpusViewer(new String[]{""});
+			cv.setVisible(true);
+			cv.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		}
+		catch (REXPMismatchException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-    private void viewDocument(int idx) {
-        try {
-            _text.setText(Deducer.eval(String.format("%s[%s][[1]]", _corpus, idx)).asString());
-        } catch(REXPMismatchException rexpm) {}
-
-    }
-
+	}
+	
 }

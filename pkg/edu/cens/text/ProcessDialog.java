@@ -41,7 +41,7 @@ public class ProcessDialog extends JDialog
 		}
 	};
 
-	private class ProcessActionPanel extends JTextField implements
+	public class ProcessActionPanel extends JTextField implements
 			MouseListener
 	{
 		ProcessCmd _command;
@@ -144,7 +144,7 @@ public class ProcessDialog extends JDialog
 			}
 		}
 
-		private ProcessActionPanel(ProcessCmd command)
+		ProcessActionPanel(ProcessCmd command)
 		{
 			super(20);
 			_command = command;

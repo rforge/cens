@@ -71,6 +71,8 @@ public class Text
 				viewOptionsDialog.setViewMethod(TermFrequencyDialog.BAR_CHART);
 				viewOptionsDialog.setCopora(getCorpora());
 				viewOptionsDialog.setVisible(true);
+				viewOptionsDialog.requestFocus();
+				
 				
 				//String[]
 				//do as much in Java as possible.
