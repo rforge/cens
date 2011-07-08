@@ -108,7 +108,8 @@ public class PreprocessingTable extends JTable
 		this.setRowSelectionAllowed(false);
 		this.setFocusable(false);
 	
-		this.setBorder(new LineBorder(Color.BLACK));
+		this.setBorder(new LineBorder(Color.BLACK, 3));
+		//(new LineBorder(Color.BLACK));
 		this.setGridColor(Color.BLACK);
 		this.setIntercellSpacing(new Dimension(3,3));
 		this.getTableHeader().setReorderingAllowed(false);
@@ -153,7 +154,7 @@ public class PreprocessingTable extends JTable
 		return (Boolean) tableContents[row][ENABLED_CHECKBOX_COLUMN];
 	}
 	
-	@Override
+	
 	public void tableChanged(TableModelEvent e)
 	{
 		super.tableChanged(e);
@@ -193,7 +194,7 @@ public class PreprocessingTable extends JTable
 		PreprocessingDialog frame = new PreprocessingDialog();
 		frame.addWindowListener(new WindowAdapter()
 		{
-			@Override
+			
 			public void windowClosing(WindowEvent e)
 			{
 				System.exit(0);
@@ -218,7 +219,7 @@ class PrepoCellRenderer implements TableCellRenderer
     {
     }
 	
-	@Override
+	
 	public Component getTableCellRendererComponent(JTable table, Object value,
 			boolean isSelected, boolean hasFocus, int row, int column)
 	{
@@ -260,7 +261,7 @@ class PrepoCellEditor extends AbstractCellEditor implements ItemListener, TableC
 
 	//public RadioButtonEditor(JCheckBox checkBox){super(checkBox);}
 
-	@Override
+	
 	public Component getTableCellEditorComponent(JTable table, Object value,
 			boolean isSelected, int row, int column)
 	{
@@ -278,13 +279,13 @@ class PrepoCellEditor extends AbstractCellEditor implements ItemListener, TableC
 		return (Component) table.getModel().getValueAt(row, column);
 	}
 
-	@Override
+	
 	public Object getCellEditorValue()
 	{
 		return null;
 	}
 
-	@Override
+	
 	public void itemStateChanged(ItemEvent e)
 	{
 		super.fireEditingStopped();
@@ -373,7 +374,7 @@ class OptionsButtonPanel extends JPanel
 	{
 		super();
 		thePanel = this;
-		this.setBackground(Color.WHITE);
+		//this.setBackground(Color.WHITE);
 		
 		//Add a label saying "options"
 		//this.add(new JLabel("options"), BorderLayout.CENTER);
@@ -393,7 +394,7 @@ class OptionsButtonPanel extends JPanel
 		this.add(button, BorderLayout.EAST);
 		ActionListener al = new ActionListener()
 		{
-			@Override
+			
 			public void actionPerformed(ActionEvent e)
 			{
 
@@ -453,7 +454,7 @@ class PreprocessingDialog extends JFrame
 		table = new PreprocessingTable(3);
 			/*new JTable(new PreproListModel(tableContents))
 		{
-			@Override
+			
 			public void tableChanged(TableModelEvent e)
 			{
 				super.tableChanged(e);

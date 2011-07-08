@@ -23,90 +23,20 @@ public class Text
 
 	private static TermFrequencyDialog viewOptionsDialog = new TermFrequencyDialog(JGR.MAINRCONSOLE);
 	
-	private enum Menu implements ActionListener
-	{
-		transform("Preprocess corpus...")
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				new ProcessDialog().setVisible(true);
-			}
-		},
-
-		view("View Corpus")
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				Deducer.eval("cens.viewer();");
-			}
-		},
-
-		tf("Term Frequency")
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				//Deducer.eval("cens.choose_and_do(print);");
-				viewOptionsDialog.setViewMethod(TermFrequencyDialog.TOTAL_FREQUENCIES);
-				viewOptionsDialog.setCopora(getCorpora());
-				viewOptionsDialog.setVisible(true);
-			}
-		},
-//		wc("Word Cloud")
-//		{
-//			@Override
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				Deducer.eval("cens.choose_and_do(cens.word_cloud);");
-//			}
-//		},
-		barplot("Bar Chart")
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				//Deducer.eval("cens.choose_and_do(cens.txt_barplot);");
-				viewOptionsDialog.setViewMethod(TermFrequencyDialog.BAR_CHART);
-				viewOptionsDialog.setCopora(getCorpora());
-				viewOptionsDialog.setVisible(true);
-				viewOptionsDialog.requestFocus();
-				
-				
-				//String[]
-				//do as much in Java as possible.
-			}
-		},
-
-		// MDS("MDS"){ //todo
-		// public void actionPerformed(ActionEvent e) {
-		// Deducer.eval("cens.choose_and_do(cens.mds);");
-		// }
-		// },
-		;
-
-		private final String _label;
-		
-
-		private Menu(String label)
-		{
-			_label = label;
-		}
-
-	}
+	
 public static String[] getCorpora()
 {
 	org.rosuda.REngine.REXP corpora = Deducer.eval("cens.getCorpusNames()");//.asList().keys();
 	
-	String[] v = {""};
+	String[] v = {};
 	try
 	{
 		v = corpora.asStrings();
 	}
 	catch (REXPMismatchException e1)
 	{
-		e1.printStackTrace();
+		//e1.printStackTrace();
+		v = new String[]{};
 	}
 	return v;
 	
@@ -119,19 +49,16 @@ public static String[] getCorpora()
 
 			MenuListener listener = new MenuListener()
 			{
-				@Override
 				public void menuCanceled(MenuEvent e)
 				{
 					dumpInfo("Canceled", e);
 				}
 
-				@Override
 				public void menuDeselected(MenuEvent e)
 				{
 					dumpInfo("Deselected", e);
 				}
 
-				@Override
 				public void menuSelected(MenuEvent e)
 				{
 					dumpInfo("Selected", e);
@@ -159,19 +86,16 @@ public static String[] getCorpora()
 			final JMenuItem dynm = new JMenuItem("test");
 			subMenu.addMenuListener(new MenuListener()
 			{
-				@Override
 				public void menuSelected(MenuEvent e)
 				{
 					subMenu.add(dynm);
 				}
 
-				@Override
 				public void menuDeselected(MenuEvent e)
 				{
 					subMenu.removeAll();
 				}
 
-				@Override
 				public void menuCanceled(MenuEvent e)
 				{
 					subMenu.removeAll();
@@ -209,13 +133,13 @@ public static String[] getCorpora()
 
 		// Add the menu item to left of "Help" menu
 		// TODO : this should probably be folded into EzMenuSwing
-		String toRightOfItem = "Help";
+		String toRightOfItem = "Packages & Data";
 		JMenuBar mb = JGR.MAINRCONSOLE.getJMenuBar();
 		int insertPos = 0;
 		boolean found = false;
 		for (; insertPos < mb.getMenuCount(); insertPos++)
 		{
-			if (mb.getMenu(insertPos).getLabel().equals(toRightOfItem))
+			if (mb.getMenu(insertPos).getText().equals(toRightOfItem))
 			{
 				found = true;
 				break;
@@ -228,15 +152,12 @@ public static String[] getCorpora()
 		}
 		mb.add(new JMenu(text), insertPos);
 
-		JMenu main = EzMenuSwing.getMenu(JGR.MAINRCONSOLE, text);
-		// final JMenu im = new JMenu("Extract Corpus");
+		JMenu textMenu = EzMenuSwing.getMenu(JGR.MAINRCONSOLE, text);
 
-		
 		final JMenuItem extractCorpusMenuItem = new JMenuItem("Extract Corpus");
 		
-		final ActionListener extractCorpusListener = new ActionListener()
+		extractCorpusMenuItem.addActionListener(new ActionListener()
 		{
-			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
 				//JFrame f = new JFrame();
@@ -246,37 +167,78 @@ public static String[] getCorpora()
 				inst.setVisible(true);
 				WindowTracker.addWindow(inst);
 			}
-		};
-		extractCorpusMenuItem.addActionListener(extractCorpusListener);
-		main.add(extractCorpusMenuItem);
+		});
+		textMenu.add(extractCorpusMenuItem);
 		
-
-		// final JMenuItem createDocTermMatrixMenuItem = new JMenuItem("Create Document-Term Matrix");
-//		final ActionListener createDocTermListener = new ActionListener()
-//		{
-//			
-//			@Override
-//			public void actionPerformed(ActionEvent e)
-//			{
-//			
-//				TermFrequencyDialog createDocTermMatrixDialog = new TermFrequencyDialog(JGR.MAINRCONSOLE, 
-//						new String[]{"exquisite", "corpus"});
-//				createDocTermMatrixDialog.setLocationRelativeTo(null);
-//				createDocTermMatrixDialog.setVisible(true);
-//				WindowTracker.addWindow(createDocTermMatrixDialog);
-//			}
-//		};
-//		createDocTermMatrixMenuItem.addActionListener(createDocTermListener);
-		//main.add(createDocTermMatrixMenuItem);
+		// TODO accelerator keys
 		
-
-		for (Menu m : Menu.values())
+		JMenuItem preprocCorpMenuItem = new JMenuItem("Preprocess Corpus");
+		
+		preprocCorpMenuItem.addActionListener(new ActionListener()
 		{
-			EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, text, m._label,
-					m.name(), m);
-			// todo accelerator keys
-		}
-
+			public void actionPerformed(ActionEvent e)
+			{
+				new ProcessDialog().setVisible(true);
+			}
+		});
+		textMenu.add(preprocCorpMenuItem);
+		
+		JMenuItem viewCorpMenuItem = new JMenuItem("View Corpus");
+		
+		viewCorpMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				Deducer.eval("cens.viewer();");
+			}
+		});
+		textMenu.add(viewCorpMenuItem);
+		
+		JMenu viewFreqDataMenu = new JMenu("View Frequency Data");
+		textMenu.add(viewFreqDataMenu);
+		
+		JMenuItem termFreqMenuItem = new JMenuItem("Term Frequencies");
+		
+		termFreqMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				viewOptionsDialog.setViewMethod(TermFrequencyDialog.TOTAL_FREQUENCIES);
+				viewOptionsDialog.setCorpora(getCorpora());
+				viewOptionsDialog.setVisible(true);
+				viewOptionsDialog.requestFocus();
+			}
+		});
+		viewFreqDataMenu.add(termFreqMenuItem);
+		
+		JMenuItem barChartMenuItem = new JMenuItem("Bar Chart");
+		
+		barChartMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				viewOptionsDialog.setViewMethod(TermFrequencyDialog.BAR_CHART);
+				viewOptionsDialog.setCorpora(getCorpora());
+				viewOptionsDialog.setVisible(true);
+				viewOptionsDialog.requestFocus();
+			}
+		});
+		viewFreqDataMenu.add(barChartMenuItem);
+		
+		JMenuItem wordCloudMenuItem = new JMenuItem("Word Cloud");
+		
+		wordCloudMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				viewOptionsDialog.setViewMethod(TermFrequencyDialog.WORD_CLOUD);
+				viewOptionsDialog.setCorpora(getCorpora());
+				viewOptionsDialog.setVisible(true);
+				viewOptionsDialog.requestFocus();
+			}
+		});
+		viewFreqDataMenu.add(wordCloudMenuItem);
+		
 	}
 
 }

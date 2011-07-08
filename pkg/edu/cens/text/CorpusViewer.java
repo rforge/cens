@@ -45,7 +45,7 @@ public class CorpusViewer extends JDialog
 
 		_corpuses.addActionListener(new ActionListener()
 		{
-			@Override
+			
 			public void actionPerformed(ActionEvent e)
 			{
 				setCorpus();
@@ -54,7 +54,7 @@ public class CorpusViewer extends JDialog
 
 		_indexSpinner.addChangeListener(new ChangeListener()
 		{
-			@Override
+			
 			public void stateChanged(ChangeEvent e)
 			{
 				viewDocument(_indexSpinner.getValue().hashCode());

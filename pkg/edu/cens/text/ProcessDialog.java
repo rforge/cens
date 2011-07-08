@@ -21,10 +21,9 @@ public class ProcessDialog extends JDialog
 
 	PreprocessingTable _table;
 	
-	private ObjectChooserWidget _source = new ObjectChooserWidget(
-			"Source Corpus:", new JFrame() //TODO replace with JGR.MAINRCONSOLE 
-			//JGR.MAINRCONSOLE
-			)
+	 JFrame parent = JGR.MAINRCONSOLE == null ? new JFrame() : JGR.MAINRCONSOLE;
+	
+	protected ObjectChooserWidget _source = new ObjectChooserWidget("Source Corpus:", this)
 	{
 		{
 			setClassFilter("Corpus");
@@ -34,252 +33,49 @@ public class ProcessDialog extends JDialog
 
 	// private JLabel _source = new JLabel("Source");
 
-	private JTextField _target = new JTextField(20)
-	{
-		{
-			setBorder(BorderFactory.createTitledBorder("New Corpus Name:"));
-		}
-	};
-
-	public class ProcessActionPanel extends JTextField implements
-			MouseListener
-	{
-		ProcessCmd _command;
-
-		@Override
-		public void mousePressed(MouseEvent e)
-		{
-			maybeShowPopup(e);
-		}
-
-		public String toString()
-		{
-			return _command.getLabel();
-		}
-		
-		@Override
-		public void mouseReleased(MouseEvent e)
-		{
-			maybeShowPopup(e);
-		}
-
-		@Override
-		public void mouseClicked(MouseEvent e)
-		{
-			maybeShowPopup(e);
-		}
-
-		@Override
-		public void mouseEntered(MouseEvent e)
-		{
-			maybeShowPopup(e);
-		}
-
-		@Override
-		public void mouseExited(MouseEvent e)
-		{
-			maybeShowPopup(e);
-		}
-
-		private void maybeShowPopup(MouseEvent e)
-		{
-			if (e.getButton() == MouseEvent.BUTTON3
-					|| e.getClickCount() == 2
-					|| ((e.getModifiersEx() & InputEvent.CTRL_MASK) == InputEvent.CTRL_MASK))
-			{
-
-				_list.setSelectedValue(this, false);
-
-				final JPopupMenu jpm = new JPopupMenu();
-
-				final JMenuItem up = new JMenuItem("Move Up");
-				final JMenuItem down = new JMenuItem("Move Down");
-
-				ActionListener al = new ActionListener()
-				{
-					@Override
-					public void actionPerformed(ActionEvent e)
-					{
-						int i = e.getSource() == up ? -1 : 1;
-
-						for (int j = 0; j < _model.getSize(); j++)
-						{
-							if (_model.get(j) == ProcessActionPanel.this
-									&& j + i >= 0 && j + i < _model.getSize())
-							{
-								_model.remove(j);
-								_model.insertElementAt(ProcessActionPanel.this,
-										j + i);
-								_list.setSelectedValue(ProcessActionPanel.this,
-										false);
-								break;
-							}
-						}
-					}
-				};
-				up.addActionListener(al);
-				down.addActionListener(al);
-
-				final JMenuItem disable = new JMenuItem(isEnabled() ? "Disable"
-						: "Enable");
-				disable.addActionListener(new ActionListener()
-				{
-					@Override
-					public void actionPerformed(ActionEvent e)
-					{
-						setEnabled(!isEnabled());
-					}
-				});
-
-				jpm.add(up);
-				jpm.add(down);
-				jpm.add(disable);
-				for (JMenuItem item : _command.getExtraOptions())
-				{
-					jpm.add(item);
-				}
-
-				jpm.show(e.getComponent(), e.getX(), e.getY());
-
-			}
-		}
-
-		ProcessActionPanel(ProcessCmd command)
-		{
-			super(20);
-			_command = command;
-			setEnabled(true);
-			setEditable(false);
-
-			setBorder(new EtchedBorder());
-			setText(_command.getLabel());
-
-		}
-	}
+	private JTextField saveAsNameField = new JTextField(15);
 
 	private DefaultListModel _model = new DefaultListModel();
 	{
 		int n = ProcessCmd.values().length;
 		for (int i = 0; i < n; i++)
 		{
-			_model.addElement(new ProcessActionPanel(ProcessCmd.values()[i]));
+			_model.addElement(
+					ProcessCmd.values()[i]
+					//new ProcessActionPanel(ProcessCmd.values()[i])
+					);
 		}
 	}
 
-	private JList _list = new JList(_model)
-	{
-		{
-			setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			setCellRenderer(new ListCellRenderer()
-			{
-				@Override
-				public Component getListCellRendererComponent(JList list,
-						Object value, int index, boolean isSelected,
-						boolean cellHasFocus)
-				{
-					Component c = (Component) value;
-					if (isSelected)
-					{
-						c.setBackground(list.getSelectionBackground());
-						c.setForeground(list.getSelectionForeground());
-					}
-					else
-					{
-						c.setBackground(list.getBackground());
-						c.setForeground(list.getForeground());
-					}
-					return c;
-				}
-			});
-
-			addMouseListener(new MouseAdapter()
-			{
-				@Override
-				public void mouseClicked(MouseEvent e)
-				{
-
-					int index = locationToIndex(e.getPoint());
-
-					if (index != -1)
-					{
-						ProcessActionPanel checkbox = (ProcessActionPanel) getModel()
-								.getElementAt(index);
-						checkbox.mouseClicked(e);
-						repaint();
-					}
-				}
-			});
-
-			setBorder(BorderFactory.createTitledBorder("Actions:"));
-
-		}
-	};
-
-	boolean _ok, _cancel;
-
-	final OkayCancelPanel _okCancel = new OkayCancelPanel(false, false,
-			new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e)
-				{
-					String cmd = e.getActionCommand();
-					if ("OK".equals(cmd))
-					{
-						_ok = doOK();
-					}
-					else if ("Cancel".equals(cmd))
-					{
-						_cancel = doCancel();
-					}
-
-				}
-			});
-
-	private final HelpButton _help = new HelpButton("");
-
-	private final JPanel _okPanel = new JPanel()
-	{
-		{
-			setLayout(new GridBagLayout());
-			GridBagConstraints c = new GridBagConstraints();
-
-			_help.setPreferredSize(new java.awt.Dimension(36, 36));
-			_okCancel.setPreferredSize(new java.awt.Dimension(267, 39));
-
-			c.anchor = GridBagConstraints.WEST;
-			add(_help, c);
-
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.weightx = 1.0;
-			c.anchor = GridBagConstraints.CENTER;
-			add(new JLabel(), c);
-
-			c.fill = GridBagConstraints.NONE;
-			c.anchor = GridBagConstraints.NORTHEAST;
-			add(_okCancel, c);
-
-			setPreferredSize(new Dimension(400, 39));
-		}
-	};
 
 	public ProcessDialog()
 	{
 		setTitle("Preprocess Corpus...");
+		
+		_source.getComboBox().addActionListener(new ActionListener()
+		{
+			
+			public void actionPerformed(ActionEvent e)
+			{
+				if (saveAsNameField != null)
+				{
+					String uniqueName = Deducer.getUniqueName(_source.getComboBox().getSelectedItem() + ".processed");
+					saveAsNameField.setText(uniqueName);
+				}
+			}
+		});
+		
 		add(new JPanel()
 		{
 			{
 
 				setLayout(new GridBagLayout());
-				setPreferredSize(new Dimension(500, 390));
 				GridBagConstraints c = new GridBagConstraints();
 				c.insets = new Insets(5, 5, 5, 5);
 				c.gridy = 0;
+				c.gridwidth = 2;
 
 				add(_source, c);
-
-				//c.gridy++;
-				//add(_target, c);
 
 				c.gridy++;
 
@@ -295,9 +91,10 @@ public class ProcessDialog extends JDialog
 				for (int i = 0; i < nActions; i++)
 				{
 					//Set the action's name
-					new ProcessActionPanel(ProcessCmd.values()[i]);
 					//_table.setActionName(ProcessCmd.values()[i].getLabel(), i);
-					_table.setAction(new ProcessActionPanel(ProcessCmd.values()[i]), i);
+					_table.setAction(ProcessCmd.values()[i], i
+							//new ProcessActionPanel(ProcessCmd.values()[i]), i
+							);
 					
 					//Add any relevant options to the action
 					JPopupMenu ithMenu =  new JPopupMenu();
@@ -312,7 +109,6 @@ public class ProcessDialog extends JDialog
 				}
 				
 				JPanel p = new JPanel();
-				p.setBackground(Color.WHITE);
 				p.setBorder(BorderFactory.createTitledBorder("Actions:"));
 				p.add(_table);
 				
@@ -322,28 +118,56 @@ public class ProcessDialog extends JDialog
 				c.weighty = 1;
 				c.weightx = 1;
 				c.gridy++;
-				c.gridwidth = 1;
+				c.gridwidth = 2;
 				c.fill = GridBagConstraints.BOTH;
 				add(new JLabel(), c); // spacing blah
-
+				
 				c.gridy++;
+				c.gridx = 0;
+				c.gridwidth = 1;
 				c.weighty = 0;
-				c.anchor = GridBagConstraints.SOUTH;
+				c.weightx = 0;
+				c.insets = new Insets(0, 15, 0, 0);
+				c.ipadx = 10;
+				
+				add(new JLabel("Save Corpus As:"), c);
+				
+				c.gridx = 1;
+				c.gridwidth = 1;
+				c.weighty = 0;
+				c.weightx = 1;
+				c.insets = new Insets(0, 0, 0, 0);
+				
+				add(saveAsNameField, c);
+
+				c.gridx = 0;
+				c.gridy++;
+				c.gridwidth = 2;
+				c.weightx = 1;
+				c.weighty = 0;
+				//c.anchor = GridBagConstraints.SOUTH;
 				c.fill = GridBagConstraints.HORIZONTAL;
-				c.insets = new Insets(10, 10, 10, 10);
-				add(_okPanel, c);
+				//c.insets = new Insets(10, 10, 10, 10);
+				add(new DeducerOkCancelPanel(this.getRootPane(), "Save as:", "Cancel")
+				{
+					
+					protected void ok()
+					{
+						doOK();
+					}
+					
+					
+					protected void cancel()
+					{
+						doCancel();
+					}
+				}, c);
 			}
 		});
 
 		pack();
+		setMinimumSize(this.getSize());
 
-	}
-
-	public static void main(String[] args)
-	{
-		ProcessDialog d = new ProcessDialog();
-		d.debugForceShow = true;
-		d.setVisible(true);
 	}
 
 	public boolean doCancel()
@@ -352,9 +176,49 @@ public class ProcessDialog extends JDialog
 		return true;
 	}
 
+	public boolean doOK()
+	{
+		String s = _source.getModel().toString();
+		
+		
+		String t = //_source.getModel().toString(); //Just overwrite the unprocessed  corpus
+		saveAsNameField.getText(); //use the new name
+	
+		int nEnabled = 0;
+		
+		for (int i = 0; i < ProcessCmd.values().length ; i++)
+		{
+			if (_table.isEnabled(i))
+			{
+				nEnabled ++;
+				ProcessCmd command = (ProcessCmd) _table.getAction(i);
+				Deducer.execute(t + "<- " + command.getRCmd(s) + ";\n");
+				//System.out.println(t + "<- " + p._command.getRCmd(s) + ";\n");
+				s = t;
+			}
+			
+		}
+	
+		if (nEnabled == 0) //
+		{
+			Toolkit.getDefaultToolkit().beep();
+			JOptionPane.showMessageDialog(getContentPane(),
+				    "No preprocessing actions were selected!" +
+				    "\nYou can enable an action by checking the box next to its name.",
+				    "Warning",
+				    JOptionPane.WARNING_MESSAGE);
+			return false;
+		}
+		else
+		{
+			dispose(); //TODO restore this line
+			return true;
+		}
+	}
+
 	private boolean debugForceShow = false;
 	
-	@Override
+	
 	public void setVisible(boolean arg0)
 	{
 		if (_source.getModel() == null && !debugForceShow)
@@ -374,60 +238,23 @@ public class ProcessDialog extends JDialog
 		}
 	}
 	
-	public boolean doOK()
+	public static void main(String[] args)
 	{
-		String s = _source.getModel().toString();
-		
-		//Just overwrite the unprocessed  corpus
-		String t = _source.getModel().toString();//_target.getText();
-
-		int nEnabled = 0;
-		
-		for (int i = 0; i < ProcessCmd.values().length ; i++)
+		JFrame f = new JFrame();
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		ProcessDialog dlg = new ProcessDialog();
+		f.setVisible(true);
+		dlg.addWindowListener(new WindowAdapter()
 		{
-			if (_table.isEnabled(i))
+			public void windowClosed(WindowEvent e)
 			{
-				nEnabled ++;
-				ProcessActionPanel p = (ProcessActionPanel) _table.getAction(i);
-				Deducer.execute(t + "<- " + p._command.getRCmd(s) + ";\n");
-				//System.out.println(t + "<- " + p._command.getRCmd(s) + ";\n");
-				s = t;
+				System.exit(0);
 			}
-			
-		}
-		
 
-		
-//		
-//		 Enumeration<?> e = _model.elements();
-//		
-//		while (e.hasMoreElements())
-//		{
-//			ProcessActionPanel p = (ProcessActionPanel) e.nextElement();
-//			if (p.isEnabled())
-//			{
-//				//Deducer.execute
-//				System.out.println(t + "<- " + p._command.getRCmd(s) + ";\n");
-//				s = t;
-//			}
-//		}
-		
-
-		if (nEnabled == 0)
-		{
-			Toolkit.getDefaultToolkit().beep();
-			JOptionPane.showMessageDialog(getContentPane(),
-				    "You must enable at least 1 prepocessing action." +
-				    "\nYou can enable an action by checking the box next to its name.",
-				    "Warning",
-				    JOptionPane.WARNING_MESSAGE);
-			return false;
-		}
-		else
-		{
-			dispose(); //TODO restore this line
-			return true;
-		}
+		});
+		dlg.debugForceShow = true;
+		dlg.setVisible(true);
+		dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	}
 
 }

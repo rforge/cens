@@ -36,7 +36,7 @@ public class TermFreqOptionsDialog extends JDialog
 			return this == alphaAsc || this == freqAsc;
 		}
 
-		@Override
+		
 		public String toString()
 		{
 			return _label;
@@ -80,7 +80,7 @@ public class TermFreqOptionsDialog extends JDialog
 
 	final ActionListener _okListener = new ActionListener()
 	{
-		@Override
+		
 		public void actionPerformed(ActionEvent e)
 		{
 			String cmd = e.getActionCommand();

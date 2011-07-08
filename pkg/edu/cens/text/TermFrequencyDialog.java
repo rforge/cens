@@ -17,25 +17,22 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
-import org.rosuda.JGR.layout.AnchorLayout;
 import org.rosuda.deducer.Deducer;
-
-import com.sun.java.swing.plaf.motif.MotifBorders.BevelBorder;
-import com.sun.org.apache.bcel.internal.generic.NEWARRAY;
-import com.sun.xml.internal.ws.api.server.Container;
 
 public class TermFrequencyDialog extends JDialog
 {
 	public static final String BAR_CHART = "Bar Chart";
 	public static final String DOCUMENT_TERM_MATRIX = "Document-Term Matrix";
 	public static final String TOTAL_FREQUENCIES = "Total Frequencies";
-	private static final String[] VIEW_MODES = { TOTAL_FREQUENCIES, BAR_CHART, DOCUMENT_TERM_MATRIX };
+	public static final String WORD_CLOUD = "Word Cloud";
+	private static final String[] VIEW_MODES = { TOTAL_FREQUENCIES, BAR_CHART, WORD_CLOUD };
 	private static final Insets DIALOG_INSETS = new Insets(0, 7, 0, 7);
 	private boolean decreasing;
 	
@@ -73,12 +70,15 @@ public class TermFrequencyDialog extends JDialog
 		// }
 	}
 
-	public void setCopora(String[] newCorpora)
+	public void setCorpora(String[] newCorpora)
 	{
-		dataSourceSelector.removeAllItems();
-		for (String s : newCorpora)
+		if (newCorpora != null && dataSourceSelector != null)
 		{
-			dataSourceSelector.addItem(s);
+		dataSourceSelector.removeAllItems();
+			for (String s : newCorpora)
+			{
+				dataSourceSelector.addItem(s);
+			}
 		}
 	}
 
@@ -251,7 +251,14 @@ public class TermFrequencyDialog extends JDialog
 
 	public String getCorpus()
 	{
-		return this.dataSourceSelector.getSelectedItem().toString();
+		if (this.dataSourceSelector.getSelectedItem() != null)
+		{
+			return this.dataSourceSelector.getSelectedItem().toString();
+		} 
+		else
+		{
+			return null;
+		}
 	}
 
 	private GridBagConstraints getTopLevelLayoutDefaults()
@@ -279,7 +286,6 @@ public class TermFrequencyDialog extends JDialog
 
 		cancelButton.addActionListener(new ActionListener()
 		{
-			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
 				setVisible(false);
@@ -288,10 +294,9 @@ public class TermFrequencyDialog extends JDialog
 		
 		ActionListener okAction = new ActionListener()
 		{
-			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
-				executeVisualization();
+				doVisualization();
 			}
 
 		};
@@ -336,13 +341,14 @@ public class TermFrequencyDialog extends JDialog
 		
 		dataSourceSelector.addActionListener(new ActionListener()
 		{
-
-			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				//TODO validate!
-				saveTotalsField.setText(dataSourceSelector.getSelectedItem()
-						.toString() + ".term_freq");
+				String selectedCorpus = getCorpus();
+				if (selectedCorpus != null)
+				{
+					saveTotalsField.setText(selectedCorpus + ".term_freq");
+				}
 			}
 		});
 
@@ -407,7 +413,7 @@ public class TermFrequencyDialog extends JDialog
 		usePanel.add(new JLabel("Top"), c);
 	
 		c.gridx = 2;
-		this.absoluteNTermsField = new JTextField("10");
+		this.absoluteNTermsField = new JTextField("10",3);
 		absoluteNTermsField.setPreferredSize(new Dimension(50, absoluteNTermsField
 				.getPreferredSize().height));
 		usePanel.add(absoluteNTermsField, c);
@@ -425,7 +431,7 @@ public class TermFrequencyDialog extends JDialog
 	
 		c.gridx = 2;
 	
-		this.topPercentField = new JTextField("100");
+		this.topPercentField = new JTextField("100", 3);
 		topPercentField.setPreferredSize(new Dimension(50, topPercentField
 				.getPreferredSize().height));
 		usePanel.add(topPercentField, c);
@@ -533,7 +539,6 @@ public class TermFrequencyDialog extends JDialog
 			
 			saveTotalsButton.addActionListener(new ActionListener()
 			{
-				@Override
 				public void actionPerformed(ActionEvent e)
 				{
 					saveTotalsAsDataFrame(saveTotalsField.getText());
@@ -541,6 +546,12 @@ public class TermFrequencyDialog extends JDialog
 				}
 			});
 			
+		}
+		else if (this.viewMethodSelector.getSelectedItem().equals(WORD_CLOUD))
+		{
+			//allOptionsPanel.add(new JLabel("HEY! YOU!"), c);
+			//c.gridy++;
+			//allOptionsPanel.add(new JLabel("Get off of my word cloud."), c);
 		}
 		else
 		{
@@ -591,8 +602,6 @@ public class TermFrequencyDialog extends JDialog
 	
 		ascendingButton.addActionListener(new ActionListener()
 		{
-	
-			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				decreasing = false;
@@ -602,7 +611,6 @@ public class TermFrequencyDialog extends JDialog
 		descendingButton.addActionListener(new ActionListener()
 		{
 	
-			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				decreasing = true;
@@ -685,7 +693,6 @@ public class TermFrequencyDialog extends JDialog
 		
 		viewMethodSelector.addActionListener(new ActionListener()
 		{		
-			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				// TODO Auto-generated method stub
@@ -729,7 +736,25 @@ public class TermFrequencyDialog extends JDialog
 		return p;
 	}
 
-	private void executeVisualization()
+	private String getTermFreqCall()
+	{
+		int percentage = getPercent();
+		int absoluteNTerms = getAbsoluteNTerms();
+		int minFreq = getMinFrequency();
+		String sorted = getSorted();
+		boolean ascending = getAsc();
+	
+		String termFreqCall = "cens.term_freq(" + 
+				"d=" + getCorpus() + ", " + 
+				"percent=" + percentage + ", " +
+				"topN=" + absoluteNTerms + ", " +
+				"sorted=\"" + sorted + "\", " +
+				"decreasing=" + ("" + ascending).toUpperCase() + ", " +
+				"minFreq=" + minFreq + ")";
+		return termFreqCall;
+	}
+
+	private void doVisualization()
 	{
 		// TODO validate selected name
 		// TODO save matrix name somewhere?
@@ -740,6 +765,15 @@ public class TermFrequencyDialog extends JDialog
 		// cens.txt_barplot(cens.term_freq(get(" + getCorpus() + "),
 		// 100, sorted, decreasing));
 
+		if (this.getCorpus() == null)
+		{
+			JOptionPane.showMessageDialog(getContentPane(),
+				    "You do not have any corpuses to visualize!",
+				    "Warning",
+				    JOptionPane.WARNING_MESSAGE);
+		} 
+		else
+		{
 
 		String termFreqCommand = getTermFreqCall();
 		
@@ -755,27 +789,19 @@ public class TermFrequencyDialog extends JDialog
 //					+ getCorpus() + ", " + percentage + ", " + "\""
 //					+ sorted + "\", "
 //					+ new String("" + ascending).toUpperCase() + "));");
+		} 
+		else if (getViewMethod().equals(WORD_CLOUD))
+		{
+			//TODO remove tempFreq
+			String tempFreq = Deducer.getUniqueName("tempFreq");
+			Deducer.execute(tempFreq + "<-" + termFreqCommand);
+			Deducer.execute("cloud(names("+ tempFreq + "), " + tempFreq + ", , 1, , , 0.5)");
+			Deducer.execute("rm(" + tempFreq + ")");
+			Deducer.execute("dev.set()", false); //give the plot focus
+		}
 		}
 	}
 	
-	private String getTermFreqCall()
-	{
-		int percentage = getPercent();
-		int absoluteNTerms = getAbsoluteNTerms();
-		int minFreq = getMinFrequency();
-		String sorted = getSorted();
-		boolean ascending = getAsc();
-
-		String termFreqCall = "cens.term_freq(" + 
-				"d=" + getCorpus() + ", " + 
-				"percent=" + percentage + ", " +
-				"topN=" + absoluteNTerms + ", " +
-				"sorted=\"" + sorted + "\", " +
-				"decreasing=" + ("" + ascending).toUpperCase() + ", " +
-				"minFreq=" + minFreq + ")";
-		return termFreqCall;
-	}
-
 	public static void main(String[] args)
 	{
 		JFrame f = new JFrame();
@@ -792,8 +818,9 @@ public class TermFrequencyDialog extends JDialog
 				}
 			}
 		};
-		dlg.setCopora(new String[] { "AAAAAAA", "BBBBBBBBBBB",
-				"^^^^^^^^^^^^^^^" });
+		dlg.setCorpora(new String[] { 
+				//"AAAAAAA", "BBBBBBBBBBB", "^^^^^^^^^^^^^^^" 
+				});
 		dlg.addWindowListener(new WindowAdapter()
 		{
 			@Override

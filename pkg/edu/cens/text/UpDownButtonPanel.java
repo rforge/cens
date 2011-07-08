@@ -40,7 +40,7 @@ public class UpDownButtonPanel extends JPanel
 		
 		ActionListener upAction = new ActionListener()
 		{
-			@Override
+			
 			public void actionPerformed(ActionEvent e)
 			{
 				table.moveRowUp(row);
@@ -49,7 +49,7 @@ public class UpDownButtonPanel extends JPanel
 		
 		ActionListener downAction = new ActionListener()
 		{
-			@Override
+			
 			public void actionPerformed(ActionEvent e)
 			{
 				table.moveRowDown(row);
