@@ -779,9 +779,22 @@ public class TermFrequencyDialog extends JDialog
 		
 		if (getViewMethod().equals(BAR_CHART))
 		{
-			Deducer.execute("cens.txt_barplot(" + termFreqCommand + ");");
+			//TODO add options to set font size, margins?
+			//barplot(words, las=2);
+			String opar = Deducer.getUniqueName("opar");
+			Deducer.execute(opar + " <- par()",false); //save the original margin parameters
+			Deducer.execute("par(mar=c(8, 4, 4, 0.5))",false); //give the plot more space at the bottom for long words.
+			Deducer.execute(
+					"barplot(" 
+					+ 
+					termFreqCommand + "," 
+					+
+					"cex.names=0.8," //make the terms a bit smaller
+					+
+					" las=2);");
 			
 			Deducer.execute("dev.set()", false); //give the plot focus
+			Deducer.execute("par("+ opar +")",false);
 		}
 		else if (getViewMethod().equals(TOTAL_FREQUENCIES))
 		{
@@ -792,7 +805,7 @@ public class TermFrequencyDialog extends JDialog
 		} 
 		else if (getViewMethod().equals(WORD_CLOUD))
 		{
-			//TODO remove tempFreq
+			//TODO sanity check # of words in cloud, give warning if too huge
 			String tempFreq = Deducer.getUniqueName("tempFreq");
 			Deducer.execute(tempFreq + "<-" + termFreqCommand);
 			Deducer.execute("cloud(names("+ tempFreq + "), " + tempFreq + ", , 1, , , 0.5)");

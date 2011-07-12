@@ -108,10 +108,12 @@ public class PreprocessingTable extends JTable
 		this.setRowSelectionAllowed(false);
 		this.setFocusable(false);
 	
-		this.setBorder(new LineBorder(Color.BLACK, 3));
+		this.showHorizontalLines = true;
+		this.showVerticalLines = true;
+		this.setBorder(new LineBorder(Color.BLACK, 1));
 		//(new LineBorder(Color.BLACK));
 		this.setGridColor(Color.BLACK);
-		this.setIntercellSpacing(new Dimension(3,3));
+		this.setIntercellSpacing(new Dimension(4,4));
 		this.getTableHeader().setReorderingAllowed(false);
 		
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -224,11 +226,11 @@ class PrepoCellRenderer implements TableCellRenderer
 			boolean isSelected, boolean hasFocus, int row, int column)
 	{
 		//return JRadioButtonTableExample.panels[row];
-		
+		Component retComp;
 		
 		if (column == PreprocessingTable.REORDER_COLUMN)
 		{
-			return reorderPanel;
+			retComp = reorderPanel;
 		}
 		else if (column == PreprocessingTable.ACTION_COLUMN)
 		{
@@ -241,9 +243,16 @@ class PrepoCellRenderer implements TableCellRenderer
 			
 			lab.setHorizontalAlignment(SwingConstants.RIGHT);
 			lab.setEnabled(enabled);
-			return lab;
+			retComp = lab;
 		}
-		return (Component) table.getModel().getValueAt(row, column);
+		else
+		{
+			retComp = (Component) table.getModel().getValueAt(row, column);
+		}
+		
+		retComp.setBackground(Color.WHITE);
+		
+		return retComp;
 	}
 }
 

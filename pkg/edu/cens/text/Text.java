@@ -189,7 +189,8 @@ public static String[] getCorpora()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				Deducer.eval("cens.viewer();");
+				//Deducer.eval("cens.viewer();");
+				new CorpusViewer().setVisible(true);
 			}
 		});
 		textMenu.add(viewCorpMenuItem);

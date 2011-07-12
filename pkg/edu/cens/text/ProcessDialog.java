@@ -8,6 +8,9 @@ import org.rosuda.deducer.widgets.ObjectChooserWidget;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Enumeration;
@@ -57,13 +60,18 @@ public class ProcessDialog extends JDialog
 			
 			public void actionPerformed(ActionEvent e)
 			{
-				if (saveAsNameField != null)
+				if (saveAsNameField != null) 
 				{
 					String uniqueName = Deducer.getUniqueName(_source.getComboBox().getSelectedItem() + ".processed");
 					saveAsNameField.setText(uniqueName);
 				}
 			}
 		});
+		if (_source.getComboBox().getModel().getSize() > 0)
+		{
+			_source.getComboBox().setSelectedIndex(0);
+		}
+		//getComboBox().addItem("Porcus");
 		
 		add(new JPanel()
 		{
@@ -178,7 +186,29 @@ public class ProcessDialog extends JDialog
 
 	public boolean doOK()
 	{
-		String s = _source.getModel().toString();
+		if (_source.getComboBox().getSelectedItem() == null)
+		{
+			Toolkit.getDefaultToolkit().beep();
+			JOptionPane.showMessageDialog(getContentPane(),
+				    "You do not have any corpuses to preprocess.",
+				    "Error",
+				    JOptionPane.ERROR_MESSAGE);
+			return false;	
+		}
+		else if (saveAsNameField.getText() == null || saveAsNameField.getText().equals(""))
+		{
+			Toolkit.getDefaultToolkit().beep();
+			JOptionPane.showMessageDialog(getContentPane(),
+				    "No name given for the processed corpus.\n" +
+				    "Please choose a valid name.",
+				    "Error",
+				    JOptionPane.ERROR_MESSAGE);
+			return false;	
+		}
+
+		
+		String s = _source.getComboBox().getSelectedItem().toString();
+		//getModel().toString();
 		
 		
 		String t = //_source.getModel().toString(); //Just overwrite the unprocessed  corpus
@@ -211,7 +241,8 @@ public class ProcessDialog extends JDialog
 		}
 		else
 		{
-			dispose(); //TODO restore this line
+			//dispose(); //TODO restore this line
+			setVisible(false);
 			return true;
 		}
 	}
@@ -221,7 +252,7 @@ public class ProcessDialog extends JDialog
 	
 	public void setVisible(boolean arg0)
 	{
-		if (_source.getModel() == null && !debugForceShow)
+		if (arg0 == true && _source.getModel() == null && !debugForceShow)
 		{
 		Toolkit.getDefaultToolkit().beep();
 		JOptionPane.showMessageDialog(getContentPane(),
@@ -230,12 +261,9 @@ public class ProcessDialog extends JDialog
 				"\nCreate a corpus with \"Extract Corpus\" in the Text menu.",
 			    "Warning",
 			    JOptionPane.WARNING_MESSAGE);
-			dispose();
 		}
-		else
-		{
-			super.setVisible(arg0);
-		}
+
+		super.setVisible(arg0);
 	}
 	
 	public static void main(String[] args)

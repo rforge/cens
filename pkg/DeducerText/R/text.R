@@ -35,8 +35,10 @@ cens.term_freq <- function(
   return(x);
 }
 
-cens.getCorpusNames <- function() {
-  names(which(unlist(eapply(.GlobalEnv, function(n) "Corpus" %in% class(n)))));
+cens.getCorpusNames <- function() 
+{
+	get.objects("Corpus")
+  #names(which(unlist(eapply(.GlobalEnv, function(n) "Corpus" %in% class(n)))));
 }
 
 cens.word_cloud <- function(words){
@@ -44,14 +46,15 @@ cens.word_cloud <- function(words){
   cloud(words, col = col.bbr(words, fit=TRUE));
 }
 
-cens.txt_barplot <- function(words){
-  barplot(words, las=2);
-}
+#cens.txt_barplot <- function(words){
+#  barplot(words, las=2);
+#}
 
-cens.viewer <- function(words){
-  x <- .jnew(J("edu.cens.text.CorpusViewer"), .jarray(cens.getCorpusNames()));
-  x$setVisible(TRUE);
-}
+# don't like this function.  Viewer should be constructed in Java.
+#cens.viewer <- function(words){
+#  x <- .jnew(J("edu.cens.text.CorpusViewer"), .jarray(cens.getCorpusNames()));
+#  x$setVisible(TRUE);
+#}
 
 
 cens.choose_corpus <- function(){
