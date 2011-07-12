@@ -1,6 +1,7 @@
 package edu.cens.text;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -23,6 +24,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 
 import org.rosuda.deducer.Deducer;
 
@@ -35,6 +38,7 @@ public class TermFrequencyDialog extends JDialog
 	private static final String[] VIEW_MODES = { TOTAL_FREQUENCIES, BAR_CHART, WORD_CLOUD };
 	private static final Insets DIALOG_INSETS = new Insets(0, 7, 0, 7);
 	private boolean decreasing;
+	private boolean useDocumentFrequency;
 	
 	JTextField topPercentField;
 	JTextField minFreqField;
@@ -57,6 +61,7 @@ public class TermFrequencyDialog extends JDialog
 	{
 		super(parent, "Term Frequency");
 		decreasing = true;
+		useDocumentFrequency = false;
 		setSize(500, 300);
 		
 		//TODO : should probably separate construction / action listener setting from GUI arrangement.
@@ -103,6 +108,12 @@ public class TermFrequencyDialog extends JDialog
 			// ////////////////////////////////////////////////////
 			JPanel okPanel = constructOkHelpPanel();
 	
+			//////////////////////////////////////////////////////
+			// Document/Term Frequency Panel /////////////////////
+			//////////////////////////////////////////////////////
+			
+
+			
 	
 			// --------------------------------------------------------------------------
 			// +++++++++ Add data selector to toplevel dialog +++++++++++++
@@ -116,31 +127,6 @@ public class TermFrequencyDialog extends JDialog
 			
 			c.insets = DIALOG_INSETS;
 			this.add(sourceDataSelectionPanel, c);
-	
-			// +++++++++ Add Use and Sort to toplevel dialog +++++++++++++
-			// -- First, Put use and sort in the same panel
-			JPanel useAndSortPanel = new JPanel(new GridBagLayout());
-			c = getTopLevelLayoutDefaults();
-			c.anchor = GridBagConstraints.FIRST_LINE_END;
-			c.gridx = 0;
-			//useAndSortPanel.add(usePanel, c);
-	
-			c.anchor = GridBagConstraints.FIRST_LINE_START;
-			c.gridx = 1;
-			c.fill = GridBagConstraints.VERTICAL;
-			//useAndSortPanel.add(sortPanel, c);
-	
-			// -- Then, put this panel in the top level dialog
-			c = getTopLevelLayoutDefaults();
-			c.anchor = GridBagConstraints.PAGE_START;
-			c.gridx = 0;
-			c.gridy = 1;
-			c.gridwidth = 1;
-			c.fill = GridBagConstraints.HORIZONTAL;
-	
-			c.insets = DIALOG_INSETS;
-			
-			//this.add(useAndSortPanel, c);
 			
 			// +++++++++ Add min freq panel to toplevel dialog +++++++++++++
 			c = getTopLevelLayoutDefaults();
@@ -155,8 +141,6 @@ public class TermFrequencyDialog extends JDialog
 			c.insets = DIALOG_INSETS;
 			this.add(constructFilteringPanel(), c);
 	
-			// +++++++++ Add save-name panel to toplevel dialog +++++++++++++
-			// this.add(saveNamePanel, c);
 	
 			// +++++++++ Add View mode selection panel to toplevel dialog
 			// +++++++++++++
@@ -361,16 +345,47 @@ public class TermFrequencyDialog extends JDialog
 		return sourceDataSelectionPanel;
 	}
 
+	private JPanel constructFrequencyMethodPanel()
+	{
+		JPanel frequencyMethodPanel = new JPanel(new GridBagLayout());
+		
+		JRadioButton termFreqRadBut = new JRadioButton("Term Frequency");
+		JRadioButton docFreqRadBut = new JRadioButton("Document Frequency");
+		termFreqRadBut.setSelected(true);
+		
+		ButtonGroup freqButGroup = new ButtonGroup();
+		freqButGroup.add(termFreqRadBut);
+		freqButGroup.add(docFreqRadBut);
+		
+		termFreqRadBut.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				useDocumentFrequency = false;
+			}
+		});
+		
+		docFreqRadBut.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				useDocumentFrequency = true;
+			}
+		});
+		
+		GridBagConstraints c = getTopLevelLayoutDefaults();
+		frequencyMethodPanel.add(termFreqRadBut, c);
+		c.gridx = 1;
+		frequencyMethodPanel.add(docFreqRadBut, c);
+		return frequencyMethodPanel;
+	}
+
 	private JPanel constructFilteringPanel()
 	{
 		GridBagConstraints c = getTopLevelLayoutDefaults();
 		c.insets = new Insets(0, 0, 0, 0);
 	
-		JPanel usePanel = new JPanel(new GridBagLayout());
-	
-		usePanel.setBorder(BorderFactory.createTitledBorder("Use:"));
-		// warning! this panels default gridbag constraints perhaps shouldn't be
-		// the same as the top level dialog's.
+		JPanel usePanelInner = new JPanel(new GridBagLayout());
 	
 		useAllButton = new JRadioButton();
 		useTopNButton = new JRadioButton();
@@ -390,55 +405,67 @@ public class TermFrequencyDialog extends JDialog
 		
 		c.anchor = c.WEST;
 		c.fill = c.NONE;
+		c.weighty = 0;
+		c.ipady = 3;
 		// ======== 'Use all' radio button row =======================
 		c.gridx = 0;
 		c.gridy = 0;
 		c.weightx = 0;
-		usePanel.add(useAllButton, c);
+		usePanelInner.add(useAllButton, c);
 		// add text for use all
 		c.gridx = 1;
 		c.gridwidth = 3;
 		c.weightx = 0;
-		usePanel.add(new JLabel("All Terms"), c);
+		usePanelInner.add(new JLabel("All Terms"), c);
 	
 		// ======= 'Use top #' radio button row =======================
 		c.gridx = 0;
 		c.gridy = 1;
 		c.gridwidth = 1;
-		usePanel.add(useTopNButton, c);
+		usePanelInner.add(useTopNButton, c);
 	
 		// add text for Top # terms
 		c.gridx = 1;
 		c.gridwidth = 1;
-		usePanel.add(new JLabel("Top"), c);
+		usePanelInner.add(new JLabel("Top"), c);
 	
 		c.gridx = 2;
 		this.absoluteNTermsField = new JTextField("10",3);
-		absoluteNTermsField.setPreferredSize(new Dimension(50, absoluteNTermsField
-				.getPreferredSize().height));
-		usePanel.add(absoluteNTermsField, c);
+//		absoluteNTermsField.setPreferredSize(new Dimension(50, absoluteNTermsField
+//				.getPreferredSize().height));
+		
+		usePanelInner.add(absoluteNTermsField, c);
 	
 		// ======= 'Use top N %' radio button row =======================
 		c.gridx = 0;
 		c.gridy = 2;
 		c.gridwidth = 1;
-		usePanel.add(useTopPercentButton, c);
+		usePanelInner.add(useTopPercentButton, c);
 	
 		// add text for Top # terms
 		c.gridx = 1;
 		c.gridwidth = 1;
-		usePanel.add(new JLabel("Top"), c);
+		usePanelInner.add(new JLabel("Top"), c);
 	
 		c.gridx = 2;
 	
 		this.topPercentField = new JTextField("100", 3);
-		topPercentField.setPreferredSize(new Dimension(50, topPercentField
-				.getPreferredSize().height));
-		usePanel.add(topPercentField, c);
+//		topPercentField.setPreferredSize(new Dimension(50, topPercentField
+//				.getPreferredSize().height));
+		usePanelInner.add(topPercentField, c);
 	
 		c.gridx = 3;
 		c.weightx = 1;
-		usePanel.add(new JLabel("%"), c);
+		usePanelInner.add(new JLabel("%"), c);
+		
+		Border usePanelBorder = new TitledBorder("Use;")
+		{
+			public Insets getBorderInsets(Component c)
+			{
+				return new Insets(20, 10, 10, 10);
+			}
+		};//("Use:");
+		usePanelInner.setBorder(usePanelBorder);
 		
 		///////////////////////////////////////////////////
 		// Min Frequency Stuff ///////////////////////////////////
@@ -469,15 +496,23 @@ public class TermFrequencyDialog extends JDialog
 		c.weighty = 1;
 		minFreqPanel.add(new JLabel(""),c);
 		
+		// ==================================================
 		JPanel allP = new JPanel(new GridBagLayout());
 		c = getTopLevelLayoutDefaults();
+		
+		c.weighty = 0;
+		c.gridwidth = 2;
+		allP.add(constructFrequencyMethodPanel(), c);
+		
+		c.gridy = 1;
+		c.gridx = 0;
 		c.weighty = 1;
+		c.gridwidth = 1;
 		c.fill = c.BOTH;
-		allP.add(usePanel,c);
+		allP.add(usePanelInner,c);
+		
 		c.gridx = 1;
 		allP.add(minFreqPanel, c);
-		
-	
 		
 		return allP;
 	}
@@ -749,8 +784,9 @@ public class TermFrequencyDialog extends JDialog
 				"percent=" + percentage + ", " +
 				"topN=" + absoluteNTerms + ", " +
 				"sorted=\"" + sorted + "\", " +
-				"decreasing=" + ("" + ascending).toUpperCase() + ", " +
-				"minFreq=" + minFreq + ")";
+				"decreasing=" + (""+ascending).toUpperCase() + ", " +
+				"minFreq=" + minFreq + "," +
+				"useDocFreq=" + (""+useDocumentFrequency).toUpperCase() + ")";
 		return termFreqCall;
 	}
 

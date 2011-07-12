@@ -5,14 +5,19 @@ cens.term_freq <- function(
 		topN=0, #only include the first 'topN' terms
 		sorted=c("none", "alpha", "freq"),
 		minFreq=1,
-        decreasing=FALSE) {
+        decreasing=FALSE,
+		useDocFreq=FALSE) {
 	
 	dtm <- DocumentTermMatrix(d, control = list(tolower=FALSE, minWordLength=1));
 	
 	#remove terms whose total ocurrences < minFreq
 	dtm <- dtm[ ,findFreqTerms(dtm, minFreq)];
 	
-  #could clamp freqs of dtm between 0 and 1 for doc. frequency
+  #clamp freqs of dtm between 0 and 1 for doc. frequency
+	if (useDocFreq == TRUE) 
+	{
+		dtm <- dtm > 0
+	}
 	x <- apply(dtm,2,sum);
 
   sorted <- match.arg(sorted);
