@@ -27,7 +27,6 @@ public class RSpatialFunctionView extends DefaultRFunctionView{
 	public RSpatialFunctionView(Param el){	
 		initGui();
 		setModel(el);
-		System.out.println("creating view");
 	}
 	public RSpatialFunctionView(Param el,VariableSelectorWidget sel){
 		selector = sel;	
