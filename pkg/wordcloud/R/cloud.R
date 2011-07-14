@@ -104,11 +104,8 @@ wordcloud <- function(words,freq,scale=c(4,.5),min.freq=3,max.words=Inf,random.o
 			if(!overlap(x1-.5*wid,y1-.5*ht,wid,ht) &&
 					x1-.5*wid>0 && y1-.5*ht>0 &&
 					x1+.5*wid<1 && y1+.5*ht<1){
-				cc <- which((0:nc)/nc>normedFreq[i])
-				if(length(cc)>0)
-					cc <- colors[cc[1]]
-				else
-					cc <- colors[1]
+				cc <- ceiling(nc*normedFreq[i])
+				cc <- colors[cc]
 				text(x1,y1,words[i],cex=size[i],offset=0,srt=rotWord*90,
 						col=cc,...)
 				#rect(x1-.5*wid,y1-.5*ht,x1+.5*wid,y1+.5*ht)
