@@ -26,7 +26,7 @@ cens.term_freq <- function(
     o <- order(x, decreasing=TRUE)[1:(length(x) * percent / 100)];
     x <- x[o];
   } else if (topN > 0) { #use absolute number of terms
-	  o <- order(x, decreasing=TRUE)[1:topN];
+	  o <- order(x, decreasing=TRUE)[1:min(topN, length(x))];
 	  x <- x[o];
   }
 
@@ -44,11 +44,6 @@ cens.getCorpusNames <- function()
 {
 	get.objects("Corpus")
   #names(which(unlist(eapply(.GlobalEnv, function(n) "Corpus" %in% class(n)))));
-}
-
-cens.word_cloud <- function(words){
-  require(snippets);
-  cloud(words, col = col.bbr(words, fit=TRUE));
 }
 
 make.color.scale<- function(aColor, bColor, steps, gradientExp=.5){
