@@ -41,8 +41,8 @@ MouseWheelListener, ActionListener, ChangeListener{
 
     protected boolean movementEnabled = true;
 
-    protected int movementMouseButton = MouseEvent.BUTTON3;
-    protected int movementMouseButtonMask = MouseEvent.BUTTON3_DOWN_MASK;
+    protected int movementMouseButton = MouseEvent.BUTTON1;
+    protected int movementMouseButtonMask = MouseEvent.BUTTON1_DOWN_MASK;
 
     protected boolean wheelZoomEnabled = true;
     protected boolean doubleClickZoomEnabled = true;
