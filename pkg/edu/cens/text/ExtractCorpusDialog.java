@@ -257,8 +257,8 @@ public class ExtractCorpusDialog extends JDialog implements ActionListener
 					Toolkit.getDefaultToolkit().beep();
 					JOptionPane.showMessageDialog(getContentPane(),
 						    "You must select a text variable before you can extract a corpus.",
-						    "Warning",
-						    JOptionPane.WARNING_MESSAGE);
+						    "Alert",
+						    JOptionPane.ERROR_MESSAGE);
 				}
 				else if (newCorpusName == null)
 				{
@@ -266,8 +266,8 @@ public class ExtractCorpusDialog extends JDialog implements ActionListener
 					Toolkit.getDefaultToolkit().beep();
 					JOptionPane.showMessageDialog(getContentPane(),
 						    "You must give the corpus a name.",
-						    "Warning",
-						    JOptionPane.WARNING_MESSAGE);
+						    "Alert",
+						    JOptionPane.ERROR_MESSAGE);
 				}
 				else if (! newCorpusName.equals(Deducer.getUniqueName(newCorpusName))) //not unique
 				{

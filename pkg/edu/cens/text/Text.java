@@ -4,15 +4,20 @@ import org.rosuda.JGR.JGR;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.deducer.Deducer;
 import org.rosuda.deducer.WindowTracker;
+import org.rosuda.deducer.data.DataViewerController;
+import org.rosuda.deducer.data.DataViewerTab;
+import org.rosuda.deducer.data.DataViewerTabFactory;
 import org.rosuda.ibase.toolkit.EzMenuSwing;
 
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import javax.swing.filechooser.FileFilter;
 
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 /**
  * Created by IntelliJ IDEA. User: Neal Date: 1/15/11 Time: 1:08 PM
@@ -125,6 +130,18 @@ public static String[] getCorpora()
 
 	public void initJGR()
 	{
+		
+		DataViewerController.init();
+		DataViewerController.addDataType("VCorpus", "text-corpus");
+		DataViewerController.addTabFactory("VCorpus","Data View", new DataViewerTabFactory()
+		{
+			public DataViewerTab makeViewerTab(String dataName)
+			{
+				CorpusViewerPanel ret = new CorpusViewerPanel();
+				ret.setData(dataName);
+				return ret;
+			}
+		});
 
 		String text = "Text";
 		
@@ -154,7 +171,18 @@ public static String[] getCorpora()
 
 		JMenu textMenu = EzMenuSwing.getMenu(JGR.MAINRCONSOLE, text);
 
-		final JMenuItem extractCorpusMenuItem = new JMenuItem("Extract Corpus");
+		final JMenuItem importTextMenuItem = new JMenuItem("Import Text(s) as Corpus");
+		importTextMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				TextFileChooser tfc = new TextFileChooser();
+				tfc.run();
+			}
+		});
+		textMenu.add(importTextMenuItem);
+		
+		final JMenuItem extractCorpusMenuItem = new JMenuItem("Extract Corpus From Dataframe");
 		
 		extractCorpusMenuItem.addActionListener(new ActionListener()
 		{

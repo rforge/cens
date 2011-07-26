@@ -2,6 +2,7 @@ package edu.cens.text;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -19,6 +20,7 @@ import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -35,21 +37,23 @@ import javax.swing.table.DefaultTableModel;
 import org.rosuda.JGR.JGR;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.deducer.Deducer;
+import org.rosuda.deducer.data.DataViewerTab;
 import org.rosuda.deducer.widgets.ObjectChooserWidget;
 
-public class CorpusViewer extends JDialog //TODO extend JDialog instead?
+public class CorpusViewerPanel extends DataViewerTab //TODO extend JDialog instead?
 {
 	JTextArea documentTextArea;
 	JTable documentTable;
 	RObjectChooser corpusSelector; //TODO replace with a friendlier corpus selection device, probably a scrollable list.
 	JFormattedTextField goToField;
+	boolean showSelector = false;
+	private JLabel corpusNameLabel;
 
-	public CorpusViewer()
+	public CorpusViewerPanel()
 	{
-		super(JGR.MAINRCONSOLE);
 
-		this.setTitle("Corpus Viewer");
-
+		corpusNameLabel = new JLabel("");
+		
 		corpusSelector = new RObjectChooser(this);
 		corpusSelector.setClassFilter("Corpus");
 		corpusSelector.refreshObjects();
@@ -61,6 +65,7 @@ public class CorpusViewer extends JDialog //TODO extend JDialog instead?
 				String corpus = corpusSelector.getSelectedObject();
 				if (corpus != null)
 				{
+					corpusNameLabel.setText(corpus);
 					try
 					{
 						int  nDocs = Deducer.eval(String.format("length(%s)", corpus)).asInteger();
@@ -263,7 +268,14 @@ public class CorpusViewer extends JDialog //TODO extend JDialog instead?
 		corpusSelectorPanel.add(new JLabel("Corpus:"), c);
 		c.gridx = 1;
 		c.weightx = 1;
-		corpusSelectorPanel.add(corpusSelector, c);
+		if (showSelector)
+		{
+			corpusSelectorPanel.add(corpusSelector, c);
+		}
+		else
+		{
+			corpusSelectorPanel.add(corpusNameLabel, c);
+		}
 
 		c = getTopLevelConstraints();
 		c.gridx = 0;
@@ -316,27 +328,41 @@ public class CorpusViewer extends JDialog //TODO extend JDialog instead?
 		c.gridwidth = 2;
 		everythingPanel.add(docStuffPane, c);
 
-		this.pack();
-		this.setMinimumSize(this.getSize());
-
 	}
 
 	public static void main(String[] args)
 	{
-		CorpusViewer cv2 =  new CorpusViewer()
-		{
-			@Override
-			public void setVisible(boolean b)
-			{
-				super.setVisible(b);
-				if (!b)
-				{
-					System.exit(0);
-				}
-			}
-		};
+		JFrame f = new JFrame();
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		CorpusViewerPanel cv2 =  new CorpusViewerPanel();
+		f.add(cv2);
+		f.setVisible(true);
+	}
 
-		cv2.setVisible(true);
+	@Override
+	public void setData(String data)
+	{
+		this.corpusSelector.setSelectedItem(data);
+	}
+
+	@Override
+	public void refresh()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public JMenuBar generateMenuBar()
+	{
+		return new JMenuBar(); //null?
+	}
+
+	@Override
+	public void cleanUp()
+	{
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -51,16 +51,17 @@ cens.word_cloud <- function(words){
   cloud(words, col = col.bbr(words, fit=TRUE));
 }
 
-#cens.txt_barplot <- function(words){
-#  barplot(words, las=2);
-#}
-
-# don't like this function.  Viewer should be constructed in Java.
-#cens.viewer <- function(words){
-#  x <- .jnew(J("edu.cens.text.CorpusViewer"), .jarray(cens.getCorpusNames()));
-#  x$setVisible(TRUE);
-#}
-
+make.color.scale<- function(aColor, bColor, steps, gradientExp=.5){
+	len <- steps-1
+	ret <- 0
+	for (i in 0:len)
+	{
+		alpha = (i/len)^gradientExp # doing this yields a better spread of color
+		ct = (1 - alpha) * aColor + alpha * bColor
+		ret[i+1] <- rgb(ct[1], ct[2], ct[3])
+	}
+	return(ret);
+}
 
 cens.choose_corpus <- function(){
   require(rJava);

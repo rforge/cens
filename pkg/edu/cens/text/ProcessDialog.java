@@ -73,6 +73,9 @@ public class ProcessDialog extends JDialog
 		}
 		//getComboBox().addItem("Porcus");
 		
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(0, 0, 10, 10);
+		this.setLayout(new GridBagLayout());
 		add(new JPanel()
 		{
 			{
@@ -171,9 +174,10 @@ public class ProcessDialog extends JDialog
 					}
 				}, c);
 			}
-		});
+		}, c);
 
 		pack();
+		setResizable(false);
 		setMinimumSize(this.getSize());
 
 	}
