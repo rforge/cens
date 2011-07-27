@@ -52,23 +52,19 @@ import org.rosuda.deducer.Deducer;
 
 public class TermFrequencyDialog extends JDialog
 {
-	public static final String BAR_CHART = "Bar Chart";
-	public static final String DOCUMENT_TERM_MATRIX = "Document-Term Matrix";
-	public static final String TOTAL_FREQUENCIES = "Total Frequencies";
-	public static final String WORD_CLOUD = "Word Cloud";
-	private static final String[] VIEW_MODES = { TOTAL_FREQUENCIES, BAR_CHART, WORD_CLOUD };
-	private static final Insets DIALOG_INSETS = new Insets(0, 7, 0, 7);
-	private boolean decreasing;
+	public static final int BAR_CHART = 1;
+	//public static final int DOCUMENT_TERM_MATRIX = -1;
+	public static final int TOTAL_FREQUENCIES = 0;
+	public static final int WORD_CLOUD = 2;
+	
 	private boolean useDocumentFrequency;
 
 	JTextField topPercentField;
 	JTextField minFreqField;
 	JTextField absoluteNTermsField;
-	JTextField saveTotalsField;
 
-	JComboBox dataSourceSelector;
+	JComboBox corpusSelector;
 	JComboBox viewMethodSelector;
-	JComboBox sortMethodSelector;
 
 	JRadioButton useAllButton = new JRadioButton();
 	JRadioButton useTopNButton = new JRadioButton();
@@ -80,15 +76,8 @@ public class TermFrequencyDialog extends JDialog
 
 	GridBagConstraints optionsPanelConstraints;
 
-	// Word cloud settings ============================
-	//This is a sign that word cloud should somehow have its own class
-	//A little abstract class that has getters for the important options,
-	//and an abstract method for generating an options panel.  Something similar
-	//for the other view methods would be sensible as well.
-	double WC_rotatePercentage;
-	double WC_minFontSize;
-	double WC_maxFontSize;
-	String WC_colors;
+	
+	private AbstractTermFrequencyViewer[] viewers;
 
 
 	public TermFrequencyDialog(JFrame parent)
@@ -96,36 +85,35 @@ public class TermFrequencyDialog extends JDialog
 		super(parent, "Term Frequency");
 		setLocationByPlatform(true);
 		this.parent = parent;
-
-		decreasing = true;
 		useDocumentFrequency = false;
 
 		//TODO : should probably separate construction / action listener setting from GUI arrangement.
-		saveTotalsField = new JTextField();
+		
+		viewers = new AbstractTermFrequencyViewer[]  { 
+					new FrequencyTotalViewer(this), 
+					new FrequencyBarChartViewer(this), 
+					new WordCloudViewer(this) 
+				};
 
 		constructGui();
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
-		// for (String corpus : corpuses)
-		// {
-		// dataSourceSelector.addItem(corpus);
-		// }
 	}
 
 	public void setCorpora(String[] newCorpora)
 	{
-		if (newCorpora != null && dataSourceSelector != null)
+		if (newCorpora != null && corpusSelector != null)
 		{
-			dataSourceSelector.removeAllItems();
+			corpusSelector.removeAllItems();
 			for (String s : newCorpora)
 			{
-				dataSourceSelector.addItem(s);
+				corpusSelector.addItem(s);
 			}
 		}
 	}
 
-	public void setViewMethod(String method)
+	public void setViewMethod(int method)
 	{
-		this.viewMethodSelector.setSelectedItem(method);
+		this.viewMethodSelector.setSelectedIndex(method);
 	}
 
 	public void constructGui()
@@ -208,31 +196,6 @@ public class TermFrequencyDialog extends JDialog
 		this.setResizable(false);// MAYBE not a good idea, but normal for dialogs.
 	}
 
-	public String getViewMethod()
-	{
-		return (String) this.viewMethodSelector.getSelectedItem();
-	}
-
-	// This is what the old options dialog used....
-	public String getSorted()
-	{
-		// "alpha" : "freq";
-		if (sortMethodSelector.getSelectedItem().equals("by frequency"))
-		{
-			return "freq";
-		}
-		else if (sortMethodSelector.getSelectedItem().equals("alphanumerically"))
-		{
-			return "alpha";
-		}
-		else
-		{
-			throw new IllegalStateException(
-					"Unrecognized value '"+ sortMethodSelector.getSelectedItem() +"'  from combo box!");
-		}
-		// return ((SortOptions) _sortedCMB.getSelectedItem()).getType();
-	}
-
 	public int getMinFrequency()
 	{
 		return Integer.parseInt(minFreqField.getText());
@@ -263,17 +226,11 @@ public class TermFrequencyDialog extends JDialog
 		// return _thresholdCMB.getSelectedItem().hashCode();
 	}
 
-	public boolean getAsc()
-	{
-		return decreasing;
-		// return ((SortOptions) _sortedCMB.getSelectedItem()).getSortAsc();
-	}
-
 	public String getCorpus()
 	{
-		if (this.dataSourceSelector.getSelectedItem() != null)
+		if (this.corpusSelector.getSelectedItem() != null)
 		{
-			return this.dataSourceSelector.getSelectedItem().toString();
+			return this.corpusSelector.getSelectedItem().toString();
 		} 
 		else
 		{
@@ -350,17 +307,14 @@ public class TermFrequencyDialog extends JDialog
 		sourceDataSelectionPanel.add(sourceDatLab, c);
 
 
-		dataSourceSelector = new JComboBox();
-
-		dataSourceSelector.addActionListener(new ActionListener()
+		corpusSelector = new JComboBox();
+		corpusSelector.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				//TODO validate!
-				String selectedCorpus = getCorpus();
-				if (selectedCorpus != null)
+				for (AbstractTermFrequencyViewer viewer : viewers)
 				{
-					saveTotalsField.setText(selectedCorpus + ".term_freq");
+					viewer.onCorpusChange(getCorpus());
 				}
 			}
 		});
@@ -370,7 +324,7 @@ public class TermFrequencyDialog extends JDialog
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.WEST;
 
-		sourceDataSelectionPanel.add(dataSourceSelector, c);
+		sourceDataSelectionPanel.add(corpusSelector, c);
 		return sourceDataSelectionPanel;
 	}
 
@@ -558,234 +512,10 @@ public class TermFrequencyDialog extends JDialog
 		JPanel ret = new JPanel(new GridBagLayout());
 		ret.setBorder(BorderFactory.createTitledBorder("View Options:"));
 
-		JPanel allOptionsPanel = new JPanel(new GridBagLayout());
+		JPanel allOptionsPanel = getSelectedViewer().getOptionsPanel();
 
 		GridBagConstraints c = getTopLevelLayoutDefaults();
-
-
-		if (this.viewMethodSelector.getSelectedItem().equals(BAR_CHART))
-		{
-			c = getTopLevelLayoutDefaults();
-			c.anchor = c.NORTH;
-			//c.insets = new Insets(0, 5, 5, 5);
-			c.ipady = 0; c.ipadx = 0;
-			allOptionsPanel.add(constructSortPanel(), c);
-		}
-		else if (this.viewMethodSelector.getSelectedItem().equals(TOTAL_FREQUENCIES))
-		{
-			c = getTopLevelLayoutDefaults();
-			c.anchor = c.CENTER;
-			c.gridwidth = 2;
-			c.weighty = 0;
-			//c.insets = new Insets(0, 5, 5, 5);
-			allOptionsPanel.add(constructSortPanel(), c);
-
-			c.gridy = 1;
-			c.weightx = 1;
-			c.weighty = 0;
-			c.fill = c.HORIZONTAL;
-			c.gridwidth = 2;
-			allOptionsPanel.add(new JSeparator(JSeparator.HORIZONTAL), c);
-
-			c.weightx = 0;
-			c.weighty = 0;
-			c.gridy = 2;
-			c.gridwidth = 1;
-			allOptionsPanel.add(new JLabel("Save Frequencies as Variable:"), c);
-
-			c.weightx = 1;
-			c.gridx = 0;
-			c.gridy = 3;
-			allOptionsPanel.add(saveTotalsField,c);
-
-			c.gridy = 3;
-			c.gridx = 1;
-			c.weightx = 0;
-			c.fill = c.NONE;
-			c.anchor = c.NORTHEAST;
-
-			JButton saveTotalsButton = new JButton("Save");
-			allOptionsPanel.add(saveTotalsButton, c);
-
-			saveTotalsButton.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					saveTotalsAsDataFrame(saveTotalsField.getText());
-
-				}
-			});
-
-		}
-		else if (this.viewMethodSelector.getSelectedItem().equals(WORD_CLOUD))
-		{
-			Double [] defaultFontSizes = {.25, 1.0, 2.0, 4.0, 8.0};
-
-			final JComboBox minFontSizeComboBox = new JComboBox(defaultFontSizes);
-			final JComboBox maxFontSizeComboBox = new JComboBox(defaultFontSizes);
-
-			minFontSizeComboBox.setEditable(true);
-			minFontSizeComboBox.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					WC_minFontSize = (Double) minFontSizeComboBox.getSelectedItem();//Double.parseDouble((String) minFontSizeComboBox.getSelectedItem());
-					maxFontSizeComboBox.setSelectedItem(Math.max(WC_minFontSize, WC_maxFontSize));
-				}
-			});
-
-
-			maxFontSizeComboBox.setEditable(true);
-			maxFontSizeComboBox.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					WC_maxFontSize = (Double) maxFontSizeComboBox.getSelectedItem();//Double.parseDouble((String) maxFontSizeComboBox.getSelectedItem());
-					minFontSizeComboBox.setSelectedItem(Math.min(WC_minFontSize, WC_maxFontSize));
-				}
-			});
-			minFontSizeComboBox.setSelectedItem(.25);
-			maxFontSizeComboBox.setSelectedItem(4.0);
-			
-			String[] colorings = 
-					{
-					"Black", 
-					"Black/White",
-					"Spectral", 
-					"Dark2",
-					"Purple/Green",
-					"Red/Cyan",
-					"Blue/Gold"
-					};
-			final JComboBox coloringComboBox = new JComboBox(colorings);
-			//Use these: 
-			//http://www.oga-lab.net/RGM2/func.php?rd_id=RColorBrewer:ColorBrewer
-			coloringComboBox.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					String colorItem = (String) coloringComboBox.getSelectedItem();
-					WC_colors = "'black'";
-					
-					if (colorItem.equals("Black"))
-					{
-						WC_colors = "'black'";
-					}
-					else if (colorItem.equals("Black/White"))
-					{
-						WC_colors = "make.color.scale(c(.95,.95,.95),c(0,0,0),256,.4)";
-					}
-					else if (colorItem.equals("Spectral"))
-					{
-						WC_colors = "brewer.pal(11,'Spectral')";
-					}
-					else if (colorItem.equals("Dark2"))
-					{
-						WC_colors = "brewer.pal(8,'Dark2')";
-					}
-					else if (colorItem.equals("Purple/Green"))
-					{
-						WC_colors = "brewer.pal(11,'PRGn')";
-					}
-					else if (colorItem.equals("Red/Cyan"))
-					{
-						WC_colors  = "make.color.scale(c(0,1,1), c(1,0,0),256,.25)";
-					}
-					else if (colorItem.equals("Blue/Gold"))
-					{
-						WC_colors = "make.color.scale(c(1,1,0), c(0,0,.85),256,.5)";
-					}
-					else
-					{
-						throw new IllegalStateException("unrecognized color! '"+ colorItem +"' from combo box!");
-					}
-				}
-			});
-			coloringComboBox.setSelectedIndex(0);
-
-			final JCheckBox rotateTermsCheckBox = new JCheckBox("Randomly Rotate Terms");
-			rotateTermsCheckBox.addItemListener(new ItemListener()
-			{
-				public void itemStateChanged(ItemEvent e)
-				{
-					if (e.getStateChange() == ItemEvent.SELECTED)
-					{
-						WC_rotatePercentage = .25;
-					} 
-					else
-					{
-						WC_rotatePercentage = 0;
-					}
-				}
-			});
-			rotateTermsCheckBox.setSelected(true);
-
-			c = getTopLevelLayoutDefaults();	
-
-			c.ipadx = 0;
-			c.ipady = 0;
-
-			c.gridx = 0;
-			c.anchor = c.EAST;
-			c.fill = c.NONE;
-			c.weightx = 0;
-			allOptionsPanel.add(new JLabel("Min Font Size:"),c);
-
-
-			c.gridx = 1;
-			c.anchor = c.WEST;
-			c.fill = c.NONE;
-			c.weightx = 1;
-			allOptionsPanel.add(minFontSizeComboBox,c);
-
-			c.gridx = 2;
-			c.gridy = 0;
-			c.anchor = c.EAST;
-			c.fill = c.NONE;
-			c.weightx = 0;
-			allOptionsPanel.add(new JLabel("Max Font Size:"),c);
-
-			c.gridx = 3;
-			c.gridy = 0;
-			c.anchor = c.WEST;
-			c.fill = c.NONE;
-			c.weightx = 1;
-			allOptionsPanel.add(maxFontSizeComboBox,c);
-
-			c.gridx = 0;
-			c.gridy = 1;
-			c.anchor = c.EAST;
-			c.fill = c.NONE;
-			c.weightx = 0;
-			c.gridwidth =1;
-			allOptionsPanel.add(new JLabel("Coloring:"),c);
-
-			c.gridx = 1;
-			c.gridy = 1;
-			c.anchor = c.WEST;
-			c.fill = c.HORIZONTAL;
-			c.weightx = 1;
-			c.gridwidth =3;
-			allOptionsPanel.add(coloringComboBox,c);
-
-			c.gridx = 1;
-			c.gridy = 2;
-			c.gridwidth = 3;
-			c.anchor = c.WEST;
-			c.fill = c.NONE;
-			allOptionsPanel.add(rotateTermsCheckBox,c);
-			
-			minFontSizeComboBox.setPreferredSize(new Dimension(60, minFontSizeComboBox.getPreferredSize().height));
-			maxFontSizeComboBox.setPreferredSize(new Dimension(60, maxFontSizeComboBox.getPreferredSize().height));
-
-			//allOptionsPanel.add(new JLabel("HEY! YOU!"), c);
-			//c.gridy++;
-			//allOptionsPanel.add(new JLabel("Get off of my word cloud."), c);
-		}
-		else
-		{
-			allOptionsPanel.add(new JLabel("Everything else"), c);
-		}
+		
 		c = getTopLevelLayoutDefaults();
 		c.gridy = 1;
 		c.anchor = c.NORTHWEST;
@@ -793,108 +523,6 @@ public class TermFrequencyDialog extends JDialog
 
 		ret.add(allOptionsPanel,c);
 		return ret;
-	}
-
-	protected void saveTotalsAsDataFrame(String saveName)
-	{
-		// TODO Implement some basic redundancy avoidance.
-
-		//Save the frequency totals to a temporary variable
-		String tempTotals = Deducer.getUniqueName("freqTotals");
-		Deducer.execute(tempTotals + " <- " + getTermFreqCall());
-
-		//NOTE: format of the output of the above call is a little weird.
-		//This is why I have the weird [1,] bracket indexing.
-
-		//Save the totals 
-		//saveName <- d(term=names(tempTotals[1,]),freq=tempTotals[1,])
-		Deducer.execute(saveName + " <- d(term=names(" + tempTotals + "), freq=" + tempTotals +")");
-
-		//delete the temporary variable
-		Deducer.execute("rm(" + tempTotals + ")");
-
-	}
-
-	private JPanel constructSortPanel()
-	{
-		GridBagConstraints c = getTopLevelLayoutDefaults();
-		JPanel sortPanel = new JPanel(new GridBagLayout());
-
-		//sortPanel.setBorder(BorderFactory.createTitledBorder("Sort: "));
-
-		JRadioButton descendingButton = new JRadioButton("descending");
-		JRadioButton ascendingButton = new JRadioButton("ascending");
-
-		ButtonGroup sortGroup = new ButtonGroup();
-		sortGroup.add(descendingButton);
-		sortGroup.add(ascendingButton);
-
-		ascendingButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				decreasing = false;
-			}
-		});
-
-		descendingButton.addActionListener(new ActionListener()
-		{
-
-			public void actionPerformed(ActionEvent e)
-			{
-				decreasing = true;
-			}
-		});
-
-		descendingButton.setSelected(true);
-
-		c.anchor =c.EAST;
-		c.weighty = 0;
-
-		sortPanel.add(new JLabel("Sort:"),c);
-
-		sortMethodSelector = new JComboBox();
-		sortMethodSelector.addItem("alphanumerically");
-		sortMethodSelector.addItem("by frequency");
-
-		// add combo box
-		c.weighty = 0;
-		c.weightx = 0;
-		c.gridx = 1;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.anchor =c.WEST;
-		sortPanel.add(sortMethodSelector, c);
-
-		JPanel radButtonPanel = new JPanel(new GridBagLayout());
-
-		// add descending radio button
-		c.anchor = GridBagConstraints.LINE_START;
-		// c.fill = GridBagConstraints.NONE;
-		c.gridwidth = 1;
-		c.gridx = 0;
-		c.gridy = 2;
-		//sortPanel.add(descendingButton, c);
-
-		// add ascending radio button
-		c.gridx = 1;
-		c.gridy = 2;
-		//sortPanel.add(ascendingButton, c);
-
-		//Put radio buttons on separate panel
-		c = getTopLevelLayoutDefaults();
-		radButtonPanel.add(descendingButton, c);
-		c.gridx = 1;
-		radButtonPanel.add(ascendingButton, c);
-
-		c = getTopLevelLayoutDefaults();
-		c.gridy = 1;
-		c.gridwidth = 2;
-		c.weightx = 1;
-		c.fill = c.HORIZONTAL;
-		sortPanel.add(radButtonPanel, c);
-
-		return sortPanel;
 	}
 
 	private JPanel constructViewMethodPanel()
@@ -929,7 +557,8 @@ public class TermFrequencyDialog extends JDialog
 				if (optionsPanel != null)
 				{
 					p.remove(optionsPanel);
-					optionsPanel = constructViewOptionsPanel();
+					optionsPanel = //getSelectedViewer().getOptionsPanel();  
+						constructViewOptionsPanel();
 					p.add(optionsPanel, optionsPanelConstraints);
 					thisPtr.setMinimumSize(null);
 					thisPtr.pack();
@@ -940,10 +569,10 @@ public class TermFrequencyDialog extends JDialog
 				}
 			}
 		});
-
-		for (String s : VIEW_MODES)
+		
+		for (AbstractTermFrequencyViewer v : viewers)
 		{
-			viewMethodSelector.addItem(s);
+			viewMethodSelector.addItem(v);
 		}
 
 
@@ -965,25 +594,34 @@ public class TermFrequencyDialog extends JDialog
 		return p;
 	}
 
-	private String getTermFreqCall()
+	public String getTermFreqCall(String extraArgs)
 	{
 		int percentage = getPercent();
 		int absoluteNTerms = getAbsoluteNTerms();
 		int minFreq = getMinFrequency();
-		String sorted = getSorted();
-		boolean ascending = getAsc();
+		//String sortOptions = sortArg == null ? "" : "sorted=\"" + sortArg + "\", "; 
+		//getSorted();
+		//boolean ascending = getAsc();
 
 		String termFreqCall = "cens.term_freq(" + 
 		"d=" + getCorpus() + ", " + 
 		"percent=" + percentage + ", " +
 		"topN=" + absoluteNTerms + ", " +
-		"sorted=\"" + sorted + "\", " +
-		"decreasing=" + (""+ascending).toUpperCase() + ", " +
 		"minFreq=" + minFreq + "," +
-		"useDocFreq=" + (""+useDocumentFrequency).toUpperCase() + ")";
+		"useDocFreq=" + (""+useDocumentFrequency).toUpperCase() + "," +
+		
+		extraArgs +
+		//sortOptions +
+		//"decreasing=" + (""+ascending).toUpperCase() + ", " +
+		")";
 		return termFreqCall;
 	}
 
+//	private String getTermFreqCall()
+//	{
+//		return getTermFreqCall("");
+//	}
+	
 	private void doVisualization()
 	{
 		// TODO validate selected name
@@ -1004,60 +642,15 @@ public class TermFrequencyDialog extends JDialog
 		} 
 		else
 		{
-
-			String termFreqCommand = getTermFreqCall();
-
-			if (getViewMethod().equals(BAR_CHART))
-			{
-				//TODO add options to set font size, margins?
-				//barplot(words, las=2);
-				String opar = Deducer.getUniqueName("opar");
-				Deducer.execute(opar + " <- par()",false); //save the original margin parameters
-				Deducer.execute("par(mar=c(8, 4, 4, 0.5))",false); //give the plot more space at the bottom for long words.
-				Deducer.execute(
-						"barplot(" 
-						+ 
-						termFreqCommand + "," 
-						+
-						"cex.names=0.8," //make the terms a bit smaller
-						+
-				" las=2);");
-
-				Deducer.execute("dev.set()", false); //give the plot focus
-				Deducer.execute("par("+ opar +")",false);
-			}
-			else if (getViewMethod().equals(TOTAL_FREQUENCIES))
-			{
-				Deducer.execute("print(" + termFreqCommand + ");");
-				//					+ getCorpus() + ", " + percentage + ", " + "\""
-				//					+ sorted + "\", "
-				//					+ new String("" + ascending).toUpperCase() + "));");
-			} 
-			else if (getViewMethod().equals(WORD_CLOUD))
-			{
-				//TODO sanity check # of words in cloud, give warning if too huge
-
-
-
-				String tempFreq = Deducer.getUniqueName("tempFreq");
-				Deducer.execute(tempFreq + "<-" + termFreqCommand);
-				Deducer.execute("wordcloud(" +
-						"names("+ tempFreq + "), " + 
-						tempFreq +
-						", min.freq=0 " +
-						
-						//given its penchant for not being able to display every word, 
-						//it's probably best to display the most frequent words first.
-						", random.order=FALSE" + 
-						", scale = c(" + WC_maxFontSize + ", " + WC_minFontSize + ")" +
-						", colors=" + WC_colors +
-						", rot.per=" + WC_rotatePercentage +")");
-				Deducer.execute("rm(" + tempFreq + ")");
-				Deducer.execute("dev.set()", false); //give the plot focus
-			}
+			getSelectedViewer().executeView();
 		}
 	}
 
+	private AbstractTermFrequencyViewer getSelectedViewer()
+	{
+		return ((AbstractTermFrequencyViewer) this.viewMethodSelector.getSelectedItem());
+	}
+	
 	public static void main(String[] args)
 	{
 		JFrame f = new JFrame();
