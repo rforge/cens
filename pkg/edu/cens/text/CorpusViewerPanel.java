@@ -1,3 +1,17 @@
+/**
+ * A panel containing a corpus viewer.
+ * 
+ * It consists of: 
+ * - a table of all documents, 
+ * 
+ * - a text area which shows the full text of the document selected in the table 
+ * 
+ * - a text field that allows you to select/go to a specific doc. in the table
+ * 
+ * - an optional combobox used to select the active corpus.  
+ * This can be replaced with a label displaying the name of the active corpus.
+ * 
+ */
 package edu.cens.text;
 
 import java.awt.BorderLayout;
@@ -46,11 +60,18 @@ public class CorpusViewerPanel extends DataViewerTab //TODO extend JDialog inste
 	JTable documentTable;
 	RObjectChooser corpusSelector; //TODO replace with a friendlier corpus selection device, probably a scrollable list.
 	JFormattedTextField goToField;
-	boolean showSelector = false;
+	boolean showCorpusSelector = false;
 	private JLabel corpusNameLabel;
 
-	public CorpusViewerPanel()
+	/**
+	 * 
+	 * @param showCorpusSelector if true, display the corpus selecting combobox,
+	 * else display a JLabel of the currently active corpus
+	 */
+	public CorpusViewerPanel(boolean showCorpusSelector)
 	{
+		
+		this.showCorpusSelector = showCorpusSelector;
 
 		corpusNameLabel = new JLabel("");
 		
@@ -268,7 +289,7 @@ public class CorpusViewerPanel extends DataViewerTab //TODO extend JDialog inste
 		corpusSelectorPanel.add(new JLabel("Corpus:"), c);
 		c.gridx = 1;
 		c.weightx = 1;
-		if (showSelector)
+		if (showCorpusSelector)
 		{
 			corpusSelectorPanel.add(corpusSelector, c);
 		}
@@ -334,7 +355,7 @@ public class CorpusViewerPanel extends DataViewerTab //TODO extend JDialog inste
 	{
 		JFrame f = new JFrame();
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		CorpusViewerPanel cv2 =  new CorpusViewerPanel();
+		CorpusViewerPanel cv2 =  new CorpusViewerPanel(false);
 		f.add(cv2);
 		f.setVisible(true);
 	}

@@ -1,3 +1,10 @@
+/**
+ * A combo box containing the all defined R-objects of a particular class.
+ * 
+ * TODO a combo box is not good for large numbers of variables.
+ * Change to something equally compact, but more efficient, and powerful
+ */
+
 package edu.cens.text;
 
 import java.awt.Color;

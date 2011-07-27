@@ -1,3 +1,20 @@
+/**
+ * Dialog for viewing and manipulating term frequency in a variety of ways. 
+ * You can currently view term frequencies as:
+ * - Word clouds:
+ * Controls for font size, color, and rotation are provided
+ * 
+ * - Simple lists:
+ * Controls for sorting, and saving the list as a dataframe are provided
+ * 
+ * - Bar plots:
+ * Controls for sorting are provided
+ * 
+ * TODO Too much functionality is crammed into this class. The particulars of 
+ * each viewing method should be factored into its own class.
+ * 
+ * TODO it would make sense to view the term-document matrix from this dialog as well
+ */
 package edu.cens.text;
 
 import java.awt.BorderLayout;

@@ -1,3 +1,25 @@
+/**
+ * A dialog for importing text files into a corpus, new or existing.
+ * 
+ * It consists of 
+ * - A file browser
+ * 	The user can select a document, or many documents
+ * 
+ * - A file filter combo box
+ * 
+ * - Radio buttons for making a new corpus, and appending to an existing corpus
+ * 
+ * - A text field for naming the new corpus
+ * Visible only if the 'make new corpus' radio button is selected
+ * 
+ * - A combo box for selecting and existing corpus, to which the selected documents are appended
+ * Visible only if the 'add to existing corpus' radio button is selected
+ * 
+ * - OK/Cancel buttons
+ * 
+ * TODO Add 'Help' button
+ *  
+ */
 package edu.cens.text;
 
 import java.awt.BorderLayout;
@@ -31,6 +53,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileFilter;
 
 import org.rosuda.JGR.JGR;
 import org.rosuda.deducer.Deducer;
@@ -176,31 +199,28 @@ public class TextFileChooser
 		
 		actualDialogPanel = new JFrame();
 		actualDialogPanel.setLayout(new BorderLayout());
-		
-		//fc.setControlButtonsAreShown(false); //Unfortunately necessary
-		//removeAllButtons(fc);
 	
 		actualDialogPanel.add(fc, BorderLayout.CENTER);
 		actualDialogPanel.add(constructExtraOptionsPanel(), BorderLayout.NORTH);
 		
 		
-		//Remove the 'Make New folder' button, if present
 		
 		
-	//	setFileSelectionMode(JFileChooser.FILES_ONLY);
-	//	setDialogType(CUSTOM_DIALOG);
-//		addChoosableFileFilter(new FileFilter()
-//		{
-//			public String getDescription()
-//			{
-//				return "Text files";
-//			}
-//			
-//			public boolean accept(File f)
-//			{
-//				return f.getName().toLowerCase().endsWith(".txt");
-//			}
-//		});
+	fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	
+	fc.addChoosableFileFilter(new FileFilter()
+		{
+			public String getDescription()
+			{
+				return "Text files (*.txt *.rtf)";
+			}
+			
+			public boolean accept(File f)
+			{
+				String fname  = f.getName().toLowerCase();
+				return fname.endsWith(".txt") || fname.endsWith(".rtf");
+			}
+		});
 		
 //		addChoosableFileFilter(new FileFilter()
 //		{

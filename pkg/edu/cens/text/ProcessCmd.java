@@ -8,6 +8,9 @@ import java.awt.event.ActionListener;
 
 /**
  * Created by IntelliJ IDEA. User: Neal Date: 2/22/11 Time: 10:00 PM
+ * 
+ * An enum that encapsulates each text-preprocessing action in R.
+ * 
  */
 
 public enum ProcessCmd

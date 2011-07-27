@@ -1,17 +1,16 @@
+/**
+ * A panel containing an up button and a down button.  Used in PreprocessingTable
+ * for reordering preprocessing actions. 
+ */
+
 package edu.cens.text;
 
-import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.basic.BasicArrowButton;
 

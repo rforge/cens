@@ -21,6 +21,8 @@ import java.io.File;
 
 /**
  * Created by IntelliJ IDEA. User: Neal Date: 1/15/11 Time: 1:08 PM
+ * 
+ * Initialized DeducerText menubar, and GUI stuff for JGR
  */
 
 public class Text
@@ -137,7 +139,7 @@ public static String[] getCorpora()
 		{
 			public DataViewerTab makeViewerTab(String dataName)
 			{
-				CorpusViewerPanel ret = new CorpusViewerPanel();
+				CorpusViewerPanel ret = new CorpusViewerPanel(false);
 				ret.setData(dataName);
 				return ret;
 			}
@@ -206,7 +208,7 @@ public static String[] getCorpora()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				new ProcessDialog().setVisible(true);
+				new PreprocessingDialog().setVisible(true);
 			}
 		});
 		textMenu.add(preprocCorpMenuItem);

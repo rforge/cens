@@ -1,10 +1,20 @@
 package edu.cens.text;
 
 /**
- * TODO 
- * - Add in Run, cancel, help button bar
- * - Add individual options menus
- * - Implement reordering
+ * A table for containing text-corpus preprocessing actions.
+ * 
+ * Each row represents an action.  A row will contain:
+ * - The action's name
+ * 
+ * - A check box for enabling/disabling the action
+ * 
+ * - A button for bringing up options specific to the action
+ * 
+ * - A pair of buttons for moving the position of an action-row up or down
+ * This is for controlling the order in which the actions are applied
+ * 
+ * NOTE: this class is separate from the actual dialog for preprocessing text
+ * 
  */
 
 import java.awt.BorderLayout;
@@ -193,15 +203,11 @@ public class PreprocessingTable extends JTable
 	
 	public static void main(String[] args)
 	{
-		PreprocessingDialog frame = new PreprocessingDialog();
-		frame.addWindowListener(new WindowAdapter()
-		{
-			
-			public void windowClosing(WindowEvent e)
-			{
-				System.exit(0);
-			}
-		});
+		JFrame frame = new JFrame();
+		frame.add(new PreprocessingTable(3));
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.pack();
+		frame.setVisible(true);
 	}
 	
 }
@@ -436,44 +442,3 @@ class OptionsButtonPanel extends JPanel
 	}
 }
 
-class PreprocessingDialog extends JFrame
-{
-	
-	//public static OptionsButtonPanel2[] panels;
-
-	//TODO separate model and view!
-	JTable table;
-	
-	
-	public PreprocessingDialog()
-	{
-		super("Preprocess");
-		UIDefaults ui = UIManager.getLookAndFeel().getDefaults();
-		UIManager.put("RadioButton.focus", ui.getColor("control"));
-
-		//panels = new OptionsButtonPanel2[2];
-		//panels[0] = new OptionsButtonPanel2();
-		//panels[1] = new OptionsButtonPanel2();
-		
-		
-
-		
-		final PreprocessingDialog thisDialog = this;
-
-		table = new PreprocessingTable(3);
-			/*new JTable(new PreproListModel(tableContents))
-		{
-			
-			public void tableChanged(TableModelEvent e)
-			{
-				super.tableChanged(e);
-				repaint();
-			}
-		};*/
-		
-		JScrollPane scroll = new JScrollPane(table);
-		getContentPane().add(scroll);
-		setSize(200, 140);
-		setVisible(true);
-	}
-}

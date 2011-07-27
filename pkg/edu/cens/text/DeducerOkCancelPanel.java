@@ -1,3 +1,8 @@
+/**
+ * A panel containing and OK and cancel button.
+ * 
+ * TODO It should optionally include a help button off to the left.
+ */
 package edu.cens.text;
 
 import java.awt.Container;
