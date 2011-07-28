@@ -96,6 +96,7 @@ public class TextFileChooser
 					
 					System.out.println(pickedFiles.length + " " + fc.isMultiSelectionEnabled());
 					
+					
 					String enclosingDir = fc.getCurrentDirectory().getAbsolutePath();//pickedFiles[0].getParent();
 					
 					for (int i = 0; i < pickedFiles.length; i++)
@@ -149,6 +150,13 @@ public class TextFileChooser
 							
 						 if (validCommand)
 						 {
+							 //Windows uses back slashes for file paths.
+							 //R can handle it, but only if they're double backslashes.
+							 if (File.separatorChar == '\\')
+							 {
+								 enclosingDir = enclosingDir.replace(""+File.separatorChar, "\\\\");
+							 }
+							 
 							Deducer.execute
 							//System.out.println
 							(newCorpusName + " <- Corpus( " +
@@ -213,7 +221,7 @@ public class TextFileChooser
 		actualDialog.setLayout(new BorderLayout());
 	
 		actualDialog.add(fc, BorderLayout.CENTER);
-		actualDialog.add(constructExtraOptionsPanel(), BorderLayout.NORTH);
+		actualDialog.add(constructExtraOptionsPanel(), BorderLayout.SOUTH);
 		
 		
 		
