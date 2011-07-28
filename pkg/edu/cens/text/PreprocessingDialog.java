@@ -38,8 +38,6 @@ public class PreprocessingDialog extends JDialog
 
 	PreprocessingTable _table;
 	
-	 JFrame parent = JGR.MAINRCONSOLE == null ? new JFrame() : JGR.MAINRCONSOLE;
-	
 	protected ObjectChooserWidget _source = new ObjectChooserWidget("Source Corpus:", this)
 	{
 		{
@@ -65,8 +63,9 @@ public class PreprocessingDialog extends JDialog
 	}
 
 
-	public PreprocessingDialog()
+	public PreprocessingDialog(JFrame parent)
 	{
+		super(parent);
 		setTitle("Preprocess Corpus...");
 		
 		_source.getComboBox().addActionListener(new ActionListener()
@@ -268,9 +267,16 @@ public class PreprocessingDialog extends JDialog
 	private boolean debugForceShow = false;
 	
 	
-	public void setVisible(boolean arg0)
+	public void setVisible(boolean visible)
 	{
-		if (arg0 == true && _source.getModel() == null && !debugForceShow)
+		
+		if (visible)
+		{
+			this.setLocationRelativeTo(this.getParent());
+		}
+		
+		
+		if (visible == true && _source.getModel() == null && !debugForceShow)
 		{
 		Toolkit.getDefaultToolkit().beep();
 		JOptionPane.showMessageDialog(getContentPane(),
@@ -281,14 +287,14 @@ public class PreprocessingDialog extends JDialog
 			    JOptionPane.WARNING_MESSAGE);
 		}
 
-		super.setVisible(arg0);
+		super.setVisible(visible);
 	}
 	
 	public static void main(String[] args)
 	{
 		JFrame f = new JFrame();
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		PreprocessingDialog dlg = new PreprocessingDialog();
+		PreprocessingDialog dlg = new PreprocessingDialog(null);
 		f.setVisible(true);
 		dlg.addWindowListener(new WindowAdapter()
 		{

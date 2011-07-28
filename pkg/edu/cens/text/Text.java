@@ -178,7 +178,7 @@ public static String[] getCorpora()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				TextFileChooser tfc = new TextFileChooser();
+				TextFileChooser tfc = new TextFileChooser(JGR.MAINRCONSOLE);
 				tfc.run();
 			}
 		});
@@ -193,7 +193,6 @@ public static String[] getCorpora()
 				//JFrame f = new JFrame();
 				// needsRLocked=true;
 				ExtractCorpusDialog inst = new ExtractCorpusDialog( JGR.MAINRCONSOLE );
-				inst.setLocationRelativeTo(null);
 				inst.setVisible(true);
 				WindowTracker.addWindow(inst);
 			}
@@ -208,7 +207,7 @@ public static String[] getCorpora()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				new PreprocessingDialog().setVisible(true);
+				new PreprocessingDialog(JGR.MAINRCONSOLE).setVisible(true);
 			}
 		});
 		textMenu.add(preprocCorpMenuItem);
@@ -220,7 +219,7 @@ public static String[] getCorpora()
 			public void actionPerformed(ActionEvent e)
 			{
 				//Deducer.eval("cens.viewer();");
-				new CorpusViewer().setVisible(true);
+				new CorpusViewer(JGR.MAINRCONSOLE).setVisible(true);
 			}
 		});
 		textMenu.add(viewCorpMenuItem);

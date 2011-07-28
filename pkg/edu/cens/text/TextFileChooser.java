@@ -43,6 +43,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -64,7 +65,7 @@ public class TextFileChooser
 {
 	
 	private JFileChooser fc;
-	JFrame actualDialogPanel;
+	JDialog actualDialog;
 	
 	boolean useExistingCorpus = false;
 
@@ -73,7 +74,7 @@ public class TextFileChooser
 	String existingCorpus = null;
 	
 	private static String mostRecentPath = null;
-	public TextFileChooser()
+	public TextFileChooser(JFrame parent)
 	{
 		fc = new JFileChooser();
 		
@@ -156,7 +157,7 @@ public class TextFileChooser
 							+ "pattern='" + patternString +"'"
 								
 							+ "))");
-							actualDialogPanel.dispose();
+							actualDialog.dispose();
 						 }
 						
 					
@@ -185,23 +186,34 @@ public class TextFileChooser
 						//System.out.println
 						("rm(" + tempCorp + ")");
 						
-						actualDialogPanel.dispose();
+						actualDialog.dispose();
 						
 					} //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		        } 
 		        else if (command.equals(JFileChooser.CANCEL_SELECTION)) 
 		        {
-		          actualDialogPanel.dispose();
+		          actualDialog.dispose();
 		        }
 				
 			}
 		});
 		
-		actualDialogPanel = new JFrame();
-		actualDialogPanel.setLayout(new BorderLayout());
+		actualDialog = new JDialog(parent)
+		{
+			public void setVisible(boolean visible)
+			{
+				if (visible)
+				{
+					this.setLocationRelativeTo(this.getParent());
+				}
+				super.setVisible(visible);
+			}
+		};
+		
+		actualDialog.setLayout(new BorderLayout());
 	
-		actualDialogPanel.add(fc, BorderLayout.CENTER);
-		actualDialogPanel.add(constructExtraOptionsPanel(), BorderLayout.NORTH);
+		actualDialog.add(fc, BorderLayout.CENTER);
+		actualDialog.add(constructExtraOptionsPanel(), BorderLayout.NORTH);
 		
 		
 		
@@ -398,14 +410,14 @@ public class TextFileChooser
 			fc.setCurrentDirectory(new File(mostRecentPath));
 		}
 		
-		actualDialogPanel.pack();
-		actualDialogPanel.setVisible(true);
+		actualDialog.pack();
+		actualDialog.setVisible(true);
 	}
 
 	public static void main(String[] args)
 	{
-		TextFileChooser tfc = new TextFileChooser();
-		tfc.actualDialogPanel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		TextFileChooser tfc = new TextFileChooser(null);
+		tfc.actualDialog.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		tfc.run();
 	}

@@ -351,6 +351,14 @@ public class ExtractCorpusDialog extends JDialog implements ActionListener
 		dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	}
 
+	public void setVisible(boolean show)
+	{
+		if (show)
+		{
+			this.setLocationRelativeTo(this.getParent());
+		}
+		super.setVisible(show);
+	}
 	
 	public void actionPerformed(ActionEvent arg0) 
 	{

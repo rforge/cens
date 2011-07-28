@@ -47,9 +47,9 @@ import org.rosuda.deducer.widgets.ObjectChooserWidget;
 public class CorpusViewer extends JDialog //TODO extend JDialog instead?
 {
 
-	public CorpusViewer()
+	public CorpusViewer(JFrame parent)
 	{
-		super(JGR.MAINRCONSOLE);
+		super(parent);
 		this.add(new CorpusViewerPanel(true));
 		this.setTitle("View Corpus");
 
@@ -63,6 +63,7 @@ public class CorpusViewer extends JDialog //TODO extend JDialog instead?
 		{
 			this.pack();
 			this.setMinimumSize(this.getSize());
+			this.setLocationRelativeTo(this.getParent());
 		}
 		super.setVisible(visible);
 	}
@@ -71,7 +72,7 @@ public class CorpusViewer extends JDialog //TODO extend JDialog instead?
 
 	public static void main(String[] args)
 	{
-		CorpusViewer cv2 =  new CorpusViewer()
+		CorpusViewer cv2 =  new CorpusViewer(null)
 		{
 			@Override
 			public void setVisible(boolean b)

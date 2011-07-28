@@ -72,8 +72,6 @@ public class TermFrequencyDialog extends JDialog
 
 	JPanel optionsPanel;
 
-	JFrame parent;
-
 	GridBagConstraints optionsPanelConstraints;
 
 	
@@ -83,8 +81,6 @@ public class TermFrequencyDialog extends JDialog
 	public TermFrequencyDialog(JFrame parent)
 	{
 		super(parent, "Term Frequency");
-		setLocationByPlatform(true);
-		this.parent = parent;
 		useDocumentFrequency = false;
 
 		//TODO : should probably separate construction / action listener setting from GUI arrangement.
@@ -592,6 +588,16 @@ public class TermFrequencyDialog extends JDialog
 		// p.setBorder(BorderFactory.createTitledBorder("View:"));
 
 		return p;
+	}
+
+	
+	public void setVisible(boolean show)
+	{
+		if (show)
+		{
+			this.setLocationRelativeTo(this.getParent());
+		}
+		super.setVisible(show);
 	}
 
 	public String getTermFreqCall(String extraArgs)
