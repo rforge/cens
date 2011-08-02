@@ -1,7 +1,7 @@
 Package: wordcloud
 Type: Package
 Title: Word Clouds
-Version: 1.1
+Version: 1.2
 Date: 2011-06-06
 Author: Ian Fellows
 Maintainer: Ian Fellows <thefell@gmail.com>
