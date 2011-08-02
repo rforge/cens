@@ -408,8 +408,11 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
             _vp = new ViewPanel(_device,this);
             _plotHolder.add(_vp);
         }
-        if(cmd ==null || "".equals(cmd))
+        if(cmd ==null || "".equals(cmd)){
+        	_device.reset();
+        	_device.repaint();
             return;
+        }
         _okayCancel.getApproveButton().setEnabled(false);
         final JLabel lab = new JLabel("plotting...");
         lab.setHorizontalAlignment(JLabel.CENTER);
