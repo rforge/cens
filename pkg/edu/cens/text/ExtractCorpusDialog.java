@@ -179,7 +179,8 @@ public class ExtractCorpusDialog extends JDialog implements ActionListener
 		c.insets = new Insets(insetVal, insetVal, insetVal, insetVal);
 
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		pack(); 
+		pack();
+		
 		
 		////////////////////////////////////////
 		///// Register action listeners ////////
@@ -282,7 +283,7 @@ public class ExtractCorpusDialog extends JDialog implements ActionListener
 		
 		//factor.setMo
 		//((DefaultListModel) factor.getModel()).add(0, "1thing");
-		setMinimumSize(new Dimension(300, 200));
+		setMinimumSize(new Dimension(300, 350));
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setModal(true);
 	}

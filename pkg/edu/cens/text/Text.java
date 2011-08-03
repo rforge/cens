@@ -33,7 +33,7 @@ public class Text
 	
 public static String[] getCorpora()
 {
-	org.rosuda.REngine.REXP corpora = Deducer.eval("cens.getCorpusNames()");//.asList().keys();
+	org.rosuda.REngine.REXP corpora = Deducer.eval("get.objects(\"Corpus\")");//.asList().keys();
 	
 	String[] v = {};
 	try
@@ -134,7 +134,7 @@ public static String[] getCorpora()
 	{
 		
 		DataViewerController.init();
-		DataViewerController.addDataType("VCorpus", "text-corpus");
+		DataViewerController.addDataType("VCorpus", "txt");
 		DataViewerController.addTabFactory("VCorpus","Data View", new DataViewerTabFactory()
 		{
 			public DataViewerTab makeViewerTab(String dataName)
@@ -173,7 +173,7 @@ public static String[] getCorpora()
 
 		JMenu textMenu = EzMenuSwing.getMenu(JGR.MAINRCONSOLE, text);
 
-		final JMenuItem importTextMenuItem = new JMenuItem("Import Text(s) as Corpus");
+		final JMenuItem importTextMenuItem = new JMenuItem("Import Corpus From File");
 		importTextMenuItem.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

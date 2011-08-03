@@ -9,11 +9,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
+import javax.swing.InputVerifier;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.text.JTextComponent;
 
 import org.rosuda.deducer.Deducer;
 
@@ -41,6 +46,32 @@ public class WordCloudViewer extends AbstractTermFrequencyViewer
 
 		final JComboBox minFontSizeComboBox = new JComboBox(defaultFontSizes);
 		final JComboBox maxFontSizeComboBox = new JComboBox(defaultFontSizes);
+		
+		InputVerifier positiveDoubleVerifier = new InputVerifier()
+		{
+			public boolean verify(JComponent input)
+			{
+				final JTextComponent source = (JTextComponent) input;
+        String text = source.getText();
+        
+    		try
+    		{
+    			Double dub = Double.parseDouble(text);
+    			return dub >= 0;
+    		}
+    		catch (NumberFormatException e)
+    		{
+    			return false;
+    		}
+        
+			}
+		};
+		
+		((JTextField)(minFontSizeComboBox.getEditor().getEditorComponent())).
+		setInputVerifier(positiveDoubleVerifier); 
+		
+		((JTextField)(maxFontSizeComboBox.getEditor().getEditorComponent())).
+		setInputVerifier(positiveDoubleVerifier); 
 
 		minFontSizeComboBox.setEditable(true);
 		minFontSizeComboBox.addActionListener(new ActionListener()

@@ -115,9 +115,10 @@ public abstract class AbstractTermFrequencyViewer
 		sortPanel.add(new JLabel("Sort:"),c);
 
 		sortMethodSelector = new JComboBox();
-		sortMethodSelector.addItem("alphanumerically");
 		sortMethodSelector.addItem("by frequency");
-
+		sortMethodSelector.addItem("alphanumerically");
+		sortMethodSelector.setSelectedIndex(0);
+		
 		// add combo box
 		c.weighty = 0;
 		c.weightx = 0;

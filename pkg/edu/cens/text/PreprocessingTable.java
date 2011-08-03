@@ -165,6 +165,10 @@ public class PreprocessingTable extends JTable
 	{
 		return (Boolean) tableContents[row][ENABLED_CHECKBOX_COLUMN];
 	}
+	public void setEnabled(int row, boolean enabled)
+	{
+		tableContents[row][ENABLED_CHECKBOX_COLUMN] = enabled;
+	}
 	
 	
 	public void tableChanged(TableModelEvent e)

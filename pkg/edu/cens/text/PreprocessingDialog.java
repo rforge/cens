@@ -131,6 +131,8 @@ public class PreprocessingDialog extends JDialog
 					_table.setHasOption(items.length > 0, i);
 					_table.setOptionsMenu(ithMenu, i);
 				}
+				_table.setEnabled(4, false);
+				_table.setEnabled(5, false);
 				
 				JPanel p = new JPanel();
 				p.setBorder(BorderFactory.createTitledBorder("Actions:"));

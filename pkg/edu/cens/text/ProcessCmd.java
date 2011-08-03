@@ -17,6 +17,8 @@ public enum ProcessCmd
 {
 
 	tolower("To Lower Case", "tm_map(%s, tolower)"), 
+	depunct("Remove Punctuation", "tm_map(%s, removePunctuation)"),
+	denumber("Remove Numbers", "tm_map(%s, removeNumbers)"),
 	deword(	"Remove Stop Words", "tm_map(%s, removeWords, stopwords())")
 	{
 		
@@ -41,8 +43,6 @@ public enum ProcessCmd
 			};
 		}
 	},
-
-	depunct("Remove Punctuation", "tm_map(%s, removePunctuation)"), 
 	strip("Remove Whitespace", "tm_map(%s, stripWhitespace)"), 
 	stem("Stem Words", "tm_map(%s, stemDocument)"), ;
 

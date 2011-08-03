@@ -372,7 +372,7 @@ public class TermFrequencyDialog extends JDialog
 		useTopNButton = new JRadioButton();
 		useTopPercentButton = new JRadioButton();
 
-		useAllButton.setSelected(true);
+		useTopNButton.setSelected(true);
 		//This line ensures each this radio button row has same height as others.
 		useAllButton.setPreferredSize
 		(
@@ -395,7 +395,7 @@ public class TermFrequencyDialog extends JDialog
 		c.ipadx = 7;
 		// ======== 'Use all' radio button row =======================
 		c.gridx = 0;
-		c.gridy = 0;
+		c.gridy = 2;
 		c.weightx = 0;
 		usePanelInner.add(useAllButton, c);
 		// add text for use all
@@ -406,7 +406,7 @@ public class TermFrequencyDialog extends JDialog
 
 		// ======= 'Use top #' radio button row =======================
 		c.gridx = 0;
-		c.gridy = 1;
+		c.gridy = 0;
 		c.gridwidth = 1;
 		usePanelInner.add(useTopNButton, c);
 
@@ -424,7 +424,7 @@ public class TermFrequencyDialog extends JDialog
 
 		// ======= 'Use top N %' radio button row =======================
 		c.gridx = 0;
-		c.gridy = 2;
+		c.gridy = 1;
 		c.gridwidth = 1;
 		usePanelInner.add(useTopPercentButton, c);
 
@@ -435,7 +435,7 @@ public class TermFrequencyDialog extends JDialog
 
 		c.gridx = 2;
 		
-		this.topPercentField = new JTextField("100", 3);
+		this.topPercentField = new JTextField("20", 3);
 		//		topPercentField.setPreferredSize(new Dimension(50, topPercentField
 		//				.getPreferredSize().height));
 		usePanelInner.add(topPercentField, c);
