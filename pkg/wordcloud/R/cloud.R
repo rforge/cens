@@ -62,7 +62,7 @@ wordcloud <- function(words,freq,scale=c(4,.5),min.freq=3,max.words=Inf,random.o
 		FALSE
 	}
 	
-	ord <- order(freq,decreasing=TRUE)
+	ord <- rank(-freq, ties.method = "random")
 	words <- words[ord<=max.words]
 	freq <- freq[ord<=max.words]
 	
