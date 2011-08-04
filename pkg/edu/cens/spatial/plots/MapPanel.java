@@ -2,9 +2,13 @@ package edu.cens.spatial.plots;
 
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -13,12 +17,15 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.rosuda.JGR.layout.AnchorConstraint;
 
 public class MapPanel extends JMapViewer{
 
 	JLayeredPane pane;
+	
+	Rectangle2D.Double subsetRectangle = null;
 	
 	public MapPanel(JLayeredPane pa){
 		super();
@@ -89,6 +96,90 @@ public class MapPanel extends JMapViewer{
 	public void addSliderListener(ChangeListener cl){
 		zoomSlider.addChangeListener(cl);
 	}
+	
 
+	//Let's try doing some of our drawing in java.
+	public void paint(Graphics g)
+	{
+		super.paint(g);
+		
+		if (subsetRectangle != null)
+		{
+			Graphics2D g2 = (Graphics2D) g; 
+			g2.draw(subsetRectangle);
+		}
+	}
+
+	//public void drawSubsetRectangle(Point corner1, Point corner2)
+	public void drawSubsetRectangle(Coordinate corner1, Coordinate corner2, boolean scrollIfClickedOutside)
+	//public void drawSubsetRectangle(Coordinate corner1, Point corner2)
+	{
+//		double minLat = Math.min(corner1.getLat(), corner2.getLat());
+//		double minLong = Math.min(corner1.getLon(), corner2.getLon());
+//		
+//		double maxLat = Math.max(corner1.getLat(), corner2.getLat());
+//		double maxLong = Math.max(corner1.getLon(), corner2.getLon());
+		
+		
+		Point activePt = //corner2; 
+			getMapPosition(corner2, false); //The one the user drags
+		
+		int maxScroll = 10;
+		
+		if (scrollIfClickedOutside)
+			{
+			if(activePt.x <= 0)
+			{
+				int disp = (activePt.x - 0) ;
+				disp = Math.max(disp, -maxScroll);
+				moveMap(disp, 0);
+			} 
+			else if(activePt.x >= getWidth() - 0)
+			{
+				int disp = -(getWidth() - activePt.x);
+				disp = Math.min(disp, maxScroll);
+				moveMap(disp, 0);
+			}
+		}
+		
+		Point p1 = getMapPosition(corner1, false);
+		Point p2 = //corner2; 
+			getMapPosition(corner2, false);
+		//p2.x += activeDisp.x;
+		
+		double x1 = Math.min(p1.x, p2.x);
+		double y1 = Math.min(p1.y, p2.y);
+		
+		double x2 = Math.max(p1.x, p2.x);
+		double y2 = Math.max(p1.y, p2.y);
+		
+		Point minPt = new Point((int) x1, (int)  y1);
+		Point maxPt = new Point((int) x2, (int)  y2);
+		
+//		double x1 = Math.min(corner1.x, corner2.x);
+//		double y1 = Math.min(corner1.y, corner2.y);
+//		
+//		double x2 = Math.max(corner1.x, corner2.x);
+//		double y2 = Math.max(corner1.y, corner2.y);
+		
+//		Point clickPt1 = new Point((int)x1, (int)y1);
+//		Point clickPt2 = new Point((int)x2, (int)y2);
+//		
+//		Coordinate latlon = getPosition(clickPt1);
+//		
+//		clickPt1 = getMapPosition(latlon);
+		
+		subsetRectangle = new Rectangle2D.Double(minPt.x, minPt.y, maxPt.x - minPt.x, maxPt.y - minPt.y);
+		
+			//new Rectangle2D.Double(clickPt1.x, clickPt1.y, 5 + x2 - x1,  5 + y2 - y1);
+		repaint();
+	}
+	
+	public void clearSubsetRectangle()
+	{
+		subsetRectangle = null;
+	}
+
+	
 	
 }

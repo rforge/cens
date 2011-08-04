@@ -143,3 +143,46 @@ choro_plot <- function (sp, dem , cuts = list("quantile", seq(0,
 			bty = "o", title = legend.title, bg = "white")
 }
 
+#Used for rectangle subsetting
+#Returns true if *ALL* of the coords are contained by the rectangle
+.containedBy <- function (minLat, minLon, maxLat, maxLon, coords) {
+	minMerc <- project_mercator(minLat, minLon)
+	maxMerc <- project_mercator(maxLat, maxLon)
+	
+	minLat <- minMerc[[1]]
+	maxLat <- maxMerc[[1]]
+	
+	minLon <- minMerc[[2]]
+	maxLon <- maxMerc[[2]]
+	
+	for (i in 1:dim(coords)[[1]]) { 
+		lat <- coords[i, 1] 
+		lon <- coords[i, 2]
+		if (!( lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon)) {
+			return(FALSE)
+		}
+	}
+	return(TRUE)
+}
+#For Polygons
+.subsetPoly <- function (minLat, minLon, maxLat, maxLon, polyDf) {
+	
+	.contained <- function(poly){return(.containedBy(minLat, minLon, maxLat, maxLon, poly@coords))}
+	
+	dupDf <- polyDf
+	
+	for (i in 1:length(polyDf@polygons)){# each list of polygons
+			dupDf@polygons[[i]]@Polygons <- Filter(.contained, polyDf@polygons[[i]]@Polygons)
+			#.containedBy(minLat, minLon, maxLat, maxLon, poly@coords)
+	}
+	
+	indices <- 1:length(polyDf)
+	indices <- Filter(function(x){return(length(dupDf@polygons[[x]]@Polygons) > 0)}, indices)
+	dupDf <- polyDf[indices, ] #really, should be dupDf[indices, ] in case of multiple polys per entri
+	#dupDf@polygons <- Filter(function(x){return(length(x@Polygons) > 0)}, dupDf@polygons)
+	
+	return(dupDf)
+}
+
+#states@data <- states@data[44,,drop=F]
+

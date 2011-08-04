@@ -37,8 +37,7 @@ public class PolyElementModel extends ElementModel{
 		pn.setTitle("Type");
 		pn.setLowerBound(.5);
 		pn.setUpperBound(25.5);
-		pn.setOptions(new String[]{"0.0","1.0","2.0","3.0","4.0","5.0","6.0"
-		});
+		pn.setOptions(new String[]{"0.0","1.0","2.0","3.0","4.0","5.0","6.0"});
 		
 		pn.setLabels(new String[]{"blank","solid","dashed","dotted","dot dash","long dash","two dash"
 			});
@@ -69,6 +68,11 @@ public class PolyElementModel extends ElementModel{
 		rfd.setSize(300, 300);
 		rfd.setRun(false);
 		return rfd;
+	}
+	
+	public String getParamX()
+	{
+		return (String) rf.get(0).getValue();
 	}
 
 	public String getCall() {

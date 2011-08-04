@@ -76,9 +76,46 @@ public class DFPointConvertDialog extends RDialog implements ActionListener{
 				return;
 			}
 			
-			String command = name + " <- SpatialPointsDataFrame("+data+"[,c('"+xvar+"', '"+yvar+"')], data="+data+",proj4string=CRS('+proj=longlat'))";
+			//The below command converts non-numbers to the standard 'NA'
+			//It seems however, that SpatialPointsDataFrame doesn't like 'NA'
+			/*
+			 		String command = name + " <- " +
+					"SpatialPointsDataFrame(\n" +
+					"as.data.frame(Map(function(x){as.numeric(as.character(x))}, \n" +
+					data +"[,c('"+xvar+"', '"+yvar+"')] \n),\n" +
+							"data="+data+",proj4string=CRS('+proj=longlat'))";
+							*/
+			
+			//Filter out any rows w/o valid lat/lon
+			String filteredData = Deducer.getUniqueName(data + "_temp");
+
+			Deducer.execute(filteredData + " <- " + data);
+			
+			Deducer.execute("if (class(ECS_May_2011_Sleep[, '" + xvar +"']) == 'factor') {");
+			Deducer.execute(filteredData + "[,'" + xvar + "'] <- as.numeric(as.character("+ filteredData + "[, '"+xvar+"']))");
+			Deducer.execute("}");
+			
+			Deducer.execute("if (class(ECS_May_2011_Sleep[, '" + yvar +"']) == 'factor') {");
+			Deducer.execute(filteredData + "[,'" + yvar + "'] <- as.numeric(as.character("+ filteredData + "[, '"+yvar+"']))");
+			Deducer.execute("}");
+			
+		Deducer.execute(filteredData + " <- subset(" + filteredData + ",  \n" +
+		"!is.na(" + xvar + ")  & !is.na("+yvar+") )");
+			
+			
+//			Deducer.execute(filteredData + " <- subset(" + data + ",  \n" +
+//					"!is.na(as.numeric(as.character(" + xvar + "))) \n" +
+//							"&\n" +
+//							"!is.na(as.numeric(as.character("+yvar+"))) \n" +
+//									")");
+			
+			String command = name + " <- SpatialPointsDataFrame(" + filteredData + "[,c('"+xvar+"', '"+yvar+"')], data="+filteredData+",proj4string=CRS('+proj=longlat'))";
 			command += "\n"+name+" <- spTransform("+name+",osm())";
+			
 			Deducer.execute(command);		//execute command as if it had been entered into the console
+			
+			Deducer.execute("rm(" + filteredData + ")");	
+			
 			this.setVisible(false);
 			completed();	//dialog completed
 		}else if(cmd=="Cancel")

@@ -130,7 +130,7 @@ public class TextFileChooser
 					{
 						String fileName = Deducer.addSlashes( pickedFiles[i].getAbsolutePath() );
 
-						corpusCall = corpusCall + "paste(readLines('" + fileName + "', warn=F), sept='', collapse='\\n')";
+						corpusCall = corpusCall + "paste(readLines('" + fileName + "', warn=F), sep='', collapse='\\n')";
 						if (i != pickedFiles.length - 1)
 						{
 							corpusCall = corpusCall + ",";

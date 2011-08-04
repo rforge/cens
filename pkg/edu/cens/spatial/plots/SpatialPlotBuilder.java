@@ -3,6 +3,7 @@ package edu.cens.spatial.plots;
 
 import java.util.*;
 
+import edu.cens.spatial.plots.MapController.SubsetBoxState;
 import edu.cens.spatial.plots.components.AbstractComponentPanel;
 import edu.cens.spatial.plots.components.ColorOptionPanel;
 import edu.cens.spatial.plots.components.OptionsComponentPanel;
@@ -331,10 +332,21 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
 
             }
 
-            String[] Menu = { "+", "File", "@N New","new", "-", //"@O Open","open", "@S Save","save","-",
-                          "+", "Map types", "Open street map", "osm", "Bing Aerial images", "bing",
-                          "+","Tools","View call","call",
-                          "~Window","0" };
+            String[] Menu = { 
+      					"+", "File", 
+      					"@N New", "new",
+      					"-", // "@O Open","open", "@S Save","save","-",
+      					
+      					"+", "Map types", 
+      						"Open street map", "osm",
+      						"Bing Aerial images", "bing", 
+      					
+      					"+", "Tools", 
+      						"View call", "call", 
+      						//"Subset", "subset",
+      					
+      					"~Window", "0" 
+      					};
             JMenuBar ezMenu = EzMenuSwing.getEzMenu(this, new MenuListener(), Menu);
 
             setContentPane(_pane);
@@ -851,12 +863,74 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener, Windo
             	_vp.setTileSource("bing");
             }else if("osm".equals(cmd)){
             	_vp.setTileSource("osm");
-            }
+            } 			
+            else if ("subset".equals(cmd))
+      			{
+      				beginSubsetting();	
+      			}
         }
     }
 
     private static boolean _fromMain = false;
+    
+  	public void beginSubsetting()
+  	{
+  		setCursorCrosshair();
+  		this._vp.beginSubsetting();
+  		//this._model.rectangleSubset();
+  	}
+  	
+  	public void stopSubsetting()
+  	{
+  		setCursorNormal();
+  	}
+  	
+  	//TODO wait cursor doesn't work.
+  	public void executeSubsetting(double minLat, double minLon, double maxLat, double maxLon)
+  	{
+  		try{
+      this.getGlassPane().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+      this.getGlassPane().setVisible(true);
+  		
+      this._model.executeSubsetting( minLat,  minLon,  maxLat,  maxLon);
+  		updatePlot();
+  		}
+  		finally
+  		{
+        this.getGlassPane().setCursor(Cursor.getDefaultCursor());
+        this.getGlassPane().setVisible(false);
+        setCursorNormal();
+  		}
+  	}
 
+  	//TODO put all cursor changes in try/finally patterns
+  	public void setCursorCrosshair()
+  	{
+  		this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+
+
+//  		if (JGR.MAINRCONSOLE != null)
+//  		{
+//  			JGR.MAINRCONSOLE.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+//  		}
+//  		else //just so it works in the debug versions.
+//  		{
+//  			map.getParent().setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+//  		}
+  	}
+  	
+  	public void setCursorNormal()
+  	{
+  		this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+//  		if (JGR.MAINRCONSOLE != null)
+//  		{
+//  			JGR.MAINRCONSOLE.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+//  		}
+//  		else //just so it works in the debug versions.
+//  		{
+//  			map.getParent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+//  		}
+  	}
 
 }
 

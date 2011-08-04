@@ -31,6 +31,7 @@ public class ViewPanel extends JPanel implements ComponentListener{
 	PlotPanel plotPanel;
 	String tp = "osm";
 	SpatialPlotBuilder parent;
+	MapController mapController;
 	
 	public ViewPanel(int w,int h,SpatialPlotBuilder par){
 		super();
@@ -75,11 +76,12 @@ public class ViewPanel extends JPanel implements ComponentListener{
     public void initMap(){
         map = new MapPanel(pane);
         map.setTileSource(new OsmTileSource.Mapnik());
-        MapController mapContr = new MapController(map,parent);
-        map.addPlusListener(mapContr);
-        map.addMinusListener(mapContr);
-        map.addSliderListener(mapContr);
-        mapContr.addListenersTo(plotPanel);
+        
+        mapController = new MapController(map,parent);
+        map.addPlusListener(mapController);
+        map.addMinusListener(mapController);
+        map.addSliderListener(mapController);
+        mapController.addListenersTo(plotPanel);
         try {
 			map.setTileLoader(new OsmFileCacheTileLoader(map));
 		} catch (SecurityException e) {
@@ -184,6 +186,10 @@ public class ViewPanel extends JPanel implements ComponentListener{
 
 	public void componentShown(ComponentEvent arg0) {}
 
+	public void beginSubsetting()
+	{
+		mapController.startSubsetting();
+	}
 
     
 }
