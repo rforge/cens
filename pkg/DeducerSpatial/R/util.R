@@ -32,19 +32,18 @@ project_mercator <- function(lat,long,drop=TRUE){
 #' @param pch plotting symbol
 #' @param legend.loc the location of the legend
 #' @param legend.title title
-#' @param ... additional parameters for plot and legend
+#' @param ... additional parameters for plot 
 colored_points<-function(x,color_var,pch=1,legend.loc="bottomleft",
 		legend.title=NULL,...){
 	if(is.character(color_var))
 		color_var <- as.factor(color_var)
-	
 	if(is.factor(color_var)){
-		clrs <- rainbow_hcl(length(color_var), start = 30, end = 300)
+		clrs <- rainbow_hcl(length(levels(color_var)), start = 30, end = 300)
 		org <- levels(color_var) 
 		levels(color_var) <- clrs
 		color_var <- as.character(color_var)
 		plot(x,col=color_var,add=TRUE,pch=pch,...)
-		legend(legend.loc,,org,col=clrs,pch=pch,title=legend.title,...)
+		legend(legend.loc,,org,col=clrs,pch=pch,title=legend.title)
 	}else{
 		color_var <- as.numeric(color_var)
 		cv <- color_var - min(color_var,na.rm=TRUE)
@@ -56,7 +55,7 @@ colored_points<-function(x,color_var,pch=1,legend.loc="bottomleft",
 		leg.val <- c(.01,.25,.50,1)*(max(color_var,na.rm=TRUE)-min(color_var,na.rm=TRUE)) + min(color_var,na.rm=TRUE)
 		leg.val <- format(leg.val,digits=3)
 		plot(x,col=repl,add=TRUE,pch=pch,...)
-		legend(legend.loc,,leg.val,col=leg.col,pch=pch,title=legend.title,...)
+		legend(legend.loc,,leg.val,col=leg.col,pch=pch,title=legend.title)
 	}
 }
 
