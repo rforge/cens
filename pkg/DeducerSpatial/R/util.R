@@ -188,6 +188,25 @@ choro_plot <- function (sp, dem , cuts = list("quantile", seq(0,
 	return(dupDf)
 }
 
+.subsetLines <- function (minLat, minLon, maxLat, maxLon, polyDf, removeSelection) {
+	
+	# The XOR inverts the function in any easy way w/o if/else statements
+	.contained <- function(poly){return(xor(!removeSelection, .containedBy(minLat, minLon, maxLat, maxLon, poly@coords)))}
+	
+	dupDf <- polyDf
+	
+	for (i in 1:length(polyDf@lines)){# each list of polygons
+		dupDf@lines[[i]]@Lines <- Filter(.contained, polyDf@lines[[i]]@Lines)
+		#.containedBy(minLat, minLon, maxLat, maxLon, poly@coords)
+	}
+	
+	indices <- 1:length(polyDf)
+	indices <- Filter(function(x){return(length(dupDf@lines[[x]]@Lines) > 0)}, indices)
+	dupDf <- polyDf[indices, ] 	
+	
+	return(dupDf)
+}
+
 .subsetPoints <- function (minLat, minLon, maxLat, maxLon, pointsDf, removeSelection) {
 	
 	dupDf <- pointsDf

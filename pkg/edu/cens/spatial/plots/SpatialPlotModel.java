@@ -105,16 +105,18 @@ public class SpatialPlotModel extends AbstractListModel
 				String polyVarName = null;
 				String subsetFunction = null;
 				
+				polyVarName = ( (ElementModel) spc.getModel() ).getDataFrameArgumentName();
+				
 				if (spc.getModel() instanceof PolyElementModel
 						||
-						spc.getModel() instanceof ChoroElementModel)
+						spc.getModel() instanceof ChoroElementModel
+						)
 				{
-					polyVarName = ( (ElementModel) spc.getModel() ).getDataFrameArgumentName();
 					subsetFunction = ".subsetPoly";
-					
-					//currently, we'll be a little destructive.
-
-					
+				}
+				else if (spc.getModel() instanceof LinesElementModel)
+				{
+					subsetFunction = ".subsetLines";
 				}
 				else if (
 						spc.getModel() instanceof PointsElementModel
@@ -124,7 +126,6 @@ public class SpatialPlotModel extends AbstractListModel
 						spc.getModel() instanceof BubbleElementModel
 						)
 				{
-					polyVarName = ( (ElementModel) spc.getModel() ).getDataFrameArgumentName();
 					subsetFunction = ".subsetPoints";
 				}
 				
