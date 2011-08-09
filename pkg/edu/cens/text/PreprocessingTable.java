@@ -122,7 +122,7 @@ public class PreprocessingTable extends JTable
 		this.showVerticalLines = true;
 		this.setBorder(new LineBorder(Color.BLACK, 1));
 		//(new LineBorder(Color.BLACK));
-		this.setGridColor(Color.BLACK);
+		this.setGridColor(Color.LIGHT_GRAY);
 		this.setIntercellSpacing(new Dimension(4,4));
 		this.getTableHeader().setReorderingAllowed(false);
 		
@@ -139,6 +139,7 @@ public class PreprocessingTable extends JTable
 		
 		//Options button
 		this.getColumnModel().getColumn(OPTIONS_COLUMN).setPreferredWidth(25);
+		this.setShowVerticalLines(false);
 	}
 	
 	public void setOptionsMenu(JPopupMenu menu, int row)

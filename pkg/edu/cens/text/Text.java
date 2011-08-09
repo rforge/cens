@@ -227,7 +227,7 @@ public static String[] getCorpora()
 		JMenu viewFreqDataMenu = new JMenu("View Frequency Data");
 		textMenu.add(viewFreqDataMenu);
 		
-		JMenuItem termFreqMenuItem = new JMenuItem("Term Frequencies");
+		JMenuItem termFreqMenuItem = new JMenuItem("Frequency Totals List");
 		
 		termFreqMenuItem.addActionListener(new ActionListener()
 		{

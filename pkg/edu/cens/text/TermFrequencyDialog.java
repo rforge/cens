@@ -78,6 +78,11 @@ public class TermFrequencyDialog extends JDialog
 	private AbstractTermFrequencyViewer[] viewers;
 
 
+	public boolean getUseDocumentFrequency()
+	{
+		return useDocumentFrequency;
+	}
+	
 	public TermFrequencyDialog(JFrame parent)
 	{
 		super(parent, "Term Frequency");
@@ -151,7 +156,7 @@ public class TermFrequencyDialog extends JDialog
 		// +++++++++ Add min freq panel to toplevel dialog +++++++++++++
 		c = getTopLevelLayoutDefaults();
 		c.gridx = 0;
-		c.gridy = 1;
+		c.gridy = 2;
 		c.gridwidth = 1;
 		c.fill = GridBagConstraints.HORIZONTAL;
 
@@ -170,7 +175,7 @@ public class TermFrequencyDialog extends JDialog
 		c.weightx = 1;
 		c.weighty = 1;
 		c.gridx = 0;
-		c.gridy = 2;
+		c.gridy = 1;
 		c.gridwidth = 1;
 		//c.insets = DIALOG_INSETS;
 		this.add(constructViewMethodPanel(), c);

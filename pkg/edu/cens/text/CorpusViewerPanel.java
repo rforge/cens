@@ -107,6 +107,8 @@ public class CorpusViewerPanel extends DataViewerTab //TODO extend JDialog inste
 						{
 							documentTable.setRowSelectionInterval(0, 0);
 						}
+						
+						
 					}
 					catch (REXPMismatchException e2)
 					{
@@ -225,7 +227,9 @@ public class CorpusViewerPanel extends DataViewerTab //TODO extend JDialog inste
 
 	private void setupTable()
 	{
-		documentTable.setGridColor(Color.BLACK);
+		documentTable.setShowVerticalLines(false);
+		//documentTable.setBorder(new LineBorder(Color.BLACK, 1));
+		documentTable.setGridColor(Color.LIGHT_GRAY);
 		documentTable.setRowHeight(20);
 		documentTable.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
 		documentTable.getColumnModel().getColumn(0).setMaxWidth(50);

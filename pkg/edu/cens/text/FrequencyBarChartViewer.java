@@ -28,7 +28,7 @@ public class FrequencyBarChartViewer extends AbstractTermFrequencyViewer
 
 	public String toString()
 	{
-		return "Bar Plot";
+		return "Bar Chart";
 	}
 
 	public void executeView()

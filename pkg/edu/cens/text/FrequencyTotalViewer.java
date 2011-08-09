@@ -81,8 +81,10 @@ public class FrequencyTotalViewer extends AbstractTermFrequencyViewer
 		String tempTotals = Deducer.getUniqueName("freqTotals");
 		Deducer.execute(tempTotals + " <- " + tfDialog.getTermFreqCall(this.getExtraTermFreqArgs()));
 
+		String totalType = this.tfDialog.getUseDocumentFrequency() ? "doc_freq" : "term_freq";
+		
 		//Save the totals 
-		Deducer.execute(saveName + " <- d(term=names(" + tempTotals + "), freq=" + tempTotals +")");
+		Deducer.execute(saveName + " <- d(term=names(" + tempTotals + "), " + totalType + "=" + tempTotals +")");
 
 		//delete the temporary variable
 		Deducer.execute("rm(" + tempTotals + ")");
