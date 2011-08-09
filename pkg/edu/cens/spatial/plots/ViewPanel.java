@@ -100,14 +100,6 @@ public class ViewPanel extends JPanel implements ComponentListener{
 
     }
     
-    public void printBBox(){
-        Coordinate c = map.getPosition(0,0);
-        System.out.println(c.getLat() + "  " + c.getLon());
-        Dimension d = this.getSize();
-        c = map.getPosition(0+getWidth(),0+getHeight());
-        System.out.println(c.getLat() + "  " + c.getLon());
-    }
-    
     public Vector<Double> getUpperLeftCoordinate(){
     	Vector<Double> d = new Vector<Double>(2);
     	Coordinate c = map.getPosition(0,0);

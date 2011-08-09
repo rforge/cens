@@ -72,4 +72,9 @@ public class PolygonLabelsElementModel extends ElementModel{
 		newM.rf = (RFunction) rf.clone();
 		return newM;
 	}
+	
+	public String getDataFrameArgumentName()
+	{
+		return (String) rf.get(0).getValue();
+	}
 }

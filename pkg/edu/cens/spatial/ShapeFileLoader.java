@@ -2,11 +2,13 @@ package edu.cens.spatial;
 
 import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.io.File;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileFilter;
 
 import org.rosuda.JGR.RController;
 import org.rosuda.JGR.toolkit.FileSelector;
@@ -28,7 +30,61 @@ public class ShapeFileLoader extends FileSelector{
 		proj.setText("+proj=longlat");
 		namePanel.add(proj);
 		this.addFooterPanel(namePanel);
+		/*
+		 !path.toLowerCase().endsWith(".shp") &&
+				!path.toLowerCase().endsWith(".shp") &&
+				!path.toLowerCase().endsWith(".dbf") &&
+				!path.toLowerCase().endsWith(".prj") &&
+				!path.toLowerCase().endsWith(".sbn") &&
+				!path.toLowerCase().endsWith(".sbx")
+		 */
+		
+		if (this.isSwing())
+		{
+			this.getJFileChooser().addChoosableFileFilter(new FileFilter()
+			{
+				public String getDescription()
+				{
+					return "Shape Files (*.shp *.dbf *.prj *.sbn *.sbx)";
+				}
+
+				public boolean accept(File f)
+				{
+					String fname  = f.getName().toLowerCase();
+					return 
+					fname.toLowerCase().endsWith(".shp") ||
+					fname.toLowerCase().endsWith(".dbf") ||
+					fname.toLowerCase().endsWith(".prj") ||
+					fname.toLowerCase().endsWith(".sbn") ||
+					fname.toLowerCase().endsWith(".sbx");
+				}
+			});
+		} //TODO handle the non-swing case
+		
+		
 	}
+		
+//		addChoosableFileFilter(new FileFilter()
+//		{
+//			public String getDescription()
+//			{
+//				return "Text files (*.txt *.rtf)";
+//			}
+//
+//			public boolean accept(File f)
+//			{
+//				String fname  = f.getName().toLowerCase();
+//				return 
+//				fname.toLowerCase().endsWith(".shp") ||
+//				fname.toLowerCase().endsWith(".shp") ||
+//				fname.toLowerCase().endsWith(".dbf") ||
+//				fname.toLowerCase().endsWith(".prj") ||
+//				fname.toLowerCase().endsWith(".sbn") ||
+//				fname.toLowerCase().endsWith(".sbx");
+//			}
+//		});
+//		
+//	}
 	
 	public ShapeFileLoader() {
 		this(null);

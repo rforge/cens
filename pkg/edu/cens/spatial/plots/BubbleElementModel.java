@@ -79,4 +79,9 @@ public class BubbleElementModel extends ElementModel{
 		newM.rf = (RFunction) rf.clone();
 		return newM;
 	}
+	
+	public String getDataFrameArgumentName()
+	{
+		return ((ParamSpatialVariable) rf.get(0)).getData();
+	}
 }

@@ -23,4 +23,5 @@ public abstract class ElementModel {
 	public String getName() {return name;}
 	public boolean isActive(){return active;}
 	public void setActive(boolean act){active=act;}
+	public abstract String getDataFrameArgumentName();
 }

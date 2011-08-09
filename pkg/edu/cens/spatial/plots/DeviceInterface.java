@@ -33,7 +33,6 @@ public class DeviceInterface extends GDInterface {
             c.reset();
             c.setDeviceNumber(devNr);
         }
-        //System.out.println("new page called : " + devNr + " = dev number");
     }
 
 	public static void register(GDContainer pl){

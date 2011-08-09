@@ -92,26 +92,65 @@ public class SpatialPlotModel extends AbstractListModel
 		return _components.get(index);
 	}
 	
-	public void executeSubsetting(double minLat, double minLon, double maxLat, double maxLon)
+	//TODO subset text, and choropleth
+	public void executeSubsetting(double minLat, double minLon, double maxLat, double maxLon, boolean keepSelected)
 	{
 		for (PlottingElement spc : _components)
 		{
 			if (spc.isActive())
 			{
-				if (spc.getModel() instanceof PolyElementModel)
+				//Back up all the subsetted data 
+				//Deducer.execute(cmd);
+				
+				String polyVarName = null;
+				String subsetFunction = null;
+				
+				if (spc.getModel() instanceof PolyElementModel
+						||
+						spc.getModel() instanceof ChoroElementModel)
 				{
-					String polyVarName = ( (PolyElementModel) spc.getModel() ).getParamX();
-					System.out.println( polyVarName );
+					polyVarName = ( (ElementModel) spc.getModel() ).getDataFrameArgumentName();
+					subsetFunction = ".subsetPoly";
 					
 					//currently, we'll be a little destructive.
-					Deducer.execute(polyVarName + " <- " +
-							".subsetPoly(" + 
-							minLat  + "," + 
-							minLon  + "," + 
-							maxLat  + "," + 
-							maxLon  + "," + 
-							polyVarName + ")");
+
 					
+				}
+				else if (
+						spc.getModel() instanceof PointsElementModel
+						||
+						spc.getModel() instanceof ColoredPointsElementModel
+						||
+						spc.getModel() instanceof BubbleElementModel
+						)
+				{
+					polyVarName = ( (ElementModel) spc.getModel() ).getDataFrameArgumentName();
+					subsetFunction = ".subsetPoints";
+				}
+				
+				//TODO handle ChoroElementModel
+			//TODO List names of backed up vars.
+				
+				if (polyVarName != null)
+				{
+					String backupvar = polyVarName;
+					if (! backupvar.contains("_pre_subset"))
+					{
+						backupvar = backupvar + "_pre_subset";
+					}
+
+					backupvar = Deducer.getUniqueName(backupvar);
+					
+					Deducer.execute(backupvar + " <- " + polyVarName);
+					Deducer.execute(polyVarName + " <- " +
+						subsetFunction +"(" + 
+						minLat  + "," + 
+						minLon  + "," + 
+						maxLat  + "," + 
+						maxLon  + "," + 
+						polyVarName + "," +
+						"removeSelection=" + (""+keepSelected).toUpperCase() + ")");
+					Deducer.execute("if (length(" + polyVarName + ") == length("+ backupvar + ")) { rm("+backupvar+") }");
 				}
 			}
 		}

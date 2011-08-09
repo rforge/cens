@@ -16,6 +16,8 @@ import org.rosuda.deducer.Deducer;
 import org.rosuda.deducer.data.DataViewerController;
 import org.rosuda.ibase.toolkit.EzMenuSwing;
 
+import edu.cens.spatial.plots.ColoredPointsElementModel;
+import edu.cens.spatial.plots.PointsElementModel;
 import edu.cens.spatial.plots.SpatialPlotBuilder;
 
 public class DeducerSpatial

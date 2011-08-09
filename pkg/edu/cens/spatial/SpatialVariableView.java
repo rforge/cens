@@ -30,8 +30,7 @@ import org.rosuda.ibase.toolkit.EzMenuSwing;
 public class SpatialVariableView extends VariableView {
 
 	public SpatialVariableView(String dn){
-		super(dn + "@data");
-		//System.out.println(dn);		
+		super(dn + "@data");	
 	}
 	
 	public void setData(String data) {

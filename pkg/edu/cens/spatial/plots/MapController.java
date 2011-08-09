@@ -329,7 +329,7 @@ public class MapController extends JMapController implements MouseListener,
 		this.subsetBoxState = SubsetBoxState.READY;
 	}
 
-	public void executeSubsetting()
+	public void executeSubsetting(boolean keepSelected)
 	{
 		this.subsetBoxState = SubsetBoxState.DISABLED;
 		((MapPanel) map).clearSubsetRectangle();
@@ -345,7 +345,7 @@ public class MapController extends JMapController implements MouseListener,
 	double maxLat = Math.max(subsetCorner1.getLat(), subsetCorner2.getLat());
 	double maxLon = Math.max(subsetCorner1.getLon(), subsetCorner2.getLon());
 		
-		this.builder.executeSubsetting(minLat, minLon, maxLat, maxLon);
+		this.builder.executeSubsetting(minLat, minLon, maxLat, maxLon, keepSelected);
 		
 		//4: Redraw the plot
 	}

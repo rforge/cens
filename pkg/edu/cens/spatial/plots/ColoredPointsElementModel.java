@@ -2,10 +2,12 @@ package edu.cens.spatial.plots;
 
 import javax.swing.JDialog;
 
+import org.rosuda.deducer.Deducer;
 import org.rosuda.deducer.widgets.param.Param;
 import org.rosuda.deducer.widgets.param.ParamCharacter;
 import org.rosuda.deducer.widgets.param.ParamLogical;
 import org.rosuda.deducer.widgets.param.ParamNumeric;
+import org.rosuda.deducer.widgets.param.ParamRObject;
 import org.rosuda.deducer.widgets.param.ParamVariable;
 import org.rosuda.deducer.widgets.param.RFunction;
 import org.rosuda.deducer.widgets.param.RFunctionDialog;
@@ -16,8 +18,6 @@ import edu.cens.spatial.plots.widgets.RSpatialFunctionView;
 
 public class ColoredPointsElementModel extends ElementModel{
 	RFunction rf;
-	
-	
 
 	public ColoredPointsElementModel(){
 		init();
@@ -25,6 +25,16 @@ public class ColoredPointsElementModel extends ElementModel{
 	
 	public void init(){
 		rf = new RPointFunction("colored_points");
+		
+		//can't get this param
+		//so added this code:
+		//==========================================
+//		ParamRObject o = new ParamRObject("x");
+//		o.setRObjectClass("SpatialPointsDataFrame");
+//		o.setRequired(true);
+//		rf.add(o);
+		//======= End new code =====================
+		
 		rf.setViewType(null);
 		ParamSpatialVariable pv = new ParamSpatialVariable("color_var");
 		pv.setFormat(ParamSpatialVariable.FORMAT_WITH_DATA);
@@ -94,5 +104,10 @@ public class ColoredPointsElementModel extends ElementModel{
 		ColoredPointsElementModel newM = new ColoredPointsElementModel();
 		newM.rf = (RFunction) rf.clone();
 		return newM;
+	}
+	
+	public String getDataFrameArgumentName()
+	{		
+		return ((ParamSpatialVariable) rf.get(0)).getData();
 	}
 }

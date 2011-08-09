@@ -74,4 +74,10 @@ public class ChoroElementModel extends ElementModel{
 		newM.rf = (RFunction) rf.clone();
 		return newM;
 	}
+	
+	public String getDataFrameArgumentName()
+	{
+		//return (String) rf.get(0).getValue();
+		return ((ParamSpatialVariable) rf.get(0)).getData();
+	}
 }

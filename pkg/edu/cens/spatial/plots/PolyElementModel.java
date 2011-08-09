@@ -70,7 +70,7 @@ public class PolyElementModel extends ElementModel{
 		return rfd;
 	}
 	
-	public String getParamX()
+	public String getDataFrameArgumentName()
 	{
 		return (String) rf.get(0).getValue();
 	}

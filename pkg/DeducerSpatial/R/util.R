@@ -33,7 +33,7 @@ project_mercator <- function(lat,long,drop=TRUE){
 #' @param legend.loc the location of the legend
 #' @param legend.title title
 #' @param ... additional parameters for plot 
-colored_points<-function(x,color_var,pch=1,legend.loc="bottomleft",
+colored_points<-function(x, color_var, pch=1, legend.loc="bottomleft",
 		legend.title=NULL,...){
 	if(is.character(color_var))
 		color_var <- as.factor(color_var)
@@ -148,6 +148,9 @@ choro_plot <- function (sp, dem , cuts = list("quantile", seq(0,
 	minMerc <- project_mercator(minLat, minLon)
 	maxMerc <- project_mercator(maxLat, maxLon)
 	
+	#print(minMerc)
+	#print(maxMerc)
+	
 	minLat <- minMerc[[1]]
 	maxLat <- maxMerc[[1]]
 	
@@ -164,9 +167,11 @@ choro_plot <- function (sp, dem , cuts = list("quantile", seq(0,
 	return(TRUE)
 }
 #For Polygons
-.subsetPoly <- function (minLat, minLon, maxLat, maxLon, polyDf) {
+#TODO handle error when no polys left.  Probably should do nothing.
+.subsetPoly <- function (minLat, minLon, maxLat, maxLon, polyDf, removeSelection) {
 	
-	.contained <- function(poly){return(.containedBy(minLat, minLon, maxLat, maxLon, poly@coords))}
+	# The XOR inverts the function in any easy way w/o if/else statements
+	.contained <- function(poly){return(xor(!removeSelection, .containedBy(minLat, minLon, maxLat, maxLon, poly@coords)))}
 	
 	dupDf <- polyDf
 	
@@ -178,6 +183,25 @@ choro_plot <- function (sp, dem , cuts = list("quantile", seq(0,
 	indices <- 1:length(polyDf)
 	indices <- Filter(function(x){return(length(dupDf@polygons[[x]]@Polygons) > 0)}, indices)
 	dupDf <- polyDf[indices, ] #really, should be dupDf[indices, ] in case of multiple polys per entri
+	#dupDf@polygons <- Filter(function(x){return(length(x@Polygons) > 0)}, dupDf@polygons)
+	
+	return(dupDf)
+}
+
+.subsetPoints <- function (minLat, minLon, maxLat, maxLon, pointsDf, removeSelection) {
+	
+	dupDf <- pointsDf
+	.contained <- function(x) {
+		return(
+				xor(!removeSelection, .containedBy(minLat, minLon, maxLat, maxLon, dupDf[x,]@coords) )
+		)
+	}
+	
+	
+	
+	indices <- 1:length(pointsDf)
+	indices <- Filter(.contained, indices)
+	dupDf <- pointsDf[indices, ] #really, should be dupDf[indices, ] in case of multiple polys per entri
 	#dupDf@polygons <- Filter(function(x){return(length(x@Polygons) > 0)}, dupDf@polygons)
 	
 	return(dupDf)
