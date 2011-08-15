@@ -224,6 +224,18 @@ public static String[] getCorpora()
 		});
 		textMenu.add(viewCorpMenuItem);
 		
+		JMenuItem DocTermMatrixMenuItem = new JMenuItem("View Term Document Matrix");
+		DocTermMatrixMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				//Deducer.eval("cens.viewer();");
+				DocumentTermMatrixViewer f = new DocumentTermMatrixViewer(JGR.MAINRCONSOLE);
+				f.setVisible(true);
+			}
+		});
+		textMenu.add(DocTermMatrixMenuItem);
+		
 		JMenu viewFreqDataMenu = new JMenu("View Frequency Data");
 		textMenu.add(viewFreqDataMenu);
 		
