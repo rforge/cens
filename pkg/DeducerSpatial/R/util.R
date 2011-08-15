@@ -168,6 +168,7 @@ choro_plot <- function (sp, dem , cuts = list("quantile", seq(0,
 }
 #For Polygons
 #TODO handle error when no polys left.  Probably should do nothing.
+#TODO These following functions could likely be consolidated
 .subsetPoly <- function (minLat, minLon, maxLat, maxLon, polyDf, removeSelection) {
 	
 	# The XOR inverts the function in any easy way w/o if/else statements
