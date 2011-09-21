@@ -3,7 +3,6 @@ package edu.cens.text;
 import org.rosuda.JGR.JGR;
 import org.rosuda.deducer.Deducer;
 import org.rosuda.deducer.toolkit.HelpButton;
-import org.rosuda.deducer.toolkit.OkayCancelPanel;
 import org.rosuda.deducer.widgets.ObjectChooserWidget;
 
 import javax.swing.*;

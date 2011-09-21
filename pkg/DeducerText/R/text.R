@@ -46,11 +46,12 @@ cens.term_freq <- function(
 
   sorted <- match.arg(sorted);
 
+  #negate x instead of using decreasing = true, so that ties are sorted alphabetically increasing without reversing 'names'
   if (topN > 0) { #use absolute number of terms
-	  o <- order(x, decreasing=TRUE)[1:min(topN, length(x))];
+	  o <- order(-x, names(x))[1:min(topN, length(x))];
 	  x <- x[o];
   } else if(percent > 0) { #use percentage of terms
-    o <- order(x, decreasing=TRUE)[1:(length(x) * percent / 100)];
+    o <- order(-x, names(x))[1:(length(x) * percent / 100)];
     x <- x[o];
   } 
 
@@ -58,7 +59,19 @@ cens.term_freq <- function(
     x <- x[order(names(x), decreasing=decreasing)];
   }
   else if (sorted == "freq") {
-    x <- sort(x, decreasing=decreasing);
+	  #x <- sort(x, decreasing=decreasing);
+		
+		#want to sort ties alphabetically
+		#using the decreasing parameter
+		#would cause these to be sorted reverse alphabetically in some cases.
+		if (decreasing)
+		{
+			x <- x[order(-x, names(x))];
+		}
+		else
+		{
+			x <- x[order(x, names(x))];
+		}
   }
 
   return(x);
@@ -76,4 +89,34 @@ make.color.scale<- function(aColor, bColor, steps, gradientExp=.5){
 	return(ret);
 }
 
+pretty.print.freq.totals <- function()
+{
+	#Pretty print freq totals
+	
+	#TODO collapse too long words
+	
+	terms <- c('loooong', 'w', 'hello', 'a', 'notaword', 'kotobanai')
+	freqs <- c('1', '2', '3', '4' , '0', '-1')
+	
+	nCol <- 3
+	colWidth <- 23
+	
+	for ( ip1 in 1:ceiling(length(terms)/nCol) )
+	{
+		i <- ip1 - 1 #CURSE YOU 1-based indexing!
+		rowStart <- (nCol*i + 1)
+		rowEnd <- min(rowStart + nCol - 1, length(terms))
+		
+		termRow = terms[rowStart:rowEnd]
+		freqRow = freqs[rowStart:rowEnd]
+		
+		cat(format(termRow,width=colWidth, justify='centre'), sep='|');
+		cat('\n');
+		cat(format(freqRow,width=colWidth, justify='centre'), sep='|');
+		cat('\n')
+		cat(paste(rep("-",nCol*colWidth),collapse=''))
+		cat('\n');
+	}
+}
+pretty.print.freq.totals()
 

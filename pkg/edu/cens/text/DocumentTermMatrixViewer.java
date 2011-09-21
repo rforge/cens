@@ -158,7 +158,7 @@ public class DocumentTermMatrixViewer extends JDialog
 			//Sort the matrix by total frequency
 			//TODO Make option to switch between the doc and term frequency
 
-			Deducer.eval(dtm + "<- " + dtm + "[order(apply(" + dtm + " > 0, 1, sum), decreasing=TRUE),]");
+			Deducer.eval(dtm + "<- " + dtm + "[order(apply(" + dtm + " > 0, 1, sum), rev("+dtm+"$dimnames$Terms), decreasing=TRUE),]");
 
 
 
