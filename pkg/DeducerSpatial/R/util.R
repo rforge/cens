@@ -183,10 +183,18 @@ choro_plot <- function (sp, dem , cuts = list("quantile", seq(0,
 	
 	indices <- 1:length(polyDf)
 	indices <- Filter(function(x){return(length(dupDf@polygons[[x]]@Polygons) > 0)}, indices)
-	dupDf <- polyDf[indices, ] #really, should be dupDf[indices, ] in case of multiple polys per entri
-	#dupDf@polygons <- Filter(function(x){return(length(x@Polygons) > 0)}, dupDf@polygons)
 	
-	return(dupDf)
+	if (length(indices) == 0)
+	{
+		return(NULL)
+	}
+	else
+	{
+		dupDf <- polyDf[indices, ] #really, should be dupDf[indices, ] in case of multiple polys per entri
+		#dupDf@polygons <- Filter(function(x){return(length(x@Polygons) > 0)}, dupDf@polygons)
+		return(dupDf)
+	}
+	
 }
 
 .subsetLines <- function (minLat, minLon, maxLat, maxLon, polyDf, removeSelection) {
@@ -203,28 +211,37 @@ choro_plot <- function (sp, dem , cuts = list("quantile", seq(0,
 	
 	indices <- 1:length(polyDf)
 	indices <- Filter(function(x){return(length(dupDf@lines[[x]]@Lines) > 0)}, indices)
-	dupDf <- polyDf[indices, ] 	
-	
-	return(dupDf)
+	if (length(indices) == 0)
+	{
+		return(NULL)
+	}
+	else
+	{
+		dupDf <- polyDf[indices, ]
+		return(dupDf)
+	}
 }
 
 .subsetPoints <- function (minLat, minLon, maxLat, maxLon, pointsDf, removeSelection) {
 	
 	dupDf <- pointsDf
+	
 	.contained <- function(x) {
-		return(
-				xor(!removeSelection, .containedBy(minLat, minLon, maxLat, maxLon, dupDf[x,]@coords) )
-		)
+		return(xor(!removeSelection, .containedBy(minLat, minLon, maxLat, maxLon, dupDf[x,]@coords) ) )
 	}
-	
-	
 	
 	indices <- 1:length(pointsDf)
 	indices <- Filter(.contained, indices)
-	dupDf <- pointsDf[indices, ] #really, should be dupDf[indices, ] in case of multiple polys per entri
-	#dupDf@polygons <- Filter(function(x){return(length(x@Polygons) > 0)}, dupDf@polygons)
 	
-	return(dupDf)
+	if (length(indices) == 0)
+	{
+		return(NULL)
+	}
+	else
+	{
+		dupDf <- pointsDf[indices, ]
+		return(dupDf)	
+	}
 }
 
 #states@data <- states@data[44,,drop=F]

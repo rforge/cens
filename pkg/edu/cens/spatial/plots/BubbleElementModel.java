@@ -28,7 +28,7 @@ public class BubbleElementModel extends ElementModel{
 		rf.setViewType(null);
 		ParamSpatialVariable pv = new ParamSpatialVariable("z");
 		pv.setFormat(ParamSpatialVariable.FORMAT_WITH_DATA);
-		pv.setTitle("Point size");
+		pv.setTitle("Variable");//("Point size"); //Gail requested this name change
 		rf.add(pv);
 		
 		
@@ -83,5 +83,10 @@ public class BubbleElementModel extends ElementModel{
 	public String getDataFrameArgumentName()
 	{
 		return ((ParamSpatialVariable) rf.get(0)).getData();
+	}
+	
+	public void setDataFrameArgumentName(String argName)
+	{
+		((ParamSpatialVariable) rf.get(0)).setData(argName);
 	}
 }

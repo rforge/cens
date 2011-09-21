@@ -12,6 +12,8 @@ import org.rosuda.deducer.widgets.param.ParamRObject;
 import org.rosuda.deducer.widgets.param.RFunction;
 import org.rosuda.deducer.widgets.param.RFunctionDialog;
 
+import edu.cens.spatial.plots.widgets.ParamSpatialVariable;
+
 public class PointsElementModel extends ElementModel {
 
 	RFunction rf;
@@ -50,7 +52,7 @@ public class PointsElementModel extends ElementModel {
 				"target","triange square","solid square","solid circle","solid triangle",
 				"solid diamond","solid circle (big)","solid circle (small)"
 			});
-		pn.setValue(1.0);
+		pn.setValue(16.0);
 		pn.setViewType(Param.VIEW_COMBO);
 		pn.setRequired(false);
 		rf.add(pn);
@@ -95,5 +97,10 @@ public class PointsElementModel extends ElementModel {
 	public String getDataFrameArgumentName()
 	{
 		return (String) rf.get(0).getValue();
+	}
+	
+	public void setDataFrameArgumentName(String argName)
+	{
+		 rf.get(0).setValue(argName);
 	}
 }

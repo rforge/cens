@@ -110,4 +110,9 @@ public class ColoredPointsElementModel extends ElementModel{
 	{		
 		return ((ParamSpatialVariable) rf.get(0)).getData();
 	}
+	
+	public void setDataFrameArgumentName(String argName)
+	{
+		 ((ParamSpatialVariable) rf.get(0)).setData(argName);
+	}
 }

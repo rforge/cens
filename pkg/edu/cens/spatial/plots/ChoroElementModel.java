@@ -80,4 +80,9 @@ public class ChoroElementModel extends ElementModel{
 		//return (String) rf.get(0).getValue();
 		return ((ParamSpatialVariable) rf.get(0)).getData();
 	}
+	
+	public void setDataFrameArgumentName(String argName)
+	{
+		rf.get(0).setValue(argName);
+	}
 }

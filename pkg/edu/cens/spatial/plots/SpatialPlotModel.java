@@ -4,6 +4,7 @@ import javax.swing.*;
 
 import org.rosuda.deducer.Deducer;
 
+import java.awt.Toolkit;
 import java.util.*;
 
 /**
@@ -93,19 +94,65 @@ public class SpatialPlotModel extends AbstractListModel
 	}
 	
 	//TODO subset text, and choropleth
-	public void executeSubsetting(double minLat, double minLon, double maxLat, double maxLon, boolean keepSelected)
+	public boolean executeSubsetting(double minLat, double minLon, double maxLat, double maxLon, boolean keepSelected, String subsetName)
 	{
-		for (PlottingElement spc : _components)
+		//Want to make sure only 1 set of data gets modified at a time
+		
+		//Options:
+		//	1: force them to hide all but 1 item.
+		//	2: Ignore items which are in no way contained or completely contained
+		//		- Deleting: Raise error if more than 1 set has deletions
+		//		- Masking: Ignore datasets for which nothing is selected, raised error
+		//		if rect contains more than one dataset.
+		
+		boolean successful = false;
+		
+		int nActiveElements = 0;
+		for (PlottingElement spc : _components)	
+		{
+			if (spc.isActive())
+			{
+				nActiveElements++;
+			}
+		}
+		
+			if (nActiveElements == 0)
+			{
+				Toolkit.getDefaultToolkit().beep();
+				JOptionPane.showMessageDialog(null,
+					    "You have nothing to subset!",
+					    "Error",
+					    JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+			else if (nActiveElements > 1)
+		{
+			Toolkit.getDefaultToolkit().beep();
+			JOptionPane.showMessageDialog(null,
+				    "You may only subset 1 dataset at a time!" +
+				    "\nPlease hide all but one dataset using the controls to the right.",
+				    "Error",
+				    JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		
+		//TODO necessary to check name's uniqueness?
+		String subsettedCopy = subsetName;//Deducer.getUniqueName("subsettedCopy");
+		
+		PlottingElement changedPlottingElement = null;
+		
+	//PlottingElement spc = null;
+		//boolean noOverlap = true;
+		//for (ListIterator<PlottingElement> i = _components.listIterator(); i.hasNext() && noOverlap; spc = i.next())
+		for (PlottingElement spc : _components)	
 		{
 			if (spc.isActive())
 			{
 				//Back up all the subsetted data 
 				//Deducer.execute(cmd);
 				
-				String polyVarName = null;
+				String varName = ( (ElementModel) spc.getModel() ).getDataFrameArgumentName();
 				String subsetFunction = null;
-				
-				polyVarName = ( (ElementModel) spc.getModel() ).getDataFrameArgumentName();
 				
 				if (spc.getModel() instanceof PolyElementModel
 						||
@@ -128,33 +175,66 @@ public class SpatialPlotModel extends AbstractListModel
 				{
 					subsetFunction = ".subsetPoints";
 				}
-				
-				//TODO handle ChoroElementModel
-			//TODO List names of backed up vars.
-				
-				if (polyVarName != null)
+				else
 				{
-					String backupvar = polyVarName;
-					if (! backupvar.contains("_pre_subset"))
-					{
-						backupvar = backupvar + "_pre_subset";
-					}
-
-					backupvar = Deducer.getUniqueName(backupvar);
-					
-					Deducer.execute(backupvar + " <- " + polyVarName);
-					Deducer.execute(polyVarName + " <- " +
+					Toolkit.getDefaultToolkit().beep();
+					JOptionPane.showMessageDialog(null,
+						    "Subsetting is not currently supported for plots of type \""+spc.getModel().getClass()+"\".",
+						    "Error",
+						    JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+				
+				if (varName != null)
+				{
+//					String backupVar = varName;
+//					if (! backupVar.contains("_pre_subset"))
+//					{
+//						backupVar = backupVar + "_pre_subset";
+//					}
+//
+//					backupVar = Deducer.getUniqueName(backupVar);
+//					
+//					Deducer.execute(backupVar + " <- " + varName);
+				
+					Deducer.eval(
+						subsettedCopy + " <- " + varName + "\n" +
+						subsettedCopy + " <- " +
 						subsetFunction +"(" + 
 						minLat  + "," + 
 						minLon  + "," + 
 						maxLat  + "," + 
 						maxLon  + "," + 
-						polyVarName + "," +
+						varName + "," +
 						"removeSelection=" + (""+keepSelected).toUpperCase() + ")");
-					Deducer.execute("if (length(" + polyVarName + ") == length("+ backupvar + ")) { rm("+backupvar+") }");
+					
+					if (Deducer.eval(subsettedCopy).isNull())
+					{
+						//Deducer.execute(varName + " <- " + backupVar);
+						//Deducer.eval("print('"+ varName + " ignored')" + "\n" + "rm(" + subsettedCopy + ")");
+						Toolkit.getDefaultToolkit().beep();
+						JOptionPane.showMessageDialog(null,
+							    "Your subset contains no elements! reverting to original plot.+\n" +
+							    "If you want to remove this component from the plot, you must use the controls at right.",
+							    "Warning",
+							    JOptionPane.WARNING_MESSAGE);
+						successful = false;
+					}
+					else
+					{
+						changedPlottingElement = spc;
+						//the below checks to see if anything was actually deleted
+						//Deducer.eval("if (length(" + varName + ") == length("+ subsettedCopy + ")) { rm(" + subsettedCopy + ") }");
+						successful = true;
+					}
 				}
 			}
 		}
+		if (successful)
+		{
+			( (ElementModel) changedPlottingElement.getModel() ).setDataFrameArgumentName(subsetName);
+		}
+		return successful;
 	}
 
 }

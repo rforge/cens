@@ -91,11 +91,11 @@ public class DFPointConvertDialog extends RDialog implements ActionListener{
 
 			Deducer.execute(filteredData + " <- " + data);
 			
-			Deducer.execute("if (class(ECS_May_2011_Sleep[, '" + xvar +"']) == 'factor') {");
+			Deducer.execute("if (class(" + data + "[, '" + xvar +"']) == 'factor') {");
 			Deducer.execute(filteredData + "[,'" + xvar + "'] <- as.numeric(as.character("+ filteredData + "[, '"+xvar+"']))");
 			Deducer.execute("}");
 			
-			Deducer.execute("if (class(ECS_May_2011_Sleep[, '" + yvar +"']) == 'factor') {");
+			Deducer.execute("if (class(" + data + "[, '" + yvar +"']) == 'factor') {");
 			Deducer.execute(filteredData + "[,'" + yvar + "'] <- as.numeric(as.character("+ filteredData + "[, '"+yvar+"']))");
 			Deducer.execute("}");
 			

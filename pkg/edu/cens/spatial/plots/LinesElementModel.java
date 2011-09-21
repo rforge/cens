@@ -10,6 +10,8 @@ import org.rosuda.deducer.widgets.param.ParamRObject;
 import org.rosuda.deducer.widgets.param.RFunction;
 import org.rosuda.deducer.widgets.param.RFunctionDialog;
 
+import edu.cens.spatial.plots.widgets.ParamSpatialVariable;
+
 public class LinesElementModel extends ElementModel{
 	RFunction rf;
 	
@@ -87,5 +89,10 @@ public class LinesElementModel extends ElementModel{
 	public String getDataFrameArgumentName()
 	{
 		return (String) rf.get(0).getValue();
+	}
+	
+	public void setDataFrameArgumentName(String argName)
+	{
+		 ((ParamSpatialVariable) rf.get(0)).setData(argName);
 	}
 }

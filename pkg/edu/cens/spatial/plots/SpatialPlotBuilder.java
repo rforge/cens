@@ -492,9 +492,16 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 		{
 			return "";
 		}
+		
+		String parStuff ="mar=c(0,0,0,0)";
+		if (run)
+		{
+			parStuff = "mar=c(.5,.5,2.5,.5), oma=c(1,1,1,1)";
+		}
+		
 		Vector<Double> ul = _vp.getUpperLeftCoordinate();
 		Vector<Double> lr = _vp.getLowerRightCoordinate();
-		String cmd = "plot.new()\npar(mar=c(0,0,0,0))\nplot.window(c(" + ul.get(0)
+		String cmd = "plot.new()\npar("+parStuff+")\nplot.window(c(" + ul.get(0)
 				+ "," + lr.get(0) + "),c(" + lr.get(1) + "," + ul.get(1)
 				+ "), xaxs = 'i', yaxs = 'i')";
 
@@ -1146,24 +1153,36 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 	}
 
 	// TODO wait cursor doesn't work.
-	public void executeSubsetting(double minLat, double minLon, double maxLat,
-			double maxLon, boolean keepSelected)
+	public boolean executeSubsetting(double minLat, double minLon, double maxLat,
+			double maxLon, boolean keepSelected, String subsetName)
 	{
+		boolean wasSuccessful = true;
 		try
 		{
-			this.getGlassPane().setCursor(
-					Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			this.getGlassPane().setVisible(true);
+			Component gp = getRootPane().getGlassPane();
+			gp.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+			gp.setVisible(true);
 
-			this._model.executeSubsetting(minLat, minLon, maxLat, maxLon, keepSelected);
+			Deducer.eval("print('subsetting...')");
+			wasSuccessful = this._model.executeSubsetting(minLat, minLon, maxLat, maxLon, keepSelected, subsetName);
 			updatePlot();
+			Deducer.eval("print('done subsetting')");
+			
+			gp.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			gp.setVisible(false);
 		}
 		finally
 		{
-			this.getGlassPane().setCursor(Cursor.getDefaultCursor());
-			this.getGlassPane().setVisible(false);
-			setCursorNormal();
+//			Component gp = getRootPane().getGlassPane();
+//			gp.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+//			gp.setVisible(false);
+//			this.getGlassPane().setCursor(Cursor.getDefaultCursor());
+//			if (wasSuccessful)
+//			{
+//				this.getGlassPane().setVisible(false);
+//			}
 		}
+		return wasSuccessful;
 	}
 
 	// TODO put all cursor changes in try/finally patterns

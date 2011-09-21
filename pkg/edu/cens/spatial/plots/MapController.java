@@ -24,14 +24,14 @@ import org.rosuda.JGR.JGR;
 import edu.cens.spatial.AcceptSubsetDialog;
 
 public class MapController extends JMapController implements MouseListener,
-		MouseMotionListener, MouseWheelListener, ActionListener, ChangeListener
+MouseMotionListener, MouseWheelListener, ActionListener, ChangeListener
 {
 
 	protected static final int MOUSE_BUTTONS_MASK = MouseEvent.BUTTON3_DOWN_MASK
-			| MouseEvent.BUTTON1_DOWN_MASK | MouseEvent.BUTTON2_DOWN_MASK;
+	| MouseEvent.BUTTON1_DOWN_MASK | MouseEvent.BUTTON2_DOWN_MASK;
 
 	protected static final int MAC_MOUSE_BUTTON3_MASK = MouseEvent.CTRL_DOWN_MASK
-			| MouseEvent.BUTTON1_DOWN_MASK;
+	| MouseEvent.BUTTON1_DOWN_MASK;
 
 	public MapController(JMapViewer map)
 	{
@@ -78,7 +78,7 @@ public class MapController extends JMapController implements MouseListener,
 		if (!movementEnabled || !isMoving)
 			return;
 
-		
+
 		if ((e.getModifiersEx() & MOUSE_BUTTONS_MASK) == movementMouseButtonMask
 				&&
 				subsetBoxState != SubsetBoxState.DRAGGING )
@@ -93,7 +93,7 @@ public class MapController extends JMapController implements MouseListener,
 			}
 			lastDragPoint = p;
 		}
-		
+
 		if (subsetBoxState == SubsetBoxState.DRAGGING  || 
 				subsetBoxState == SubsetBoxState.ACCEPT_DIALOG)
 		{
@@ -101,17 +101,17 @@ public class MapController extends JMapController implements MouseListener,
 			{
 				subsetCorner2 = map.getPosition(e.getPoint());
 			}
-			
+
 			if (e.getPoint() != null)
 			{
 				((MapPanel) map).drawSubsetRectangle(
 						subsetCorner1, 
 						subsetCorner2, 
 						subsetBoxState == SubsetBoxState.DRAGGING
-						);
+				);
 			}
 		}
-		
+
 		////////////////////////////////////
 	}
 
@@ -122,23 +122,23 @@ public class MapController extends JMapController implements MouseListener,
 		//
 		if (isPlatformOsx())
 		{
-//			if (!movementEnabled || !isMoving)
-//				return;
-//			
-//			if (e.getModifiersEx() == MouseEvent.CTRL_DOWN_MASK)
-//			{
-//				Point p = e.getPoint();
-//				if (lastDragPoint != null)
-//				{
-//					int diffx = lastDragPoint.x - p.x;
-//					int diffy = lastDragPoint.y - p.y;
-//					map.moveMap(diffx, diffy);
-//				}
-//				lastDragPoint = p;
-//			}
-	
+			//			if (!movementEnabled || !isMoving)
+			//				return;
+			//			
+			//			if (e.getModifiersEx() == MouseEvent.CTRL_DOWN_MASK)
+			//			{
+			//				Point p = e.getPoint();
+			//				if (lastDragPoint != null)
+			//				{
+			//					int diffx = lastDragPoint.x - p.x;
+			//					int diffy = lastDragPoint.y - p.y;
+			//					map.moveMap(diffx, diffy);
+			//				}
+			//				lastDragPoint = p;
+			//			}
+
 		}
-	
+
 	}
 
 	public void mouseClicked(MouseEvent e)
@@ -175,6 +175,10 @@ public class MapController extends JMapController implements MouseListener,
 		{
 			lastDragPoint = null;
 			isMoving = false;
+			
+			//Need to change cursor back.
+			
+			this.builder.setCursorNormal();
 
 			if (subsetBoxState == SubsetBoxState.DRAGGING)
 			{
@@ -207,7 +211,7 @@ public class MapController extends JMapController implements MouseListener,
 			doZoom(map.getZoom() - e.getWheelRotation(), e.getPoint());
 		}
 	}
-	
+
 	private void doZoom(int amount, Point p)
 	{
 		map.setZoom(amount, p);
@@ -264,17 +268,17 @@ public class MapController extends JMapController implements MouseListener,
 		this.movementMouseButton = movementMouseButton;
 		switch (movementMouseButton)
 		{
-		case MouseEvent.BUTTON1:
-			movementMouseButtonMask = MouseEvent.BUTTON1_DOWN_MASK;
-			break;
-		case MouseEvent.BUTTON2:
-			movementMouseButtonMask = MouseEvent.BUTTON2_DOWN_MASK;
-			break;
-		case MouseEvent.BUTTON3:
-			movementMouseButtonMask = MouseEvent.BUTTON3_DOWN_MASK;
-			break;
-		default:
-			throw new RuntimeException("Unsupported button");
+			case MouseEvent.BUTTON1:
+				movementMouseButtonMask = MouseEvent.BUTTON1_DOWN_MASK;
+				break;
+			case MouseEvent.BUTTON2:
+				movementMouseButtonMask = MouseEvent.BUTTON2_DOWN_MASK;
+				break;
+			case MouseEvent.BUTTON3:
+				movementMouseButtonMask = MouseEvent.BUTTON3_DOWN_MASK;
+				break;
+			default:
+				throw new RuntimeException("Unsupported button");
 		}
 	}
 
@@ -329,27 +333,31 @@ public class MapController extends JMapController implements MouseListener,
 		this.subsetBoxState = SubsetBoxState.READY;
 	}
 
-	public void executeSubsetting(boolean keepSelected)
+	public boolean executeSubsetting(boolean keepSelected, String subsetName)
 	{
-		this.subsetBoxState = SubsetBoxState.DISABLED;
-		((MapPanel) map).clearSubsetRectangle();
-		map.repaint();
-		
 		//1: Find all the plotted points (worry about other objects later)
 		//2: Find which points lie inside the shape
 		//3: Reassign the dataframe to only those points
 
-	double minLat = Math.min(subsetCorner1.getLat(), subsetCorner2.getLat());
-	double minLon = Math.min(subsetCorner1.getLon(), subsetCorner2.getLon());
-	
-	double maxLat = Math.max(subsetCorner1.getLat(), subsetCorner2.getLat());
-	double maxLon = Math.max(subsetCorner1.getLon(), subsetCorner2.getLon());
-		
-		this.builder.executeSubsetting(minLat, minLon, maxLat, maxLon, keepSelected);
-		
+		double minLat = Math.min(subsetCorner1.getLat(), subsetCorner2.getLat());
+		double minLon = Math.min(subsetCorner1.getLon(), subsetCorner2.getLon());
+
+		double maxLat = Math.max(subsetCorner1.getLat(), subsetCorner2.getLat());
+		double maxLon = Math.max(subsetCorner1.getLon(), subsetCorner2.getLon());
+
+		boolean wasSuccessful =	this.builder.executeSubsetting(minLat, minLon, maxLat, maxLon, keepSelected, subsetName);
+
+		if (wasSuccessful)
+		{
+			this.subsetBoxState = SubsetBoxState.DISABLED;
+			((MapPanel) map).clearSubsetRectangle();
+			map.repaint();
+		}
+
+		return wasSuccessful;
 		//4: Redraw the plot
 	}
-	
+
 	public void stopSubsetting()
 	{
 		//setCursorNormal();

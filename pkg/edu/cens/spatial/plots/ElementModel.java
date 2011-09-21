@@ -23,5 +23,13 @@ public abstract class ElementModel {
 	public String getName() {return name;}
 	public boolean isActive(){return active;}
 	public void setActive(boolean act){active=act;}
+	
+	//It turns out these all actually have the same body...
+	//TODO make these inherited methods.
 	public abstract String getDataFrameArgumentName();
+	public abstract void setDataFrameArgumentName(String argName);
+//	public void setDataFrameArgumentName(String argName)
+//	{
+//		throw new IllegalStateException("This method is yet undefined");
+//	}
 }

@@ -80,4 +80,9 @@ public class TextElementModel extends ElementModel{
 	{
 		return (String) rf.get(0).getValue();
 	}
+	
+	public void setDataFrameArgumentName(String argName)
+	{
+		rf.get(0).setValue(argName);
+	}
 }
