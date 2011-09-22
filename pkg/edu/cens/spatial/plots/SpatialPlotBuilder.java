@@ -493,6 +493,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 			return "";
 		}
 		
+		//Add a margin around the spatial plot, so you can put in a title.
 		String parStuff ="mar=c(0,0,0,0)";
 		if (run)
 		{
