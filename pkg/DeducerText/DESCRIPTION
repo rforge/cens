@@ -3,11 +3,12 @@ Type: Package
 Title: Deducer GUI for Text Data
 Version: 0.1-0
 Date: 2011-01-17
-Author: Neal Fultz, Ian Fellows, Alex Rickett
-Maintainer: Neal Fultz <nfultz@stat.ucla.edu>
+Author: Alex Rickett, with contributions from Neal Fultz and Ian Fellows
+Maintainer: Ian Fellows <ian@fellstat.com>
 Depends: R (>= 2.10.0), Deducer, tm, wordcloud, Snowball, RColorBrewer
 Suggests:
 SystemRequirements: Java (>= 1.5), JRI
 License: GPL-2
-Description: More about what it does (maybe more than one line)
+Description: A GUI for text mining
 LazyLoad: yes
+URL: http://www.deducer.org/manual.html http://www.fellstat.com http://research.cens.ucla.edu/
