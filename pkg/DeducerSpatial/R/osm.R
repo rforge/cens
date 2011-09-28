@@ -40,8 +40,8 @@ osmtile <- function(x,y,zoom,type="osm"){
 #' @param add add to current plot
 #' @param ... additional parameters to image
 plot.osmtile <- function(x,y=NULL,add=TRUE,...){
-	image(x=seq(x$bbox$p1[1],x$bbox$p2[1],length=255),
-			y=seq(x$bbox$p2[2],x$bbox$p1[2],length=255),
+	image(x=seq(x$bbox$p1[1],x$bbox$p2[1],length=255) + (x$bbox$p1[1]-x$bbox$p2[1])/254,
+			y=seq(x$bbox$p2[2],x$bbox$p1[2],length=255) + (x$bbox$p1[2]-x$bbox$p2[2])/254,
 			z=matrix(1:(255*255),ncol=255)[,255:1],
 			col=x$colorData,add=add,...)
 	
