@@ -197,7 +197,7 @@ public class SpatialPlotModel extends AbstractListModel
 //					
 //					Deducer.execute(backupVar + " <- " + varName);
 				
-					Deducer.eval(
+					String subsetCommand = 
 						subsettedCopy + " <- " + varName + "\n" +
 						subsettedCopy + " <- " +
 						subsetFunction +"(" + 
@@ -206,7 +206,21 @@ public class SpatialPlotModel extends AbstractListModel
 						maxLat  + "," + 
 						maxLon  + "," + 
 						varName + "," +
-						"removeSelection=" + (""+keepSelected).toUpperCase() + ")");
+						"removeSelection=" + (""+keepSelected).toUpperCase() + ")";
+					
+					String printableSubsetCommand = subsetCommand;
+					printableSubsetCommand.replace("\n", "\\n");
+					
+					//System.out.println("the string:\n"+subsetCommand+"\n==============\n");
+					
+					System.out.println();
+					
+					//output the subsetting code to the console, since eval won't,
+					//and we need the blocking call only available in eval.
+					//System.out.println could work too
+					Deducer.eval("cat(\""+printableSubsetCommand+"\\n\")");
+					
+					Deducer.eval(subsetCommand);
 					
 					if (Deducer.eval(subsettedCopy).isNull())
 					{

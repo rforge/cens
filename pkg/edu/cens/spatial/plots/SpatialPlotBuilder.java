@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -41,6 +42,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
@@ -52,6 +54,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.omg.CORBA._PolicyStub;
 import org.rosuda.JGR.layout.AnchorConstraint;
 import org.rosuda.JGR.layout.AnchorLayout;
 import org.rosuda.deducer.Deducer;
@@ -92,6 +95,8 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 	private ButtonGroup							_backgroundGroup			= new ButtonGroup();
 	private ViewPanel								_vp;
 	private boolean									firstPlot							= true;
+	
+	private JTextField							_plotTitleField				= new JTextField();
 
 	public SpatialPlotBuilder()
 	{
@@ -255,7 +260,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 				_plotHolder.setBorder(BorderFactory
 						.createBevelBorder(BevelBorder.LOWERED));
 				JPanel defaultPlotPanel = new JPanel(); // new DefaultPlotPanel(this);
-				_plotHolder.add(defaultPlotPanel);
+				_plotHolder.add(defaultPlotPanel, BorderLayout.CENTER);
 				_pane.add(_plotHolder, new AnchorConstraint(137, 158, 52, 22,
 						AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_ABS,
 						AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_REL), 2);
@@ -300,8 +305,14 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 
 				{
 					JPanel elementsPanel = new JPanel();
-					BorderLayout elementsPanelLayout = new BorderLayout();
-					elementsPanel.setLayout(elementsPanelLayout);
+					elementsPanel.setLayout(new BorderLayout());
+					
+					JPanel titlePanel = new JPanel(new BorderLayout());
+					titlePanel.add(_plotTitleField, BorderLayout.CENTER);
+					titlePanel.add(new JLabel("Title:"), BorderLayout.WEST);
+					
+					elementsPanel.add(titlePanel, BorderLayout.NORTH);
+					
 					_rightPanel.add(elementsPanel, new AnchorConstraint(0, 928, 859, 90,
 							AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_REL,
 							AnchorConstraint.ANCHOR_REL, AnchorConstraint.ANCHOR_REL));
@@ -336,8 +347,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 							_elementsList.addListSelectionListener(new ElementListListener());
 							_elementsList.setTransferHandler(new ElementTransferHandler());
 
-							_elementsList
-									.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+							_elementsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 							_elementsList.addMouseListener(new MouseListener()
 							{
@@ -405,19 +415,17 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 				{
 					HelpButton helpButton = new HelpButton(
 							"pmwiki.php?n=Main.SpatialPlotBuilder");
-					bottomPanel.add(helpButton, new AnchorConstraint(364, 51, 872, 19,
+					bottomPanel.add(helpButton, new AnchorConstraint(364, 51, 0, 19,
 							AnchorConstraint.ANCHOR_NONE, AnchorConstraint.ANCHOR_NONE,
-							AnchorConstraint.ANCHOR_REL, AnchorConstraint.ANCHOR_REL));
+							AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_REL));
 					helpButton.setPreferredSize(new java.awt.Dimension(36, 36));
 				}
 				{
-
-					bottomPanel.add(_okayCancel, new AnchorConstraint(127, 965, 872, 592,
+					bottomPanel.add(_okayCancel, new AnchorConstraint(500, 965, 0, 592,
 							AnchorConstraint.ANCHOR_NONE, AnchorConstraint.ANCHOR_REL,
-							AnchorConstraint.ANCHOR_REL, AnchorConstraint.ANCHOR_NONE));
+							AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_NONE));
 					_okayCancel.setPreferredSize(new java.awt.Dimension(267, 39));
 				}
-
 			}
 
 			String[] Menu = { "+", "File", "@N New", "new",
@@ -429,6 +437,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 					"+", "Tools", "View call", "call", "Subset", "subset",
 
 					"~Window", "0" };
+			
 			JMenuBar ezMenu = EzMenuSwing.getEzMenu(this, new MenuListener(), Menu);
 
 			setContentPane(_pane);
@@ -497,7 +506,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 		String parStuff ="mar=c(0,0,0,0)";
 		if (run)
 		{
-			parStuff = "mar=c(.5,.5,2.5,.5), oma=c(1,1,1,1)";
+			parStuff = "mar=c(.5,.5,2.25,.5), oma=c(1,1,1,1)";
 		}
 		
 		Vector<Double> ul = _vp.getUpperLeftCoordinate();
@@ -517,6 +526,12 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 		}
 
 		cmd += modelCall;
+		
+		if (run && this._plotTitleField.getText() != null)
+		{
+			cmd += "\n" + "title('" + _plotTitleField.getText() + "')";
+		}
+		
 		return cmd;
 	}
 
@@ -1164,10 +1179,10 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 			gp.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 			gp.setVisible(true);
 
-			Deducer.eval("print('subsetting...')");
+			//Deducer.eval("print('subsetting...')");
 			wasSuccessful = this._model.executeSubsetting(minLat, minLon, maxLat, maxLon, keepSelected, subsetName);
 			updatePlot();
-			Deducer.eval("print('done subsetting')");
+			//Deducer.eval("print('done subsetting')");
 			
 			gp.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			gp.setVisible(false);
