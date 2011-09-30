@@ -54,7 +54,7 @@ public class DocumentTermMatrixViewer extends JDialog
 		table = new JTable();
 		doTableSetup();
 		
-		//initTableDebug(); //TODO remove this line for official releases
+		initTableDebug(); //TODO remove this line for official releases
 		
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints c = getTopLevelConstraints();
@@ -86,7 +86,7 @@ public class DocumentTermMatrixViewer extends JDialog
 
 		JPanel tableHeaderPanel = new JPanel(new GridBagLayout());
 		c.anchor = c.CENTER;
-		c.insets = new Insets(0,5,0,0);;
+		c.insets = new Insets(0,5,0,0);
 		c.gridy = 0;
 		c.gridx = 0;
 		c.weightx = 0;
@@ -137,40 +137,42 @@ public class DocumentTermMatrixViewer extends JDialog
 			table.getColumnModel().getColumn(0).setPreferredWidth(115);
 			table.getColumnModel().getColumn(0).setMaxWidth(175);
 			
+			table.getColumnModel().getColumn(1).setPreferredWidth(75);
+			table.getColumnModel().getColumn(1).setMaxWidth(75);
+			
 			scrollPane.setViewportView(table);				
-			fixedTable = new FixedColumnTable(1, scrollPane);
+			fixedTable = new FixedColumnTable(2, scrollPane);
 		
 			fixedTable.getFixedTable().setShowGrid(true);
 			fixedTable.getFixedTable().setGridColor(Color.LIGHT_GRAY);
 		}
-		
 	}
-	
 	
 	public void initTableFromCorpus(String corpus)
 	{		
 		try
 		{
 			table = new JTable();
-			String dtm = Deducer.getUniqueName("dtm");
-			Deducer.eval(dtm + " <- TermDocumentMatrix(" + corpus + ", control = list(tolower=FALSE, minWordLength=1))");
+			String tdm = Deducer.getUniqueName("dtm");
+			Deducer.eval(tdm + " <- TermDocumentMatrix(" + corpus + ", control = list(tolower=FALSE, minWordLength=1))");
 
 			//Sort the matrix by total frequency
 			//TODO Make option to switch between the doc and term frequency
 
-			Deducer.eval(dtm + "<- " + dtm + "[order(apply(" + dtm + " > 0, 1, sum), rev("+dtm+"$dimnames$Terms), decreasing=TRUE),]");
+			Deducer.eval(tdm + "<- " + tdm + "[order(apply(" + tdm + " > 0, 1, sum), rev("+tdm+"$dimnames$Terms), decreasing=TRUE),]");
 
 
 
-			final String[] terms = Deducer.eval(dtm+"$dimnames$Terms").asStrings(); // new String[] {"rabid", "fricative", "lateral"};
+			final String[] terms = Deducer.eval(tdm+"$dimnames$Terms").asStrings(); // new String[] {"rabid", "fricative", "lateral"};
 
-			final String [] docNames = Deducer.eval(dtm+"$dimnames$Docs").asStrings(); 
+			final String [] docNames = Deducer.eval(tdm+"$dimnames$Docs").asStrings(); 
+			
 			//new String[nDocs + 1];// {"term", "1", "2", "3"};
 
-
-			int[] rowIndices = Deducer.eval(dtm+"$i").asIntegers();
-			int[] colIndices = Deducer.eval(dtm+"$j").asIntegers();
-			int[] nonZeroVals = Deducer.eval(dtm+"$v").asIntegers();
+			int[] rowIndices = Deducer.eval(tdm+"$i").asIntegers();
+			int[] colIndices = Deducer.eval(tdm+"$j").asIntegers();
+			int[] nonZeroVals = Deducer.eval(tdm+"$v").asIntegers();
+			final int [] freqTotals = Deducer.eval("unname(apply(" + tdm + ",1,sum))").asIntegers();
 
 
 			final Map<Point, Integer> freqMap = new HashMap<Point, Integer>();
@@ -196,9 +198,13 @@ public class DocumentTermMatrixViewer extends JDialog
 					{
 						return terms[rowIndex];
 					}
+					else if (columnIndex == 1)
+					{
+						return freqTotals[rowIndex];
+					}
 					else
 					{
-						return freqMap.get(new Point(rowIndex, columnIndex - 1));
+						return freqMap.get(new Point(rowIndex, columnIndex - 2));
 					}
 				}
 
@@ -214,10 +220,14 @@ public class DocumentTermMatrixViewer extends JDialog
 					{
 						return "Terms";
 					}
+					else if (columnIndex == 1)
+					{
+						return "Total";
+					}
 					else
 					{
 						//extra column for term strings:(-1) 
-						return columnIndex + "";
+						return (columnIndex - 1) + "";
 						//"doc_" + columnIndex + ": " + 
 						//columnNames[columnIndex - 1];
 					}
@@ -225,7 +235,7 @@ public class DocumentTermMatrixViewer extends JDialog
 
 				public int getColumnCount()
 				{
-					return docNames.length + 1;
+					return docNames.length + 2;
 				}
 			});
 			
@@ -236,8 +246,6 @@ public class DocumentTermMatrixViewer extends JDialog
 		{
 			e.printStackTrace();
 		}
-
-
 	}
 
 	//String[] terms = {"ergot", "escargot", "excommunicate"};
@@ -280,6 +288,10 @@ public class DocumentTermMatrixViewer extends JDialog
 					{
 						return terms[rowIndex];
 					}
+					else if (columnIndex == 1)
+					{
+						return 101;
+					}
 					else
 					{
 						return freqMap.get(new Point(rowIndex, columnIndex - 1));
@@ -309,7 +321,7 @@ public class DocumentTermMatrixViewer extends JDialog
 
 				public int getColumnCount()
 				{
-					return docNames.length + 1;
+					return docNames.length + 2;
 				}
 			});
 			doTableSetup();
