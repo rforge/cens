@@ -116,7 +116,7 @@ public class DeducerSpatial
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.add(b.getContentPane(), BorderLayout.CENTER);
 		f.add(temp,BorderLayout.SOUTH);
-		f.pack();
+		//f.pack();
 		f.setVisible(true);
 		//b.setVisible(true);
 	}

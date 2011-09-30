@@ -96,7 +96,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 	private ViewPanel								_vp;
 	private boolean									firstPlot							= true;
 	
-	private JTextField							_plotTitleField				= new JTextField();
+	private JTextField							_titleField				= new JTextField();
 
 	public SpatialPlotBuilder()
 	{
@@ -142,6 +142,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 
 	private void initGUI()
 	{
+		int windowTopToPlotTop = 155;
 		try
 		{
 			Toolkit.getDefaultToolkit().setDynamicLayout(true);
@@ -158,6 +159,17 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 				_pane.setLayer(_topPanel, 10);
 				_topPanel.setPreferredSize(new java.awt.Dimension(683, 122));
 
+				
+				JPanel titlePanel = new JPanel(new BorderLayout());
+				titlePanel.add(_titleField, BorderLayout.CENTER);
+				titlePanel.add(new JLabel("Title: "), BorderLayout.WEST);
+//				elementsPanel.add(titlePanel, BorderLayout.NORTH);
+				
+				_pane.add(titlePanel, new AnchorConstraint(125, 25, 0, 25,
+						AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_ABS,
+						AnchorConstraint.ANCHOR_NONE, AnchorConstraint.ANCHOR_ABS));
+				_pane.setLayer(titlePanel, 100);
+				
 				_pane.add(_shadow, new AnchorConstraint(1, 1, 164, 1,
 						AnchorConstraint.ANCHOR_REL, AnchorConstraint.ANCHOR_ABS,
 						AnchorConstraint.ANCHOR_NONE, AnchorConstraint.ANCHOR_REL));
@@ -261,7 +273,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 						.createBevelBorder(BevelBorder.LOWERED));
 				JPanel defaultPlotPanel = new JPanel(); // new DefaultPlotPanel(this);
 				_plotHolder.add(defaultPlotPanel, BorderLayout.CENTER);
-				_pane.add(_plotHolder, new AnchorConstraint(137, 158, 52, 22,
+				_pane.add(_plotHolder, new AnchorConstraint(windowTopToPlotTop, 158, 52, 22,
 						AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_ABS,
 						AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_REL), 2);
 				_plotHolder.setPreferredSize(new java.awt.Dimension(515, 391));
@@ -272,7 +284,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 			{
 				AnchorLayout rightPanelLayout = new AnchorLayout();
 				_rightPanel.setLayout(rightPanelLayout);
-				_pane.add(_rightPanel, new AnchorConstraint(135, 1000, 52, 731,
+				_pane.add(_rightPanel, new AnchorConstraint(windowTopToPlotTop, 1000, 52, 731,
 						AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_REL,
 						AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_NONE), 4);
 				_rightPanel.setPreferredSize(new java.awt.Dimension(160, 389));
@@ -306,12 +318,6 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 				{
 					JPanel elementsPanel = new JPanel();
 					elementsPanel.setLayout(new BorderLayout());
-					
-					JPanel titlePanel = new JPanel(new BorderLayout());
-					titlePanel.add(_plotTitleField, BorderLayout.CENTER);
-					titlePanel.add(new JLabel("Title:"), BorderLayout.WEST);
-					
-					elementsPanel.add(titlePanel, BorderLayout.NORTH);
 					
 					_rightPanel.add(elementsPanel, new AnchorConstraint(0, 928, 859, 90,
 							AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_REL,
@@ -527,9 +533,9 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 
 		cmd += modelCall;
 		
-		if (run && this._plotTitleField.getText() != null)
+		if (run && this._titleField.getText() != null)
 		{
-			cmd += "\n" + "title('" + _plotTitleField.getText() + "')";
+			cmd += "\n" + "title('" + _titleField.getText() + "')";
 		}
 		
 		return cmd;
