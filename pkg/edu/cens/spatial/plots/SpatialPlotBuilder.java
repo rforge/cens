@@ -165,7 +165,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 				titlePanel.add(new JLabel("Title: "), BorderLayout.WEST);
 //				elementsPanel.add(titlePanel, BorderLayout.NORTH);
 				
-				_pane.add(titlePanel, new AnchorConstraint(125, 25, 0, 25,
+				_pane.add(titlePanel, new AnchorConstraint(125, 160, 0, 25,
 						AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_ABS,
 						AnchorConstraint.ANCHOR_NONE, AnchorConstraint.ANCHOR_ABS));
 				_pane.setLayer(titlePanel, 100);
@@ -627,7 +627,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 			Deducer.eval(cmd);
 			if (first)
 			{
-				Thread.sleep(500);
+				Thread.sleep(2000);
 				// System.out.println("refreshing...");
 				tmp.refreshPlot();
 			}
