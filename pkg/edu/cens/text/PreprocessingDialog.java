@@ -122,6 +122,7 @@ public class PreprocessingDialog extends JDialog
 					//Add any relevant options to the action
 					JPopupMenu ithMenu =  new JPopupMenu();
 					JMenuItem [] items = ProcessCmd.values()[i].getExtraOptions();
+					ProcessCmd.values()[i].setParentComponent(_table);
 					
 					for (JMenuItem item : items)
 					{

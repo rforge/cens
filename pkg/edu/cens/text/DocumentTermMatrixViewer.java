@@ -177,7 +177,6 @@ public class DocumentTermMatrixViewer extends JDialog
 
 			final Map<Point, Integer> freqMap = new HashMap<Point, Integer>();
 
-
 			for(int i = 0; i < rowIndices.length; i++)
 			{
 				//R indexing is 1-based

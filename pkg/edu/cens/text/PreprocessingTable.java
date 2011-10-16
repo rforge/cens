@@ -135,7 +135,7 @@ public class PreprocessingTable extends JTable
 		this.getColumnModel().getColumn(REORDER_COLUMN).setPreferredWidth(25);
 		
 		//Action name
-		this.getColumnModel().getColumn(ACTION_COLUMN).setPreferredWidth(150);
+		this.getColumnModel().getColumn(ACTION_COLUMN).setPreferredWidth(225);
 		
 		//Options button
 		this.getColumnModel().getColumn(OPTIONS_COLUMN).setPreferredWidth(25);
