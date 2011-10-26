@@ -29,6 +29,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.rosuda.deducer.Deducer;
+import org.rosuda.deducer.toolkit.HelpButton;
 import org.rosuda.deducer.toolkit.OkayCancelPanel;
 import org.rosuda.deducer.toolkit.VariableSelector;
 import org.rosuda.deducer.widgets.TextFieldWidget;
@@ -161,11 +162,21 @@ public class ExtractCorpusDialog extends JDialog implements ActionListener
 		//messagePane.add(okayCancelPanel, c);
 		//messagePane.add(new JButton("VERY BOTTOM"), c);
 
+		
 		c.fill = GridBagConstraints.NONE;
 		c.ipadx = 0;
 		c.gridx = 0;
 		c.gridy = 0;
-		c.weightx = 0.8;
+		c.weightx = 0;
+		c.weighty = 0;
+		c.anchor = GridBagConstraints.LINE_END;
+		footerPanel.add(new HelpButton(""), c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.ipadx = 0;
+		c.gridx = 1;
+		c.gridy = 0;
+		c.weightx = 1;
 		c.weighty = 0;
 		c.anchor = GridBagConstraints.LINE_END;
 

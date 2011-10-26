@@ -25,6 +25,7 @@ package edu.cens.text;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -61,6 +62,7 @@ import javax.swing.filechooser.FileFilter;
 
 import org.rosuda.JGR.JGR;
 import org.rosuda.deducer.Deducer;
+import org.rosuda.deducer.toolkit.HelpButton;
 
 import com.sun.tools.javac.util.List;
 
@@ -240,9 +242,6 @@ public class TextFileChooser
 		actualDialog.add(fc, BorderLayout.CENTER);
 		actualDialog.add(constructExtraOptionsPanel(), BorderLayout.SOUTH);
 
-
-
-
 		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
 		fc.addChoosableFileFilter(new FileFilter()
@@ -341,21 +340,43 @@ public class TextFileChooser
 
 		JPanel radButPan = new JPanel();
 
-		c.weightx = 0;
+		c.weightx = 1;
 		c.gridx = 0;
 		c.gridy = 0;
-		c.fill = GridBagConstraints.NONE;
+		c.fill = GridBagConstraints.BOTH;
+		c.anchor = GridBagConstraints.WEST;
+		
+		c.weightx = 1;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.anchor = GridBagConstraints.CENTER;
 
 		radButPan.add(makeNewCorpusButton, c);
 
-		c.gridx = 1;
+		c.gridx = 2;
 
 		radButPan.add(addToCorpusButton, c);
 
+		
 		c.gridx = 0;
 		c.gridy = 1;
+		c.weightx = 0;
+		//JPanel coloredStuff = new JPanel();
+		//coloredStuff.setBackground(Color.blue);
+		//System.out.println(helpButton.getSize());
+		c.ipadx = 25;
+		c.ipady = 15;
+		retPanel.add(new HelpButton(""), c);
+		
+		c.ipadx = 0;
+		c.ipady = 0;
+		c.gridx = 1;
+		c.gridy = 1;
 		c.weightx = 1;
+		c.fill = GridBagConstraints.HORIZONTAL;
 
+		//radButPan.setBackground(Color.RED);
 		retPanel.add(radButPan, c);
 
 		////////////////////////////////////////////////////////
@@ -425,6 +446,7 @@ public class TextFileChooser
 
 		c.insets = new Insets(5, 15, 5, 15);
 
+		//retPanel.setBackground(Color.green);
 		retPanel.add(nameOrCorpusPanel, c);
 
 		////////////////////////////////////////////
@@ -435,7 +457,7 @@ public class TextFileChooser
 		c.gridwidth = 2;
 		c.insets = new Insets(0, 5, 0, 5);
 
-		retPanel.add(new JSeparator(SwingConstants.HORIZONTAL),c);
+		//retPanel.add(new JSeparator(SwingConstants.HORIZONTAL),c);
 
 		/////////////////////////////////////////////
 		//  Default to making new corpus  ///////////
@@ -458,11 +480,12 @@ public class TextFileChooser
 
 	public static void main(String[] args)
 	{
-		TextFileChooser tfc = new TextFileChooser(null)
+		JFrame f = new JFrame();
+		f.setVisible(true);
+		TextFileChooser tfc = new TextFileChooser(f)
 		{
 
 		};
-
 		tfc.run();
 	}
 }

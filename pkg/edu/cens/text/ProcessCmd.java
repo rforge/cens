@@ -18,7 +18,6 @@ import java.io.File;
 
 public enum ProcessCmd
 {
-
 	tolower("To Lower Case", "tm_map(%s, tolower)"), 
 	depunct("Remove Punctuation", "tm_map(%s, removePunctuation)"),
 	denumber("Remove Numbers", "tm_map(%s, removeNumbers)"),
@@ -70,10 +69,11 @@ public enum ProcessCmd
 						}
 					},
 					
-					new JMenuItem("Choose Stopword File")
+					new JMenuItem("Use Custom Stopword File")
 					{
-						Component theMenuItemItself = this;
+						//JRadioButtonMenuItem theMenuItemItself = this;
 						{
+							//defaultOrCustomStopwordButtonGroup.add(this);
 							addActionListener(new ActionListener()
 							{
 								public void actionPerformed(ActionEvent e)
@@ -88,6 +88,7 @@ public enum ProcessCmd
 										File fff = new File(stopwordFile);
 										//System.out.println(stopwordFile);
 										_label = "Remove Stopwords (" + fff.getName() + ")";
+										//theMenuItemItself.setSelected(true);
 										
 										if(_parent != null)
 										{
@@ -97,20 +98,27 @@ public enum ProcessCmd
 										//SwingUtilities.windowForComponent(theMenuItemItself).invalidate();
 										//SwingUtilities.windowForComponent(theMenuItemItself).repaint();
 									}
+									else
+									{
+									}
 									//readLines("/Users/xander/Desktop/stop.txt")
 								}
 							});
 						}
 					},
 					
-					new JMenuItem("Choose Stopword File")
+					new JMenuItem("Use Default Stopwords")
 					{
 						{
+							//final JRadioButtonMenuItem thisPtr = this;
+							//defaultOrCustomStopwordButtonGroup.add(this);
+							this.setSelected(true);
 							addActionListener(new ActionListener()
 							{
 								public void actionPerformed(ActionEvent e)
 								{
 									stopwordFile = null;
+									//thisPtr.setSelected(true);
 									_label = "Remove Stopwords (default list)";
 								}
 							});
@@ -146,6 +154,7 @@ public enum ProcessCmd
 	public String _label;
 	public final String	_function;
 	protected  Component _parent;
+	protected static ButtonGroup defaultOrCustomStopwordButtonGroup = new ButtonGroup();
 
 	public String toString()
 	{

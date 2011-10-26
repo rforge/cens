@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 
 import org.rosuda.JGR.layout.AnchorConstraint;
 import org.rosuda.deducer.Deducer;
+import org.rosuda.deducer.toolkit.HelpButton;
 import org.rosuda.deducer.widgets.*;
 
 

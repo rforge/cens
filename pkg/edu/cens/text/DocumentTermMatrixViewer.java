@@ -31,6 +31,7 @@ import javax.swing.table.TableModel;
 
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.deducer.Deducer;
+import org.rosuda.deducer.toolkit.HelpButton;
 
 import com.sun.tools.internal.ws.wsdl.document.jaxws.Exception;
 
@@ -80,8 +81,24 @@ public class DocumentTermMatrixViewer extends JDialog
 			corpusChooser.setSelectedIndex(0);
 		} //else no corpora
 
+		JPanel topMostPanel = new JPanel(new GridBagLayout());
+		c.weightx = 1;
+		topMostPanel.add(corpusChooser, c);
+		c.gridx = 1;
+		c.weightx = 0;
+		c.ipadx = 15;
+		c.ipady = 15;
+		topMostPanel.add(new HelpButton(""), c);
+		
+		
+		c = new GridBagConstraints();
 		c.gridy = 0;
-		this.add(corpusChooser);
+		c.weightx = 1;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		//topMostPanel.setBackground(Color.red);
+		this.add(topMostPanel,c);
+		
+		c= new GridBagConstraints();
 
 
 		JPanel tableHeaderPanel = new JPanel(new GridBagLayout());

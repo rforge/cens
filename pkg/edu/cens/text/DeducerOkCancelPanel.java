@@ -23,6 +23,9 @@ import org.rosuda.deducer.toolkit.HelpButton;
 public abstract class DeducerOkCancelPanel extends JPanel
 {	
 	
+	JButton okButton;
+	JButton cancelButton;
+	
 	public DeducerOkCancelPanel()
 	{
 		this(null);

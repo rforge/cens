@@ -13,6 +13,7 @@ import javax.swing.filechooser.FileFilter;
 import org.rosuda.JGR.RController;
 import org.rosuda.JGR.toolkit.FileSelector;
 import org.rosuda.deducer.Deducer;
+import org.rosuda.deducer.toolkit.HelpButton;
 
 public class ShapeFileLoader extends FileSelector{
 	
@@ -29,6 +30,7 @@ public class ShapeFileLoader extends FileSelector{
 		proj = new JTextField(10);
 		proj.setText("+proj=longlat");
 		namePanel.add(proj);
+		namePanel.add(new HelpButton(""));
 		this.addFooterPanel(namePanel);
 		/*
 		 !path.toLowerCase().endsWith(".shp") &&

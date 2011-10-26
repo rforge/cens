@@ -52,6 +52,7 @@ import org.rosuda.JGR.JGR;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.deducer.Deducer;
 import org.rosuda.deducer.data.DataViewerTab;
+import org.rosuda.deducer.toolkit.HelpButton;
 import org.rosuda.deducer.widgets.ObjectChooserWidget;
 
 public class CorpusViewerPanel extends DataViewerTab //TODO extend JDialog instead?
@@ -315,9 +316,11 @@ public class CorpusViewerPanel extends DataViewerTab //TODO extend JDialog inste
 		c.fill = GridBagConstraints.NONE;
 		c.weighty = 0;
 		JPanel gotoPanel = new JPanel();
+		gotoPanel.add(new HelpButton(""), BorderLayout.EAST);
 		gotoPanel.add(new JLabel("Go To: "),BorderLayout.WEST);
 		gotoPanel.add(goToField,BorderLayout.CENTER);
 		everythingPanel.add(gotoPanel,c);
+
 		//------------------------------------------------------------------------
 		// Document text area / document selector
 		//------------------------------------------------------------------------
