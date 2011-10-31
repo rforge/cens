@@ -49,6 +49,7 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
 import org.rosuda.deducer.Deducer;
+import org.rosuda.deducer.toolkit.HelpButton;
 
 public class TermFrequencyDialog extends JDialog
 {
@@ -276,6 +277,15 @@ public class TermFrequencyDialog extends JDialog
 
 		GridBagConstraints c = getTopLevelLayoutDefaults();
 		okPanel.add(new JLabel(""), c);
+		
+		c.gridx = 0;
+		c.gridy = 0;
+		c.anchor = GridBagConstraints.WEST;
+		c.ipadx = 10;
+		c.ipady = 10;
+		okPanel.add(new HelpButton(""), c);
+		
+		c = getTopLevelLayoutDefaults();
 
 		c.fill = GridBagConstraints.NONE;
 		c.weightx = 0;
