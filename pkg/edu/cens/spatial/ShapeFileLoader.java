@@ -28,7 +28,7 @@ public class ShapeFileLoader extends FileSelector{
 		namePanel.add(new JLabel("      Proj: "));
 
 		proj = new JTextField(10);
-		proj.setText("+proj=longlat");
+		proj.setText("+proj=longlat +datum=NAD83");
 		namePanel.add(proj);
 		namePanel.add(new HelpButton(""));
 		this.addFooterPanel(namePanel);
