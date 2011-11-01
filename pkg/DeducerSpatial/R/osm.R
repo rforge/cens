@@ -40,7 +40,7 @@ osmtile <- function(x,y,zoom,type="osm"){
 #' @param add add to current plot ( if raster, then image is always added)
 #' @param raster use raster image
 #' @param ... additional parameters to image or rasterImage
-plot.osmtile <- function(x, y=NULL, add=TRUE, raster=TRUE, ...){
+plot.osmtile <- function(x, y=NULL, add=TRUE, raster=FALSE, ...){
 	if(!raster)
 		image(x=seq(x$bbox$p1[1],x$bbox$p2[1],length=255) + (x$bbox$p1[1]-x$bbox$p2[1])/254,
 			y=seq(x$bbox$p2[2],x$bbox$p1[2],length=255) + (x$bbox$p1[2]-x$bbox$p2[2])/254,

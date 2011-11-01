@@ -1,7 +1,8 @@
 \name{plot.OpenStreetMap}
 \alias{plot.OpenStreetMap}
 \title{the map in mercator coordinates.}
-\usage{plot.OpenStreetMap(x, y, add=FALSE, ...)}
+\usage{
+\method{plot}{OpenStreetMap}(x,y=NULL,add=FALSE,...)}
 \description{the map in mercator coordinates. see osm().}
 \arguments{\item{x}{the OpenStreetMap}
 \item{y}{ignored}

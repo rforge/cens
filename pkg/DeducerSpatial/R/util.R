@@ -16,7 +16,7 @@ osm <- function(){
 project_mercator <- function(lat,long,drop=TRUE){
 	df <- data.frame(long=long,lat=lat)
 	coordinates(df) <- ~long+lat
-	proj4string(df) <- CRS("+proj=longlat")
+	proj4string(df) <- CRS("+proj=longlat +datum=NAD83")
 	df1 <- spTransform(df,osm())
 	coords <- coordinates(df1)
 	colnames(coords) <- c("x","y")

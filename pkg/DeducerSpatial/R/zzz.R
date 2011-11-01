@@ -5,7 +5,7 @@
 
 
 
-.First.lib <- function(libname, pkgname) {
+.onLoad <- function(libname, pkgname) {
 	
 	if (!nzchar(Sys.getenv("NOAWT")) || .jgr==TRUE){
 		.jpackage(pkgname)  
