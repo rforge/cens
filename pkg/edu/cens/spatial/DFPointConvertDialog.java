@@ -12,6 +12,8 @@ import org.rosuda.deducer.widgets.*;
 
 public class DFPointConvertDialog extends RDialog implements ActionListener{
 
+	private static final String HELP_URL = "index.php?n=Main.DeducerSpatial";
+	
 	private VariableSelectorWidget variableSelector;
 	private SingleVariableWidget yaxis;
 	private SingleVariableWidget xaxis;
@@ -58,7 +60,7 @@ public class DFPointConvertDialog extends RDialog implements ActionListener{
 		this.setTitle("Convert data.frame to Spatial Points");
 		
 		setOkayCancel(true,true,this);
-		addHelpButton("pmwiki.php");
+		addHelpButton(HELP_URL);
 		this.setSize(555, 445);
 	}
 

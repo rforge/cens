@@ -63,6 +63,7 @@ public class CorpusViewerPanel extends DataViewerTab //TODO extend JDialog inste
 	JFormattedTextField goToField;
 	boolean showCorpusSelector = false;
 	private JLabel corpusNameLabel;
+	private static final String HELP_URL = "index.php?n=Main.DeducerText";
 
 	/**
 	 * 
@@ -316,7 +317,7 @@ public class CorpusViewerPanel extends DataViewerTab //TODO extend JDialog inste
 		c.fill = GridBagConstraints.NONE;
 		c.weighty = 0;
 		JPanel gotoPanel = new JPanel();
-		gotoPanel.add(new HelpButton(""), BorderLayout.EAST);
+		gotoPanel.add(new HelpButton(HELP_URL), BorderLayout.EAST);
 		gotoPanel.add(new JLabel("Go To: "),BorderLayout.WEST);
 		gotoPanel.add(goToField,BorderLayout.CENTER);
 		everythingPanel.add(gotoPanel,c);

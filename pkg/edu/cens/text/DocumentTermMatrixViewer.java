@@ -43,6 +43,7 @@ public class DocumentTermMatrixViewer extends JDialog
 	final JScrollPane scrollPane;
 	private static final int FREQ_COLUMN_WIDTH = 50;
 	FixedColumnTable fixedTable;
+	private static final String HELP_URL = "index.php?n=Main.DeducerText";
 
 	public DocumentTermMatrixViewer(Frame parent) 
 	{
@@ -88,7 +89,7 @@ public class DocumentTermMatrixViewer extends JDialog
 		c.weightx = 0;
 		c.ipadx = 15;
 		c.ipady = 15;
-		topMostPanel.add(new HelpButton(""), c);
+		topMostPanel.add(new HelpButton(HELP_URL), c);
 		
 		
 		c = new GridBagConstraints();

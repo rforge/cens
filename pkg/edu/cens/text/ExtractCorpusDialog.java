@@ -47,6 +47,7 @@ public class ExtractCorpusDialog extends JDialog implements ActionListener
 	private OkayCancelPanel okayCancelPanel;
 
 	private boolean userHasNamed;
+	private static final String HELP_URL = "index.php?n=Main.DeducerText";
 
 	public ExtractCorpusDialog(JFrame parent)
 	{
@@ -170,7 +171,7 @@ public class ExtractCorpusDialog extends JDialog implements ActionListener
 		c.weightx = 0;
 		c.weighty = 0;
 		c.anchor = GridBagConstraints.LINE_END;
-		footerPanel.add(new HelpButton(""), c);
+		footerPanel.add(new HelpButton(HELP_URL), c);
 		
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.ipadx = 0;

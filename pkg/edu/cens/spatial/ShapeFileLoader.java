@@ -17,6 +17,7 @@ import org.rosuda.deducer.toolkit.HelpButton;
 
 public class ShapeFileLoader extends FileSelector{
 	
+	private static final String HELP_URL = "index.php?n=Main.DeducerSpatial";
 	private JTextField rDataNameField;
 	JTextField proj ;
 	public ShapeFileLoader(Frame f) {
@@ -30,7 +31,7 @@ public class ShapeFileLoader extends FileSelector{
 		proj = new JTextField(10);
 		proj.setText("+proj=longlat +datum=NAD83");
 		namePanel.add(proj);
-		namePanel.add(new HelpButton(""));
+		namePanel.add(new HelpButton(HELP_URL));
 		this.addFooterPanel(namePanel);
 		/*
 		 !path.toLowerCase().endsWith(".shp") &&

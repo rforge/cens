@@ -53,6 +53,7 @@ import org.rosuda.deducer.toolkit.HelpButton;
 
 public class TermFrequencyDialog extends JDialog
 {
+	private static final String HELP_URL = "index.php?n=Main.DeducerText";
 	public static final int BAR_CHART = 1;
 	//public static final int DOCUMENT_TERM_MATRIX = -1;
 	public static final int TOTAL_FREQUENCIES = 0;
@@ -283,7 +284,7 @@ public class TermFrequencyDialog extends JDialog
 		c.anchor = GridBagConstraints.WEST;
 		c.ipadx = 10;
 		c.ipady = 10;
-		okPanel.add(new HelpButton(""), c);
+		okPanel.add(new HelpButton(HELP_URL), c);
 		
 		c = getTopLevelLayoutDefaults();
 

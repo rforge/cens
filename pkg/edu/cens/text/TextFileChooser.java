@@ -69,6 +69,8 @@ import com.sun.tools.javac.util.List;
 public class TextFileChooser
 {
 
+	private static final String HELP_URL = "index.php?n=Main.DeducerText";
+	
 	private JFileChooser fc;
 	JDialog actualDialog;
 
@@ -367,7 +369,7 @@ public class TextFileChooser
 		//System.out.println(helpButton.getSize());
 		c.ipadx = 25;
 		c.ipady = 15;
-		retPanel.add(new HelpButton(""), c);
+		retPanel.add(new HelpButton(HELP_URL), c);
 		
 		c.ipadx = 0;
 		c.ipady = 0;

@@ -70,6 +70,8 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 		WindowListener
 {
 
+	private static final String HELP_URL = "http://www.deducer.org/pmwiki/index.php?n=Main.DeducerSpatial";
+	
 	private final JLayeredPane			_pane									= new JLayeredPane();
 	private final JPanel						_rightPanel						= new JPanel();
 	private final JPanel						_topPanel							= new JPanel();
@@ -421,6 +423,8 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 				{
 					HelpButton helpButton = new HelpButton(
 							"pmwiki.php?n=Main.SpatialPlotBuilder");
+					helpButton.setUrl(HELP_URL);
+					
 					bottomPanel.add(helpButton, new AnchorConstraint(364, 51, 0, 19,
 							AnchorConstraint.ANCHOR_NONE, AnchorConstraint.ANCHOR_NONE,
 							AnchorConstraint.ANCHOR_ABS, AnchorConstraint.ANCHOR_REL));
@@ -1013,7 +1017,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 						String url = "http://www.deducer.org";
 						if (url != null && url.length() > 0)
 						{
-							HelpButton.showInBrowser(url);
+							HelpButton.showInBrowser(HELP_URL);
 						}
 					}
 

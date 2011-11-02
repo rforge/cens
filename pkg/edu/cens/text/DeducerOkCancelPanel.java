@@ -25,6 +25,7 @@ public abstract class DeducerOkCancelPanel extends JPanel
 	
 	JButton okButton;
 	JButton cancelButton;
+	HelpButton helpButton;
 	
 	public DeducerOkCancelPanel()
 	{
@@ -36,6 +37,22 @@ public abstract class DeducerOkCancelPanel extends JPanel
 		 this(rootPane, "OK", "Cancel");
 	 }
 	
+	 public void setHelpUrl(String url)
+	 {
+		 this.helpButton.setUrl(url);
+	 }
+	 
+	 public DeducerOkCancelPanel(
+			 JRootPane rootPane,
+			 String okLabel, 
+			String cancelLabel,
+			String helpUrl
+			)
+	{
+		 this (rootPane, okLabel, cancelLabel);
+		 this.setHelpUrl(helpUrl);
+	}
+	 
 	 public DeducerOkCancelPanel(
 			 JRootPane rootPane,
 			 String okLabel, 
@@ -82,7 +99,7 @@ public abstract class DeducerOkCancelPanel extends JPanel
 			c.weightx = 1;
 			c.fill = c.NONE;
 			c.anchor = c.WEST;
-			HelpButton helpButton = new HelpButton("");
+			helpButton = new HelpButton("index.php?n=Main.DeducerManual");
 			add(helpButton, c);
 
 			c.fill = GridBagConstraints.NONE;

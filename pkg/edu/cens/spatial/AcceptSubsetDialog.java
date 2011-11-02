@@ -24,6 +24,7 @@ import edu.cens.spatial.plots.MapController;
 
 public class AcceptSubsetDialog extends JDialog
 {
+	private static final String HELP_URL = "http://www.deducer.org/pmwiki/index.php?n=Main.DeducerSpatial";
 	private final MapController mc;
 	private boolean keepSelected = true;
 	DeducerDataFrameNameField nameField;
@@ -178,6 +179,7 @@ public class AcceptSubsetDialog extends JDialog
 			}
 			
 		};
+		okp.setHelpUrl(HELP_URL);
 		this.add(okp, c);
 		
 		
