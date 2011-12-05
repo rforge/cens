@@ -66,6 +66,8 @@ import org.rosuda.ibase.toolkit.EzMenuSwing;
 import org.rosuda.ibase.toolkit.TJFrame;
 import org.rosuda.javaGD.PlotPanel;
 
+import edu.cens.spatial.DeducerSpatial;
+
 public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 		WindowListener
 {
@@ -139,7 +141,8 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 		lm.addElement(new PlottingElement(new PolyElementModel()));
 		lm.addElement(new PlottingElement(new PolygonLabelsElementModel()));
 		lm.addElement(new PlottingElement(new ChoroElementModel()));
-
+		
+		DeducerSpatial.rgdalCheck();
 	}
 
 	private void initGUI()

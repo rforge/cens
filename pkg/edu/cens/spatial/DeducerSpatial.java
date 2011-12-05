@@ -9,6 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.rosuda.JGR.JGR;
@@ -64,12 +65,32 @@ public class DeducerSpatial
 					"Variable View", new SpatialVariableViewFactory());
 			DataViewerController.addTabFactory("SpatialLinesDataFrame",
 					"Paths", new CoordViewFactory(true));
-
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public static boolean rgdalCheck(){
+		if(!Deducer.isLoaded("rgdal")){
+			if(Deducer.isInstalled("rgdal")){
+				Deducer.execute("library(rgdal)");
+				return true;
+			}else{
+				int inst = JOptionPane.showOptionDialog(null, "The package rgdal is required for most functionality in Deducer Spatial. Would you like to install it now?",
+						"Install", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,null,
+						new String[]{"Yes","No"}, "Yes");
+				if(inst==JOptionPane.OK_OPTION){
+					if(System.getProperty("os.name").startsWith("Mac"))
+						Deducer.execute("setRepositories(ind=c(9,2))\ninstall.packages('rgdal')\nlibrary(rgdal)");
+					else
+						Deducer.execute("install.packages('rgdal')\nlibrary(rgdal)");
+				}
+				return false;
+			}
+		}else
+			return true;
 	}
 
 	public static void insertMenu(JFrame f, String name, int index)

@@ -24,7 +24,7 @@ public class DFPointConvertDialog extends RDialog implements ActionListener{
 	public static DFPointConvertDialog getInstance(){
 		if(inst==null)
 			inst = new DFPointConvertDialog();
-		
+		DeducerSpatial.rgdalCheck();
 		return inst;
 	}
 	
@@ -112,7 +112,7 @@ public class DFPointConvertDialog extends RDialog implements ActionListener{
 //							"!is.na(as.numeric(as.character("+yvar+"))) \n" +
 //									")");
 			
-			String command = name + " <- SpatialPointsDataFrame(" + filteredData + "[,c('"+xvar+"', '"+yvar+"')], data="+filteredData+",proj4string=CRS('+proj=longlat'))";
+			String command = name + " <- SpatialPointsDataFrame(" + filteredData + "[,c('"+xvar+"', '"+yvar+"')], data="+filteredData+",proj4string=CRS('+proj=longlat +datum=WGS84'))";
 			command += "\n"+name+" <- spTransform("+name+",osm())";
 			
 			Deducer.execute(command);		//execute command as if it had been entered into the console

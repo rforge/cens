@@ -29,7 +29,7 @@ public class ShapeFileLoader extends FileSelector{
 		namePanel.add(new JLabel("      Proj: "));
 
 		proj = new JTextField(10);
-		proj.setText("+proj=longlat +datum=NAD83");
+		proj.setText("+proj=longlat +datum=WGS84");
 		namePanel.add(proj);
 		namePanel.add(new HelpButton(HELP_URL));
 		this.addFooterPanel(namePanel);
@@ -59,12 +59,13 @@ public class ShapeFileLoader extends FileSelector{
 					fname.toLowerCase().endsWith(".dbf") ||
 					fname.toLowerCase().endsWith(".prj") ||
 					fname.toLowerCase().endsWith(".sbn") ||
-					fname.toLowerCase().endsWith(".sbx");
+					fname.toLowerCase().endsWith(".sbx") ||
+					f.isDirectory();
 				}
 			});
 		} //TODO handle the non-swing case
 		
-		
+		DeducerSpatial.rgdalCheck();
 	}
 		
 //		addChoosableFileFilter(new FileFilter()
