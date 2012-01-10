@@ -1,14 +1,14 @@
 Package: wordcloud
 Type: Package
 Title: Word Clouds
-Version: 1.2
-Date: 2011-06-06
+Version: 2.0
+Date: 2012-01-09
 Author: Ian Fellows
 Maintainer: Ian Fellows <ian@fellstat.com>
 Description: Pretty word clouds
 License: LGPL-2.1
 LazyLoad: yes
-Depends: methods, Rcpp (>= 0.9.4)
-Suggests: tm, RColorBrewer
+Depends: methods, Rcpp (>= 0.9.4), RColorBrewer
+Suggests: tm
 URL: http://www.fellstat.com http://research.cens.ucla.edu/
 LinkingTo: Rcpp
