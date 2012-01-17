@@ -81,13 +81,15 @@ openmap <- function(upperLeft,lowerRight,zoom,type="osm"){
 #' @param x the OpenStreetMap
 #' @param y ignored
 #' @param add add to current plot
+#' @param removeMargin remove margins from plotting device
 #' @param ... additional parameters to be passed to plot
-plot.OpenStreetMap <- function(x,y=NULL,add=FALSE,...){
+plot.OpenStreetMap <- function(x,y=NULL,add=FALSE,removeMargin=FALSE, ...){
 	if(add==FALSE){
 		plot.new()
-		par(mar=c(0,0,0,0))
-		plot.window(xlim=c(x$bbox$p1[1],x$bbox$p2[1]),ylim=c(x$bbox$p2[2],x$bbox$p1[2]), 
-				xaxs = 'i', yaxs = 'i',asp=abs((x$bbox$p2[2]-x$bbox$p1[2])/(x$bbox$p1[1]-x$bbox$p2[1])))
+		if(removeMargin)
+			par(mar=c(0,0,0,0))
+		plot.window(xlim=c(x$bbox$p1[1],x$bbox$p2[1]),ylim=c(x$bbox$p2[2],x$bbox$p1[2]) ,
+				xaxs = 'i', yaxs = 'i', asp=T)
 	}
 	for(tile in x$tiles)
 		plot(tile,...)
