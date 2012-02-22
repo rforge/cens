@@ -55,17 +55,38 @@ plot.osmtile <- function(x, y=NULL, add=TRUE, raster=FALSE, ...){
 #' get a map based on lat long coordinates 
 #' @param upperLeft the upper left lat and long
 #' @param lowerRight the lower right lat and long
-#' @param zoom the zoom level
-#' @param type osm for mapnik open street map, or 'bing' for bing aerial
-openmap <- function(upperLeft,lowerRight,zoom,type="osm"){
-	zoom <- as.integer(zoom)
+#' @param zoom the zoom level. If null, it is determined automatically
+#' @param type 'osm' for mapnik open street map, or 'bing' for bing aerial
+#' @param minNumTiles If zoom is null, zoom will be chosen such that
+#' 					the number of map tiles is greater than or equal 
+#' 					to this number.
+#' @examples \dontrun{
+#' #Korea
+#' map <- openmap(c(43.46886761482925,119.94873046875),
+#' 				c(33.22949814144951,133.9892578125),type='osm')
+#' plot(map,raster=TRUE)
+#' }
+openmap <- function(upperLeft,lowerRight,zoom=NULL,type="osm",minNumTiles=9L){
+	autoZoom <- is.null(zoom)
+	if(autoZoom)
+		zoom <- 1L
+	else
+		zoom <- as.integer(zoom)
 	ts <- new(J("org.openstreetmap.gui.jmapviewer.tilesources.BingAerialTileSource"))
-	minY <-as.integer(floor(ts$latToTileY(upperLeft[1],zoom)))
-	maxY <-as.integer(floor(ts$latToTileY(lowerRight[1],zoom)))
+	for(i in 1:18){
+		minY <-as.integer(floor(ts$latToTileY(upperLeft[1],zoom)))
+		maxY <-as.integer(floor(ts$latToTileY(lowerRight[1],zoom)))
 	
-	minX <-as.integer(floor(ts$lonToTileX(upperLeft[2],zoom)))
-	maxX <-as.integer(floor(ts$lonToTileX(lowerRight[2],zoom)))
-	
+		minX <-as.integer(floor(ts$lonToTileX(upperLeft[2],zoom)))
+		maxX <-as.integer(floor(ts$lonToTileX(lowerRight[2],zoom)))
+		ntiles <- (maxX-minX+1)*(maxY-minY+1)
+		if(!autoZoom)
+			break
+		if(ntiles>=minNumTiles)
+			break
+		else
+			zoom <- as.integer(zoom + 1L)
+	}
 	map <- list(tiles=list())
 	for( x in minX:maxX){
 		for(y in minY:maxY){
@@ -75,6 +96,7 @@ openmap <- function(upperLeft,lowerRight,zoom,type="osm"){
 	}
 	map$bbox <- list(p1=project_mercator(upperLeft[1],upperLeft[2]),p2=project_mercator(lowerRight[1],lowerRight[2]))
 	class(map) <- "OpenStreetMap"
+	attr(map,"zoom") <- zoom
 	map
 }
 
@@ -109,11 +131,3 @@ plot.OpenStreetMap <- function(x,y=NULL,add=FALSE,removeMargin=FALSE, ...){
 		plot(tile,...)
 }
 
-#m <- c(25.7738889,-80.1938889)
-#j <- c(58.3019444,-134.4197222)
-#miami <- project_mercator(25.7738889,-80.1938889)
-#jun <- project_mercator(58.3019444,-134.4197222)
-#data(states)
-#map <- openmap(j,m,4)
-#plot(map)
-#plot(states,add=T)

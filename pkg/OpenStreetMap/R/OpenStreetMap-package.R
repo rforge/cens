@@ -4,10 +4,10 @@
 ###############################################################################
 
 
-#' Deducer for spatial data analysis.
+#' Open street maps.
 #'
 #' \tabular{ll}{
-#' Package: \tab DeducerSpatial\cr
+#' Package: \tab OpenStreetMap\cr
 #' Type: \tab Package\cr
 #' Version: \tab 1.0\cr
 #' Date: \tab 2011-04-04\cr
@@ -15,16 +15,16 @@
 #' LazyLoad: \tab yes\cr
 #' }
 #'
-#' A Deducer plug-in for spatial data analysis. Includes The ability to plot and explore Open Street Map and Bing satellite images.
+#' Includes The ability to plot Open Street Map and Bing satellite images.
 #'
 #'
-#' @name DeducerSpatial-package
-#' @aliases DeducerSpatial
+#' @name OpenStreetMap-package
+#' @aliases OpenStreetMap
 #' @docType package
-#' @title Deducer for spatial data analysis.
+#' @title Open Street Maps.
 #' @author Ian Fellows \email{ian.fellows@@stat.ucla.edu}
 #' @references
-#' \url{http://www.deducer.org}
+#' \url{http://www.fellstat.com}
 #' @keywords package
 #' @import rJava
 #' @exportPattern "^[[:alpha:]]+"
