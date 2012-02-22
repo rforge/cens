@@ -15,7 +15,7 @@
 #' LazyLoad: \tab yes\cr
 #' }
 #'
-#' A Deducer plug-in for spatial data analysis. Includes The ability to plot and explore Open Street Map and Bing satellite images.
+#' A Deducer plug-in for spatial data analysis.
 #'
 #'
 #' @name DeducerSpatial-package
@@ -28,10 +28,4 @@
 #' @keywords package
 NULL
 
-#' The united states
-#'
-#' @name states
-#' @docType data
-#' @keywords data
-NULL
 
