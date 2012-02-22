@@ -37,6 +37,9 @@ nothing
   \code{\link{text}}
 }
 \examples{
+
+wordcloud(c(letters, LETTERS, 0:9), seq(1, 1000, len = 62))
+
 if(require(tm)){
 	data(crude)
 	crude <- tm_map(crude, removePunctuation)
