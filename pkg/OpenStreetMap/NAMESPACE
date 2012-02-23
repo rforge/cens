@@ -1,3 +1,2 @@
 exportPattern("^[[:alpha:]]+")
 import(rJava)
-S3method(openproj,default)

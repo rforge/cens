@@ -3,6 +3,32 @@
 # Author: ianfellows
 ###############################################################################
 
+#' open street map (and google) mercator projection
+osm <- function(){
+	CRS("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs")
+}
+
+#' Latitude Longitude projection
+longlat <- function(){
+	CRS("+proj=longlat +datum=WGS84")
+}
+
+#'maps long lat values to the open street map mercator projection
+#' @param lat a vector of latitudes
+#' @param long a vector of longitudes
+#' @param drop drop to lowest dimension
+project_mercator <- function(lat,long,drop=TRUE){
+	library(rgdal)
+	df <- data.frame(long=long,lat=lat)
+	coordinates(df) <- ~long+lat
+	proj4string(df) <- CRS("+proj=longlat +datum=WGS84")
+	df1 <- spTransform(df,osm())
+	coords <- coordinates(df1)
+	colnames(coords) <- c("x","y")
+	if(drop)
+		coords <- drop(coords)
+	coords
+}
 
 
 #'get an open street map tile. tpe can be "osm" or "bing"
@@ -43,8 +69,8 @@ plot.osmtile <- function(x, y=NULL, add=TRUE, raster=FALSE, ...){
 	xres <- x$xres
 	yres <- x$yres
 	if(!raster)
-		image(x=seq(x$bbox$p1[1],x$bbox$p2[1],length=yres) + (x$bbox$p1[1]-x$bbox$p2[1])/yres,
-			y=seq(x$bbox$p2[2],x$bbox$p1[2],length=xres) + (x$bbox$p1[2]-x$bbox$p2[2])/xres,
+		image(x=seq(x$bbox$p1[1],x$bbox$p2[1],length=yres) + (x$bbox$p1[1]-x$bbox$p2[1])/xres,
+			y=seq(x$bbox$p2[2],x$bbox$p1[2],length=xres) + (x$bbox$p1[2]-x$bbox$p2[2])/yres,
 			z=t(matrix(1:(xres*yres),nrow=xres,byrow=TRUE))[,xres:1],
 			col=x$colorData,add=add,...)
 	else
@@ -118,6 +144,28 @@ openmap <- function(upperLeft,lowerRight,zoom=NULL,type="osm",minNumTiles=9L){
 #' plot(map,removeMargin=TRUE)
 #' plot(states,add=TRUE)
 #' 
+#' data(LA_places)
+#' longBeachHarbor <- openmap(c(33.760525217369974,-118.22052955627441),
+#' 		c(33.73290566922855,-118.17521095275879),14,'bing')
+#' coords <- coordinates(LA_places)
+#' x <- coords[,1]
+#' y <- coords[,2]
+#' txt <- slot(LA_places,"data")[,'NAME']
+#' plot(longBeachHarbor,removeMargins=TRUE,raster=TRUE)
+#' points(x,y,col="red")
+#' text(x,y,txt,col="white",adj=0)
+#' 
+#'  library(UScensus2000)
+#'  
+#'  lat <- c(43.834526782236814,30.334953881988564)
+#'  lon <- c(-131.0888671875  ,-107.8857421875)
+#'  southwest <- openmap(c(lat[1],lon[1]),c(lat[2],lon[2]),5,'osm')
+#'  data(california.tract)
+#'  california.tract <- spTransform(california.tract,osm())
+#'  
+#'  plot(southwest,removeMargin=TRUE)
+#'  plot(california.tract,add=TRUE)
+#' 
 #' }
 plot.OpenStreetMap <- function(x,y=NULL,add=FALSE,removeMargin=FALSE, ...){
 	if(add==FALSE){
@@ -132,13 +180,55 @@ plot.OpenStreetMap <- function(x,y=NULL,add=FALSE,removeMargin=FALSE, ...){
 }
 
 
+
+
+
+#' create a RasterLayer from a tile
+#' @param x an osmtile
+#' @param ... unused
+setMethod("raster","osmtile",function(x, ...){
+	library(raster)
+	rgbCol <- col2rgb(x$colorData)
+	
+	red <- matrix(rgbCol[1,],nrow=x$xres,byrow=TRUE)
+	green <- matrix(rgbCol[2,],nrow=x$xres,byrow=TRUE)
+	blue <- matrix(rgbCol[3,],nrow=x$xres,byrow=TRUE)
+	
+	xmn <- x$bbox$p1[1]
+	xmx <- x$bbox$p2[1]
+	ymn <- x$bbox$p2[2]
+	ymx <- x$bbox$p1[2]
+
+	ras <- stack(raster(red,xmn=xmn,xmx=xmx,ymn=ymn,ymx=ymx),
+			raster(green,xmn=xmn,xmx=xmx,ymn=ymn,ymx=ymx),
+			raster(blue,xmn=xmn,xmx=xmx,ymn=ymn,ymx=ymx))
+	projection(ras) <- x$projection	
+	ras
+}
+)
+
+#' create a RasterLayer from an OpenStreetMap
+#' @param x an OpenStreetMap
+#' @param ... unused
+setMethod("raster","OpenStreetMap",function(x, ...){
+	rasterImg <- NULL
+	for(i in 1:length(x$tiles)){
+				
+		if(i==1)
+			rasterImg <- raster(x$tiles[[i]])
+		else
+			rasterImg <- raster::merge(rasterImg,raster(x$tiles[[i]]))
+	}	
+	rasterImg
+}
+)
+
 #' Projects the open street map to an alternate coordinate system
 #' @param x an OpenStreetMap object
 #' @param projection a proj4 character string or CRS object
 #' @param ... additional parameters for projectRaster
 #' @examples \dontrun{
 #' library(rgdal)
-#' library(raster)
 #' library(maps)
 #' 
 #' #plot map in native mercator coords
@@ -148,61 +238,39 @@ plot.OpenStreetMap <- function(x,y=NULL,add=FALSE,removeMargin=FALSE, ...){
 #' 
 #' #using longlat projection lets us combine with the maps library
 #' map_longlat <- openproj(map)
-#' plot(map_longlat)
+#' plot(map_longlat,raster=TRUE)
 #' map("world",col="red",add=TRUE)
 #' 
 #' #robinson projection. good for whole globe viewing.
-#' map_robinson <- openproj(map, projection=
+#' map_robinson <- openproj(map_longlat, projection=
 #' 				"+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
 #' plot(map_robinson)			
+#' 
+#' 
+#' map <- openmap(c(70,-179),
+#' 		c(40,179),zoom=2,type='bing')
+#' map_longlat <- openproj(map)
+#' #Lambert Conic Conformal (takes some time...)
+#' map_llc <- openproj(map_longlat, projection=
+#' 				"+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96")
+#' plot(map_llc,raster=TRUE)	
+#' 
 #' }
-openproj <- function(x,projection = "+proj=longlat",...) {
-	UseMethod("openproj")
-}
-
-#' Projects the open street map to an alternate coordinate system
-#' @param x an OpenStreetMap object
-#' @param projection a proj4 character string or CRS object
-#' @param ... additional parameters for projectRaster
-#' @S3method openproj default
-openproj.default <- function(x,projection = "+proj=longlat",...) {
-	stop("unsupported")
-}
-
-#' Projects the open street map to an alternate coordinate system
-#' @param x an OpenStreetMap object
-#' @param projection a proj4 character string or CRS object
-#' @param ... additional parameters for projectRaster
-#' @method openproj osmtile
-openproj.osmtile <- function(x,projection = "+proj=longlat",...){
-	library(raster)
-
-	rgbCol <- col2rgb(x$colorData)
-
-	red <- matrix(rgbCol[1,],nrow=x$xres,byrow=TRUE)
-	green <- matrix(rgbCol[2,],nrow=x$xres,byrow=TRUE)
-	blue <- matrix(rgbCol[3,],nrow=x$xres,byrow=TRUE)
-	xmn <- x$bbox$p1[1]
-	xmx <- x$bbox$p2[1]
-	ymn <- x$bbox$p2[2]
-	ymx <- x$bbox$p1[2]
-	ras <- stack(raster(red,xmn=xmn,xmx=xmx,ymn=ymn,ymx=ymx),
-			raster(green,xmn=xmn,xmx=xmx,ymn=ymn,ymx=ymx),
-			raster(blue,xmn=xmn,xmx=xmx,ymn=ymn,ymx=ymx))
-	projection(ras) <- x$projection
-
+openproj <- function(x,projection = "+proj=longlat",...){
 	if(!is.character(projection))
 		projection <- projection@projargs
 	
-	ras2 <- projectRaster(ras,crs=projection,...)
+	rasterImg <- raster(x)
+	ras2 <- projectRaster(rasterImg,crs=projection,...)
+	
 	vals <- values(ras2)
-
 	vals <- pmin(pmax(vals,0L),255L)
 	flag <- apply(vals,1,function(a)any(!is.finite(a)))
 	vals1 <- vals
 	vals1[!is.finite(vals)] <- 0L
 	colors <- ifelse(flag,NA,rgb(vals1[,1],vals1[,2],vals1[,3],maxColorValue=255L))
 	ext <- extent(ras2)
+	
 	result <- list()
 	result$colorData <- colors
 	result$bbox <- list(p1 = c(ext@xmin,ext@ymax), p2 = c(ext@xmax,ext@ymin))
@@ -210,31 +278,18 @@ openproj.osmtile <- function(x,projection = "+proj=longlat",...){
 	result$xres <- dim(ras2)[1]
 	result$yres <- dim(ras2)[2]
 	class(result) <- "osmtile"
-	result
-}
-
-#' Projects the open street map to an alternate coordinate system
-#' @param x an OpenStreetMap object
-#' @param projection a proj4 character string or CRS object
-#' @param ... additional parameters for projectRaster
-#' @method  openproj OpenStreetMap
-openproj.OpenStreetMap <- function(x,projection = "+proj=longlat",...){
-	p1 <- c(Inf,-Inf)
-	p2 <- c(-Inf,Inf)
-	for(i in 1:length(x$tiles)){
-		tile <- openproj(x$tiles[[i]],projection=projection,...)
-		x$tiles[[i]] <- tile
-		p1 <- c(min(tile$bbox$p1[1],p1[1]), max(tile$bbox$p1[2],p1[2]))
-		p2 <- c(max(tile$bbox$p2[1],p2[1]), min(tile$bbox$p2[2],p2[2]))
-	}
-	x$bbox$p1 <- p1
-	x$bbox$p2 <- p2
-	x
+	
+	osm <- list(tiles=list(result))
+	osm$bbox <- result$bbox
+	attr(osm,"zoom") <- attr(x,"zoom")
+	class(osm) <- "OpenStreetMap"
+	osm
 }
 
 if(FALSE){
+	library(OpenStreetMap)
+	
 library(rgdal)
-library(raster)
 library(maps)
 
 #plot map in native mercator coords
@@ -244,38 +299,51 @@ plot(map)
 
 #using longlat projection lets us combine with the maps library
 map_longlat <- openproj(map)
-plot(map_longlat)
+plot(map_longlat,raster=TRUE)
 map("world",col="red",add=TRUE)
 
 #robinson projection. good for whole globe viewing.
-map_robinson <- openproj(map, projection=
+map_robinson <- openproj(map_longlat, projection=
 				"+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
 plot(map_robinson)			
 				
-				#"+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96")
-plot(map_polar)
 
-x <- map$tiles[[1]]
-red <- matrix(as.integer(as.hexmode(
-						substring(x$colorData,2,3))),nrow=255,byrow=TRUE)
-green <- matrix(as.integer(as.hexmode(
-						substring(x$colorData,4,5))),nrow=255,byrow=TRUE)
-blue <- matrix(as.integer(as.hexmode(
-						substring(x$colorData,6,7))),nrow=255,byrow=TRUE)
-xmn <- x$bbox$p1[1]# + (x$bbox$p1[1]-x$bbox$p2[1])/255
-xmx <- x$bbox$p2[1]# + (x$bbox$p1[1]-x$bbox$p2[1])/255
-ymn <- x$bbox$p2[2]# + (x$bbox$p1[2]-x$bbox$p2[2])/255
-ymx <- x$bbox$p1[2]# + (x$bbox$p1[2]-x$bbox$p2[2])/255
-ras <- stack(raster(red,xmn=xmn,xmx=xmx,ymn=ymn,ymx=ymx),
-		raster(green,xmn=xmn,xmx=xmx,ymn=ymn,ymx=ymx),
-		raster(blue,xmn=xmn,xmx=xmx,ymn=ymn,ymx=ymx))
-projection(ras) <- osm()
-plotRGB(ras,r=1,g=2,b=3)
+map <- openmap(c(70,-179),
+		c(40,179),zoom=2,type='bing')
+map_longlat <- openproj(map)
+#Lambert Conic Conformal (takes some time...)
+map_llc <- openproj(map_longlat, projection=
+				"+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96", res=500)
+plot(map_llc,raster=TRUE)		
 
-#ras2 <- projectRaster(ras,crs="+proj=longlat")
-ras2 <- projectRaster(ras,crs="+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96")
-#dev.new()
-plotRGB(ras2,r=1,g=2,b=3)
+data(states)
+st_llc <- spTransform(states,CRS("+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96") )
+
+data(LA_places)
+longBeachHarbor <- openmap(c(33.760525217369974,-118.22052955627441),
+		c(33.73290566922855,-118.17521095275879),14,'bing')
+coords <- coordinates(LA_places)
+x <- coords[,1]
+y <- coords[,2]
+txt <- slot(LA_places,"data")[,'NAME']
+plot(longBeachHarbor,removeMargins=TRUE,raster=TRUE)
+points(x,y,col="red")
+text(x,y,txt,col="white",adj=0)
+
+
+ library(UScensus2000)
+ 
+ lat <- c(43.834526782236814,30.334953881988564)
+ lon <- c(-131.0888671875  ,-107.8857421875)
+ southwest <- openmap(c(lat[1],lon[1]),c(lat[2],lon[2]),5,'osm')
+ data(california.tract)
+ california.tract <- spTransform(california.tract,osm())
+ 
+ plot(southwest,removeMargin=TRUE)
+ plot(california.tract,add=TRUE)
+ 
+ 
+ 
 }
 #'print map
 #' @param x the OpenStreetMap
