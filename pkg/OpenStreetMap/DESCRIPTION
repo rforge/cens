@@ -16,7 +16,8 @@ Depends:
 Suggests:
     rgdal,
     ggplot2 (>= 0.9.0),
-    colorspace
+    colorspace,
+    raster
 Imports:
     rJava
 Collate:

@@ -10,7 +10,7 @@
 
   \item{y}{ignored}
 
-  \item{add}{add to current plot ( if raster, then image is
+  \item{add}{add to current plot (if raster, then image is
   always added)}
 
   \item{raster}{use raster image}

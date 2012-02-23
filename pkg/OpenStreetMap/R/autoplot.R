@@ -14,7 +14,7 @@ autoplot.osmtile <- function(data,plot=FALSE,...){
 	x <- data
 	p1 <- x$bbox$p1
 	p2 <- x$bbox$p2
-	rast <- as.raster(matrix(x$colorData, nrow = 255, 
+	rast <- as.raster(matrix(x$colorData, nrow=x$xres, 
 					byrow = TRUE))
 	annot <- annotation_raster(rast,p1[1],p2[1],
 			p2[2],p1[2])

@@ -6,7 +6,6 @@
 
 
 .onLoad <- function(libname, pkgname) {
-	.jpackage(pkgname)  
-	return(TRUE)
+	.jpackage(pkgname, lib.loc=libname)  
 }
 

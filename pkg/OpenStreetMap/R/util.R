@@ -9,11 +9,17 @@ osm <- function(){
 	CRS("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs")
 }
 
+#' Latitude Longitude projection
+longlat <- function(){
+	CRS("+proj=longlat +datum=WGS84")
+}
+
 #'maps long lat values to the open street map mercator projection
 #' @param lat a vector of latitudes
 #' @param long a vector of longitudes
 #' @param drop drop to lowest dimension
 project_mercator <- function(lat,long,drop=TRUE){
+	library(rgdal)
 	df <- data.frame(long=long,lat=lat)
 	coordinates(df) <- ~long+lat
 	proj4string(df) <- CRS("+proj=longlat +datum=WGS84")
