@@ -17,7 +17,7 @@ longlat <- function(){
 #' @param lat a vector of latitudes
 #' @param long a vector of longitudes
 #' @param drop drop to lowest dimension
-project_mercator <- function(lat,long,drop=TRUE){
+projectMercator <- function(lat,long,drop=TRUE){
 	library(rgdal)
 	df <- data.frame(long=long,lat=lat)
 	coordinates(df) <- ~long+lat
@@ -120,7 +120,7 @@ openmap <- function(upperLeft,lowerRight,zoom=NULL,type="osm",minNumTiles=9L){
 			map$tiles[[length(map$tiles)+1]] <- tile
 		}
 	}
-	map$bbox <- list(p1=project_mercator(upperLeft[1],upperLeft[2]),p2=project_mercator(lowerRight[1],lowerRight[2]))
+	map$bbox <- list(p1=projectMercator(upperLeft[1],upperLeft[2]),p2=projectMercator(lowerRight[1],lowerRight[2]))
 	class(map) <- "OpenStreetMap"
 	attr(map,"zoom") <- zoom
 	map
@@ -137,8 +137,8 @@ openmap <- function(upperLeft,lowerRight,zoom=NULL,type="osm",minNumTiles=9L){
 #' library(rgdal)
 #' m <- c(25.7738889,-80.1938889)
 #' j <- c(58.3019444,-134.4197222)
-#' miami <- project_mercator(25.7738889,-80.1938889)
-#' jun <- project_mercator(58.3019444,-134.4197222)
+#' miami <- projectMercator(25.7738889,-80.1938889)
+#' jun <- projectMercator(58.3019444,-134.4197222)
 #' data(states)
 #' map <- openmap(j,m,4)
 #' plot(map,removeMargin=TRUE)
@@ -213,7 +213,6 @@ setMethod("raster","osmtile",function(x, ...){
 setMethod("raster","OpenStreetMap",function(x, ...){
 	rasterImg <- NULL
 	for(i in 1:length(x$tiles)){
-				
 		if(i==1)
 			rasterImg <- raster(x$tiles[[i]])
 		else
@@ -253,7 +252,11 @@ setMethod("raster","OpenStreetMap",function(x, ...){
 #' #Lambert Conic Conformal (takes some time...)
 #' map_llc <- openproj(map_longlat, projection=
 #' 				"+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96")
-#' plot(map_llc,raster=TRUE)	
+#' plot(map_llc,raster=TRUE)
+#' #add choropleth
+#' data(states)
+#' st_llc <- spTransform(states,CRS("+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96"))
+#' plot(st_llc,add=T,col=heat.colors(48,.4)[slot(st_llc,"data")[["ORDER_ADM"]]])
 #' 
 #' }
 openproj <- function(x,projection = "+proj=longlat",...){
@@ -286,65 +289,7 @@ openproj <- function(x,projection = "+proj=longlat",...){
 	osm
 }
 
-if(FALSE){
-	library(OpenStreetMap)
-	
-library(rgdal)
-library(maps)
 
-#plot map in native mercator coords
-map <- openmap(c(70,-179),
-		c(-70,179),zoom=2,type='bing')
-plot(map)
-
-#using longlat projection lets us combine with the maps library
-map_longlat <- openproj(map)
-plot(map_longlat,raster=TRUE)
-map("world",col="red",add=TRUE)
-
-#robinson projection. good for whole globe viewing.
-map_robinson <- openproj(map_longlat, projection=
-				"+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
-plot(map_robinson)			
-				
-
-map <- openmap(c(70,-179),
-		c(40,179),zoom=2,type='bing')
-map_longlat <- openproj(map)
-#Lambert Conic Conformal (takes some time...)
-map_llc <- openproj(map_longlat, projection=
-				"+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96", res=500)
-plot(map_llc,raster=TRUE)		
-
-data(states)
-st_llc <- spTransform(states,CRS("+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96") )
-
-data(LA_places)
-longBeachHarbor <- openmap(c(33.760525217369974,-118.22052955627441),
-		c(33.73290566922855,-118.17521095275879),14,'bing')
-coords <- coordinates(LA_places)
-x <- coords[,1]
-y <- coords[,2]
-txt <- slot(LA_places,"data")[,'NAME']
-plot(longBeachHarbor,removeMargins=TRUE,raster=TRUE)
-points(x,y,col="red")
-text(x,y,txt,col="white",adj=0)
-
-
- library(UScensus2000)
- 
- lat <- c(43.834526782236814,30.334953881988564)
- lon <- c(-131.0888671875  ,-107.8857421875)
- southwest <- openmap(c(lat[1],lon[1]),c(lat[2],lon[2]),5,'osm')
- data(california.tract)
- california.tract <- spTransform(california.tract,osm())
- 
- plot(southwest,removeMargin=TRUE)
- plot(california.tract,add=TRUE)
- 
- 
- 
-}
 #'print map
 #' @param x the OpenStreetMap
 #' @param ... ignored

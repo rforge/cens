@@ -20,6 +20,7 @@
 \dontrun{
 require(maps)
 require(ggplot2)
+require(rgdal)
 gpclibPermit()
 
 mp <- openmap(c(53.38332836757155,-130.517578125),
@@ -28,16 +29,16 @@ mp_bing <- openmap(c(53.38332836757155,-130.517578125),
 		c(15.792253570362446,-67.939453125),4,'bing')
 states_map <- map_data("state")
 states_map_merc <- as.data.frame(
-		project_mercator(states_map$lat,states_map$long))
+		projectMercator(states_map$lat,states_map$long))
 states_map_merc$region <- states_map$region
 states_map_merc$group <- states_map$group
 crimes <- data.frame(state = tolower(rownames(USArrests)), USArrests)
-pdf()
+
 p <- autoplot(mp,expand=FALSE) + geom_polygon(aes(x=x,y=y,group=group),
 		data=states_map_merc,fill="black",colour="black",alpha=.1) + theme_bw()
 print(p)
 p <- autoplot(mp_bing) + geom_map(aes(x=-10000000,y=4000000,map_id=state,fill=Murder),
-		data=crimes,map=states_map_merc,alpha=.1)
+		data=crimes,map=states_map_merc)
 print(p)
 }
 }

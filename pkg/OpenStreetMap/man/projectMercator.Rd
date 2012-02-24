@@ -1,8 +1,8 @@
-\name{project_mercator}
-\alias{project_mercator}
+\name{projectMercator}
+\alias{projectMercator}
 \title{maps long lat values to the open street map mercator projection}
 \usage{
-  project_mercator(lat, long, drop = TRUE)
+  projectMercator(lat, long, drop = TRUE)
 }
 \arguments{
   \item{lat}{a vector of latitudes}

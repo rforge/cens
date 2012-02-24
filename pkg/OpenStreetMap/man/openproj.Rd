@@ -43,6 +43,10 @@ map_longlat <- openproj(map)
 map_llc <- openproj(map_longlat, projection=
 				"+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96")
 plot(map_llc,raster=TRUE)
+#add choropleth
+data(states)
+st_llc <- spTransform(states,CRS("+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96"))
+plot(st_llc,add=T,col=heat.colors(48,.4)[slot(st_llc,"data")[["ORDER_ADM"]]])
 
 }
 }
