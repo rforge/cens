@@ -4,8 +4,8 @@
 ###############################################################################
 
 .containedBy <- function (minLat, minLon, maxLat, maxLon, coords) {
-	minMerc <- project_mercator(minLat, minLon)
-	maxMerc <- project_mercator(maxLat, maxLon)
+	minMerc <- projectMercator(minLat, minLon)
+	maxMerc <- projectMercator(maxLat, maxLon)
 	
 	#print(minMerc)
 	#print(maxMerc)
@@ -40,8 +40,8 @@
 #TODO handle error when no polys left.  Probably should do nothing.
 #TODO These following functions could likely be consolidated
 .subsetPoly <- function (minLat, minLon, maxLat, maxLon, polyDf, removeSelection) {
-	minMerc <- project_mercator(minLat, minLon)
-	maxMerc <- project_mercator(maxLat, maxLon)
+	minMerc <- projectMercator(minLat, minLon)
+	maxMerc <- projectMercator(maxLat, maxLon)
 	# The XOR inverts the function in any easy way w/o if/else statements
 	.contained <- function(poly){return(xor(!removeSelection, .containedBy2(minMerc, maxMerc, poly)))}
 	
