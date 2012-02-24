@@ -108,7 +108,7 @@ public class ViewPanel extends JPanel implements ComponentListener{
     		d.add(0.0);
     		return d;
     	}
-    	String cmd = "project_mercator("+c.getLat()+","+c.getLon()+")";
+    	String cmd = "projectMercator("+c.getLat()+","+c.getLon()+")";
     	//System.out.println(cmd);
     	REXP ul = Deducer.eval(cmd);
     	try{
@@ -127,7 +127,7 @@ public class ViewPanel extends JPanel implements ComponentListener{
     		d.add(0.0);
     		return d;
     	}
-    	String cmd = "project_mercator("+c.getLat()+","+c.getLon()+")";
+    	String cmd = "projectMercator("+c.getLat()+","+c.getLon()+")";
     	//System.out.println(cmd);
     	REXP ul = Deducer.eval(cmd);
     	try{
