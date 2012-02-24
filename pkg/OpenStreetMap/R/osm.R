@@ -69,13 +69,19 @@ plot.osmtile <- function(x, y=NULL, add=TRUE, raster=FALSE, ...){
 	xres <- x$xres
 	yres <- x$yres
 	if(!raster)
-		image(x=seq(x$bbox$p1[1],x$bbox$p2[1],length=yres) + (x$bbox$p1[1]-x$bbox$p2[1])/xres,
-			y=seq(x$bbox$p2[2],x$bbox$p1[2],length=xres) + (x$bbox$p1[2]-x$bbox$p2[2])/yres,
+		image(x=seq(x$bbox$p1[1] - .5*abs(x$bbox$p1[1]-x$bbox$p2[1])/yres,
+			x$bbox$p2[1] + .5*abs(x$bbox$p1[1]-x$bbox$p2[1])/yres,length=yres),
+			y=seq(x$bbox$p2[2] - .5*abs(x$bbox$p1[2]-x$bbox$p2[2])/xres,
+				x$bbox$p1[2] + .5*abs(x$bbox$p1[2]-x$bbox$p2[2])/xres,length=xres),
 			z=t(matrix(1:(xres*yres),nrow=xres,byrow=TRUE))[,xres:1],
 			col=x$colorData,add=add,...)
 	else
-		rasterImage(as.raster(matrix(x$colorData,nrow=xres,byrow=TRUE)[,yres:1]),
-				x$bbox$p2[1],x$bbox$p2[2],x$bbox$p1[1],x$bbox$p1[2],...)
+		rasterImage(as.raster(matrix(x$colorData,nrow=xres,byrow=TRUE)),
+				x$bbox$p1[1] - .5*abs(x$bbox$p1[1]-x$bbox$p2[1])/yres,
+				x$bbox$p2[2] + .5*abs(x$bbox$p1[2]-x$bbox$p2[2])/xres,
+				x$bbox$p2[1] - .5*abs(x$bbox$p1[1]-x$bbox$p2[1])/yres,
+				x$bbox$p1[2] + .5*abs(x$bbox$p1[2]-x$bbox$p2[2])/xres,
+				...)
 }
 
 #' get a map based on lat long coordinates 

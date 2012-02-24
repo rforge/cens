@@ -14,10 +14,15 @@ autoplot.osmtile <- function(data,plot=FALSE,...){
 	x <- data
 	p1 <- x$bbox$p1
 	p2 <- x$bbox$p2
+	yres <- x$yres
+	xres <- x$xres
 	rast <- as.raster(matrix(x$colorData, nrow=x$xres, 
 					byrow = TRUE))
-	annot <- annotation_raster(rast,p1[1],p2[1],
-			p2[2],p1[2])
+	annot <- annotation_raster(rast,
+			p1[1] - .5*abs(x$bbox$p1[1]-x$bbox$p2[1])/yres,
+			p2[1] + .5*abs(x$bbox$p1[1]-x$bbox$p2[1])/yres,
+			p2[2] - .5*abs(x$bbox$p1[2]-x$bbox$p2[2])/xres,
+			p1[2] + .5*abs(x$bbox$p1[2]-x$bbox$p2[2])/xres)
 	if(plot)
 		ggplot(aes(x=a,y=b),data=data.frame(a=p1[1],b=p1[2])) + 
 				annot + expand_limits(x = c(p1[1],p2[1]),
