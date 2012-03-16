@@ -11,6 +11,7 @@
 #' @method autoplot osmtile
 autoplot.osmtile <- function(data,plot=FALSE,...){
 	library(ggplot2)
+	a <- b <- NULL
 	x <- data
 	p1 <- x$bbox$p1
 	p2 <- x$bbox$p2
@@ -61,6 +62,7 @@ autoplot.osmtile <- function(data,plot=FALSE,...){
 #' }
 #' @method autoplot OpenStreetMap
 autoplot.OpenStreetMap <- function(data, expand=TRUE, ...){
+	x <- y <- NULL
 	library(ggplot2)
 	x <- data
 	p1 <- x$bbox$p1

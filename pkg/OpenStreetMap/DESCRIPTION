@@ -5,7 +5,7 @@ Title: Access to open street map raster images
 Author: Ian Fellows, using the JMapViewer library by Jan Peter Stotz
 Description: Access to high quality open street map raster images.
 SystemRequirements: Java (>= 1.5), JRI
-Version: 0.1
+Version: 0.3
 URL: http://www.fellstat.com http://research.cens.ucla.edu/
 Date: 2012-02-21
 Depends:

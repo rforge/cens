@@ -18,7 +18,7 @@ longlat <- function(){
 #' @param long a vector of longitudes
 #' @param drop drop to lowest dimension
 projectMercator <- function(lat,long,drop=TRUE){
-	library(rgdal)
+	.requireRgdal()
 	df <- data.frame(long=long,lat=lat)
 	coordinates(df) <- ~long+lat
 	proj4string(df) <- CRS("+proj=longlat +datum=WGS84")
@@ -38,6 +38,7 @@ projectMercator <- function(lat,long,drop=TRUE){
 #' @param type osm for mapnik open street map, or 'bing' for bing aerial
 #' @return a tile
 osmtile <- function(x,y,zoom,type="osm"){
+	.tryJava()
 	x <- as.double(x)
 	y <- as.double(y)
 	zoom <- as.double(zoom)
@@ -99,6 +100,7 @@ plot.osmtile <- function(x, y=NULL, add=TRUE, raster=FALSE, ...){
 #' plot(map,raster=TRUE)
 #' }
 openmap <- function(upperLeft,lowerRight,zoom=NULL,type="osm",minNumTiles=9L){
+	.tryJava()
 	autoZoom <- is.null(zoom)
 	if(autoZoom)
 		zoom <- 1L
