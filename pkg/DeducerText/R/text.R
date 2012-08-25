@@ -23,7 +23,7 @@
 #	  included in the output.
 #
 
-cens.term_freq <- function(
+term.freq <- function(
 		d, 
 		topN=0, #only include the first 'topN' terms
 		percent=0,
@@ -89,34 +89,34 @@ make.color.scale<- function(aColor, bColor, steps, gradientExp=.5){
 	return(ret);
 }
 
-pretty.print.freq.totals <- function()
-{
-	#Pretty print freq totals
-	
-	#TODO collapse too long words
-	
-	terms <- c('loooong', 'w', 'hello', 'a', 'notaword', 'kotobanai')
-	freqs <- c('1', '2', '3', '4' , '0', '-1')
-	
-	nCol <- 3
-	colWidth <- 23
-	
-	for ( ip1 in 1:ceiling(length(terms)/nCol) )
-	{
-		i <- ip1 - 1 #CURSE YOU 1-based indexing!
-		rowStart <- (nCol*i + 1)
-		rowEnd <- min(rowStart + nCol - 1, length(terms))
-		
-		termRow = terms[rowStart:rowEnd]
-		freqRow = freqs[rowStart:rowEnd]
-		
-		cat(format(termRow,width=colWidth, justify='centre'), sep='|');
-		cat('\n');
-		cat(format(freqRow,width=colWidth, justify='centre'), sep='|');
-		cat('\n')
-		cat(paste(rep("-",nCol*colWidth),collapse=''))
-		cat('\n');
-	}
-}
-pretty.print.freq.totals()
+#pretty.print.freq.totals <- function()
+#{
+#	#Pretty print freq totals
+#	
+#	#TODO collapse too long words
+#	
+#	terms <- c('loooong', 'w', 'hello', 'a', 'notaword', 'kotobanai')
+#	freqs <- c('1', '2', '3', '4' , '0', '-1')
+#	
+#	nCol <- 3
+#	colWidth <- 23
+#	
+#	for ( ip1 in 1:ceiling(length(terms)/nCol) )
+#	{
+#		i <- ip1 - 1 #CURSE YOU 1-based indexing!
+#		rowStart <- (nCol*i + 1)
+#		rowEnd <- min(rowStart + nCol - 1, length(terms))
+#		
+#		termRow = terms[rowStart:rowEnd]
+#		freqRow = freqs[rowStart:rowEnd]
+#		
+#		cat(format(termRow,width=colWidth, justify='centre'), sep='|');
+#		cat('\n');
+#		cat(format(freqRow,width=colWidth, justify='centre'), sep='|');
+#		cat('\n')
+#		cat(paste(rep("-",nCol*colWidth),collapse=''))
+#		cat('\n');
+#	}
+#}
+#pretty.print.freq.totals()
 

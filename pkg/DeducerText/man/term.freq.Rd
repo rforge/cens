@@ -1,5 +1,5 @@
-\name{cens.term_freq}
-\alias{cens.term_freq}
+\name{term.freq}
+\alias{term.freq}
 \title{
   Get a table of term frequencies
 }
@@ -7,7 +7,7 @@
   Get a table of term frequencies.
 }
 \usage{
-cens.term_freq( d, 
+term.freq( d, 
 		topN = 0, 
 		percent = 0,
 		sorted = c("none", "alpha", "freq"),
@@ -32,6 +32,6 @@ A name vector of the term frequencies.
 \examples{
 if(require(tm)){
 data(crude)
-cens.term_freq(d=crude, percent=0, topN=10, minFreq=0,useDocFreq=FALSE,sorted="alpha", decreasing=TRUE)
+term.freq(d=crude, percent=0, topN=10, minFreq=0,useDocFreq=FALSE,sorted="alpha", decreasing=TRUE)
 }
 } 
