@@ -625,7 +625,7 @@ public class TermFrequencyDialog extends JDialog
 		//getSorted();
 		//boolean ascending = getAsc();
 
-		String termFreqCall = "cens.term_freq(" + 
+		String termFreqCall = "term.freq(" + 
 		"d=" + getCorpus() + ", " + 
 		"percent=" + percentage + ", " +
 		"topN=" + absoluteNTerms + ", " +

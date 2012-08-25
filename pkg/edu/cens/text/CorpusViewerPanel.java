@@ -42,6 +42,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -88,34 +89,7 @@ public class CorpusViewerPanel extends DataViewerTab //TODO extend JDialog inste
 				String corpus = corpusSelector.getSelectedObject();
 				if (corpus != null)
 				{
-					corpusNameLabel.setText(corpus);
-					try
-					{
-						int  nDocs = Deducer.eval(String.format("length(%s)", corpus)).asInteger();
-						Object [][] data = new Object[nDocs][2];
-						String [] columnNames = {"Doc #", "Text"};
-
-						for (int i = 1; i <= nDocs; i++)
-						{
-							String docBody = Deducer.eval("paste(" + corpus + "[[" + i  + "]],sep='',collapse='\n')").asString(); 
-								//Deducer.eval(corpus + "[[" + i + "]]").asString();//corpus + "[" + i + "][[1]]").asString();
-							data[i-1][0] = i;
-							data[i-1][1] = docBody;
-						}
-						
-						documentTable.setModel(new DefaultTableModel(data, columnNames));
-						setupTable();
-						if (nDocs > 0)
-						{
-							documentTable.setRowSelectionInterval(0, 0);
-						}
-						
-						
-					}
-					catch (REXPMismatchException e2)
-					{
-						e2.printStackTrace();
-					}
+					setData(corpus);
 				}
 			}
 		});
@@ -369,9 +343,52 @@ public class CorpusViewerPanel extends DataViewerTab //TODO extend JDialog inste
 	}
 
 	@Override
-	public void setData(String data)
+	public void setData(String d)
 	{
-		this.corpusSelector.setSelectedItem(data);
+		final String corpus = d;
+		
+		new Thread(new Runnable(){
+
+			public void run() {
+				try
+				{
+					final int  nDocs = Deducer.timedEval(String.format("length(%s)", corpus)).asInteger();
+					Object [][] data = new Object[nDocs][2];
+					final String [] columnNames = {"Doc #", "Text"};
+
+					for (int i = 1; i <= nDocs; i++)
+					{
+						String docBody = Deducer.timedEval("paste(" + corpus + "[[" + i  + "]],sep='',collapse='\n')").asString(); 
+							//Deducer.eval(corpus + "[[" + i + "]]").asString();//corpus + "[" + i + "][[1]]").asString();
+						data[i-1][0] = i;
+						data[i-1][1] = docBody;
+					}
+					final Object[][] dat = data;
+					SwingUtilities.invokeLater(new Runnable(){
+
+						public void run() {
+							corpusNameLabel.setText(corpus);
+							documentTable.setModel(new DefaultTableModel(dat, columnNames));
+							setupTable();
+							if (nDocs > 0)
+							{
+								documentTable.setRowSelectionInterval(0, 0);
+							}
+						}
+						
+					});
+
+					
+					
+				}
+				catch (REXPMismatchException e2)
+				{
+					e2.printStackTrace();
+				}
+			}
+			
+		}).start();
+
 	}
 
 	@Override
