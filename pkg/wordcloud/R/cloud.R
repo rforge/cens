@@ -34,13 +34,28 @@ wordcloud <- function(words,freq,scale=c(4,.5),min.freq=3,max.words=Inf,random.o
 	tails <- "g|j|p|q|y"
 	last <- 1
 	nc<- length(colors)
-
+	if(missing(freq)){
+		if(!require("tm"))
+			stop("freq must either be non-missing, or the tm package must be available")
+		if(is.character(words) || is.factor(words)){
+			corpus <- Corpus(VectorSource(words))
+			corpus <- tm_map(corpus, removePunctuation)
+			corpus <- tm_map(corpus, function(x)removeWords(x,stopwords()))
+		}else
+			corpus <- words
+		tdm <- TermDocumentMatrix(corpus)
+		freq <- slam::row_sums(tdm)
+		words <- names(freq)
+	}
     if (ordered.colors) {
         if (length(colors) != 1 && length(colors) != length(words)) {
             stop(paste("Length of colors does not match length of words",
                        "vector"))
         }
     }
+	
+	if(min.freq > max(freq))
+		min.freq <- 0
 
 	overlap <- function(x1, y1, sw1, sh1) {
 		if(!use.r.layout)
