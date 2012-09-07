@@ -3,9 +3,9 @@ Type: Package
 Title: Deducer GUI for Text Data
 Version: 0.1-0
 Date: 2011-01-17
-Author: Alex Rickett, with contributions from Neal Fultz and Ian Fellows
+Author: Alex Rickett and Ian Fellows, with contributions from Neal Fultz
 Maintainer: Ian Fellows <ian@fellstat.com>
-Depends: R (>= 2.10.0), Deducer (>= 0.7-0), tm, wordcloud, Snowball, RColorBrewer
+Depends: R (>= 2.10.0), Deducer (>= 0.7-0), tm, wordcloud (>= 2.1), Snowball, RColorBrewer
 Suggests:
 SystemRequirements: Java (>= 1.5), JRI
 License: LGPL-2
