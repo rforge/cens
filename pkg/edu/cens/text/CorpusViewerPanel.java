@@ -64,7 +64,7 @@ public class CorpusViewerPanel extends DataViewerTab //TODO extend JDialog inste
 	JFormattedTextField goToField;
 	boolean showCorpusSelector = false;
 	private JLabel corpusNameLabel;
-	private static final String HELP_URL = "index.php?n=Main.DeducerText";
+	private static final String HELP_URL = "index.php?n=Main.TextViewCorpus";
 
 	/**
 	 * 

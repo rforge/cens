@@ -7,6 +7,7 @@ import org.rosuda.deducer.WindowTracker;
 import org.rosuda.deducer.data.DataViewerController;
 import org.rosuda.deducer.data.DataViewerTab;
 import org.rosuda.deducer.data.DataViewerTabFactory;
+import org.rosuda.deducer.toolkit.HelpButton;
 import org.rosuda.ibase.toolkit.EzMenuSwing;
 
 import javax.swing.*;
@@ -173,6 +174,28 @@ public static String[] getCorpora()
 
 		JMenu textMenu = EzMenuSwing.getMenu(JGR.MAINRCONSOLE, text);
 
+		final JMenuItem quickWordMenuItem = new JMenuItem("Quick Word Cloud");
+		quickWordMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				Deducer.threadedEval(".getDialog('Quick Word Cloud')$run()");
+			}
+		});
+		textMenu.add(quickWordMenuItem);
+
+		final JMenuItem textPlotMenuItem = new JMenuItem("Text Plot");
+		textPlotMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				Deducer.threadedEval(".getDialog('Text Plot')$run()");
+			}
+		});
+		textMenu.add(textPlotMenuItem);
+		
+		textMenu.add(new JSeparator());
+		
 		final JMenuItem importTextMenuItem = new JMenuItem("Import Corpus From File");
 		importTextMenuItem.addActionListener(new ActionListener()
 		{
@@ -199,6 +222,8 @@ public static String[] getCorpora()
 		});
 		textMenu.add(extractCorpusMenuItem);
 		
+		textMenu.add(new JSeparator());
+		
 		// TODO accelerator keys
 		
 		JMenuItem preprocCorpMenuItem = new JMenuItem("Preprocess Corpus");
@@ -211,6 +236,8 @@ public static String[] getCorpora()
 			}
 		});
 		textMenu.add(preprocCorpMenuItem);
+		
+		textMenu.add(new JSeparator());
 		
 		JMenuItem viewCorpMenuItem = new JMenuItem("View Corpus");
 		
@@ -236,7 +263,9 @@ public static String[] getCorpora()
 		});
 		textMenu.add(DocTermMatrixMenuItem);
 		
-		JMenu viewFreqDataMenu = new JMenu("View Frequency Data");
+		textMenu.add(new JSeparator());
+		
+		JMenu viewFreqDataMenu = new JMenu("Word Frequencies");
 		textMenu.add(viewFreqDataMenu);
 		
 		JMenuItem termFreqMenuItem = new JMenuItem("Frequency Totals List");
@@ -280,6 +309,14 @@ public static String[] getCorpora()
 			}
 		});
 		viewFreqDataMenu.add(wordCloudMenuItem);
+		
+		EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Help", "Deducer Add-on: Text", "dhelp",new ActionListener(){
+
+			public void actionPerformed(ActionEvent e) {
+				HelpButton.showInBrowser(HelpButton.baseUrl+"pmwiki.php?n=Main.DeducerText");
+			}
+			
+		});
 		
 	}
 

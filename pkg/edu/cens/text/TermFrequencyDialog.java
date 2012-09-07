@@ -53,7 +53,7 @@ import org.rosuda.deducer.toolkit.HelpButton;
 
 public class TermFrequencyDialog extends JDialog
 {
-	private static final String HELP_URL = "index.php?n=Main.DeducerText";
+	private static final String HELP_URL = "index.php?n=Main.TextWordFrequencies";
 	public static final int BAR_CHART = 1;
 	//public static final int DOCUMENT_TERM_MATRIX = -1;
 	public static final int TOTAL_FREQUENCIES = 0;

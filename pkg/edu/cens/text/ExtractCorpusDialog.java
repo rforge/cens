@@ -47,7 +47,7 @@ public class ExtractCorpusDialog extends JDialog implements ActionListener
 	private OkayCancelPanel okayCancelPanel;
 
 	private boolean userHasNamed;
-	private static final String HELP_URL = "index.php?n=Main.DeducerText";
+	private static final String HELP_URL = "index.php?n=Main.TextImportFromDataFrame";
 
 	public ExtractCorpusDialog(JFrame parent)
 	{

@@ -5,6 +5,7 @@
 
 package edu.cens.text;
 
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +14,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.basic.BasicArrowButton;
+
+import org.rosuda.deducer.toolkit.IconButton;
 
 
 public class UpDownButtonPanel extends JPanel
@@ -27,8 +30,13 @@ public class UpDownButtonPanel extends JPanel
 		this.table = null;// Also, set later// prepocessingDialog;
 		//this.add(new JLabel("up"), BorderLayout.CENTER); 
 		this.setLayout(new GridLayout(2,0));
+		//JButton upButton = new IconButton("/icons/sort-up.gif", "up", null, "up");// 
 		JButton upButton = new BasicArrowButton(SwingConstants.NORTH);
+		upButton.setBackground(Color.white);
+		//upButton.setContentAreaFilled(false);
 		JButton downButton = new BasicArrowButton(SwingConstants.SOUTH);
+		downButton.setBackground(Color.white);
+		//downButton.setContentAreaFilled(false);
 		
 		this.add(upButton);
 		this.add(downButton);

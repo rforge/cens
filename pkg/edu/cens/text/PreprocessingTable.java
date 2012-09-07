@@ -63,6 +63,8 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
+import org.rosuda.deducer.toolkit.IconButton;
+
 import com.sun.tools.javac.util.List;
 
 import edu.cens.text.OptionsButtonPanel;
@@ -404,14 +406,22 @@ class OptionsButtonPanel extends JPanel
 		
 		if (FACE_RIGHT)
 		{
-			button = new BasicArrowButton(SwingConstants.EAST);
+			//button = new BasicArrowButton(SwingConstants.EAST);
+			button = new IconButton("/icons/advanced_21.png", "options", null, "options");
+			button.setContentAreaFilled(false);
+			button.setMinimumSize(new Dimension(21, 21));
+			button.setPreferredSize(new Dimension(21, 21));
 		}
 		else
 		{
-			button = new BasicArrowButton(SwingConstants.SOUTH);
+			button = new IconButton("/icons/advanced_21.png", "options", null, "options");
+			//button = new BasicArrowButton(SwingConstants.SOUTH);
+			button.setContentAreaFilled(false);
+			button.setMinimumSize(new Dimension(21, 21));
+			button.setPreferredSize(new Dimension(21, 21));
 		}
 		
-		this.add(button, BorderLayout.EAST);
+		this.add(button, BorderLayout.NORTH);
 		ActionListener al = new ActionListener()
 		{
 			

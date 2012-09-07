@@ -69,7 +69,7 @@ import com.sun.tools.javac.util.List;
 public class TextFileChooser
 {
 
-	private static final String HELP_URL = "index.php?n=Main.DeducerText";
+	private static final String HELP_URL = "index.php?n=Main.TextImportFromFile";
 	
 	private JFileChooser fc;
 	JDialog actualDialog;
@@ -85,7 +85,8 @@ public class TextFileChooser
 	{
 		newNameField = new JTextField();
 		fc = new JFileChooser();
-
+		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		fc.setApproveButtonText("Import");
 		fc.setMultiSelectionEnabled(true); 
 
 		//// Register Action to set corpus name on file change //////////////
@@ -96,10 +97,17 @@ public class TextFileChooser
 				//If a file became selected, find out which one.
 				if (JFileChooser.SELECTED_FILE_CHANGED_PROPERTY.equals(e.getPropertyName())) 
 				{
-					String fileName = ((File) e.getNewValue()).getName();
+					String fileName;
+					if(e.getNewValue() instanceof File){
+						File f = (File) e.getNewValue();
+						fileName = f.getName();
+					}else{
+						return;
+					}
 
 					//remove extension
-					fileName = fileName.substring(0, fileName.lastIndexOf("."));
+					//if(!f.isDirectory() && fileName.indexOf(".")>1)
+					//	fileName = fileName.substring(0, fileName.lastIndexOf("."));
 
 					newNameField.setText(Deducer.getUniqueName(fileName));
 				}
@@ -122,7 +130,17 @@ public class TextFileChooser
 					//Build the corpus
 
 					File[] pickedFiles = fc.getSelectedFiles();
-
+					ArrayList<File> files = new ArrayList<File>();
+					for(int i=0;i<pickedFiles.length;i++){
+						if(pickedFiles[i].isDirectory()){
+							File[] subFiles = pickedFiles[i].listFiles();
+							if(subFiles!=null)
+								for(int j=0;j<subFiles.length;j++)
+									if(!subFiles[j].isDirectory() && !subFiles[j].getName().startsWith("."))
+										files.add(subFiles[j]);
+						}else
+							files.add(pickedFiles[i]);
+					}
 					//System.out.println(pickedFiles.length + " " + fc.isMultiSelectionEnabled());
 
 					String corpusCall = "Corpus(VectorSource(c(\n";
@@ -130,12 +148,12 @@ public class TextFileChooser
 					String enclosingDir = fc.getCurrentDirectory().getAbsolutePath();//pickedFiles[0].getParent();
 					mostRecentPath = enclosingDir;
 
-					for (int i = 0; i < pickedFiles.length; i++)
+					for (int i = 0; i < files.size(); i++)
 					{
-						String fileName = Deducer.addSlashes( pickedFiles[i].getAbsolutePath() );
+						String fileName = Deducer.addSlashes( files.get(i).getAbsolutePath() );
 
 						corpusCall = corpusCall + "paste(readLines('" + fileName + "', warn=F), sep='', collapse='\\n')";
-						if (i != pickedFiles.length - 1)
+						if (i != files.size() - 1)
 						{
 							corpusCall = corpusCall + ",";
 						}
@@ -244,7 +262,7 @@ public class TextFileChooser
 		actualDialog.add(fc, BorderLayout.CENTER);
 		actualDialog.add(constructExtraOptionsPanel(), BorderLayout.SOUTH);
 
-		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+//		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
 		fc.addChoosableFileFilter(new FileFilter()
 		{
@@ -256,9 +274,10 @@ public class TextFileChooser
 			public boolean accept(File f)
 			{
 				String fname  = f.getName().toLowerCase();
-				return fname.endsWith(".txt") || fname.endsWith(".rtf");
+				return fname.endsWith(".txt") || fname.endsWith(".rtf") || f.isDirectory();
 			}
 		});
+		
 
 		//		addChoosableFileFilter(new FileFilter()
 		//		{

@@ -40,7 +40,7 @@ public class PreprocessingDialog extends JDialog
 	//NOTE: infuriating quirk of HelpButton, is that in the constructor, it puts in a base URL,
 	//but in the setUrl function it does not.  And so... sometimes you need to specify the whole
 	//URL, and sometimes not.  If using the DeducerOkCancelPanel, you must specify the whole URL
-	private static final String HELP_URL = "http://www.deducer.org/pmwiki/index.php?n=Main.DeducerText";
+	private static final String HELP_URL = "http://www.deducer.org/pmwiki/index.php?n=Main.TextPreprocess";
 	
 	protected ObjectChooserWidget _source = new ObjectChooserWidget("Source Corpus:", this)
 	{
