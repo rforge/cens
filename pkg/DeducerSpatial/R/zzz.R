@@ -112,10 +112,11 @@
 		return(NULL)
 	
 	if (!nzchar(Sys.getenv("NOAWT")) || .jgr==TRUE){
-		.jpackage(pkgname)  
+		.jpackage(pkgname,lib.loc=libname)  
 		.jengine(TRUE)
 		DeducerSpatial <- J("edu.cens.spatial.DeducerSpatial")
 		DeducerSpatial$init()
+		.registerDialog("Load Census Data",.makeCensusDialog)
 	}
 	
 	#x <- .jnew(J("edu.cens.spatial.Spatial"));
