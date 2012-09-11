@@ -76,18 +76,20 @@ public class FrequencyTotalViewer extends AbstractTermFrequencyViewer
 	protected void saveTotalsAsDataFrame(String saveName)
 	{
 		// TODO Implement some basic redundancy avoidance.
-
+		String cmd = "";
 		//Save the frequency totals to a temporary variable
 		String tempTotals = Deducer.getUniqueName("freqTotals");
-		Deducer.execute(tempTotals + " <- " + tfDialog.getTermFreqCall(this.getExtraTermFreqArgs()));
-
+		//Deducer.execute(tempTotals + " <- " + tfDialog.getTermFreqCall(this.getExtraTermFreqArgs()));
+		cmd += tempTotals + " <- " + tfDialog.getTermFreqCall(this.getExtraTermFreqArgs())+ "\n";
 		String totalType = this.tfDialog.getUseDocumentFrequency() ? "doc_freq" : "term_freq";
 		
 		//Save the totals 
-		Deducer.execute(saveName + " <- d(term=names(" + tempTotals + "), " + totalType + "=" + tempTotals +")");
-
+		//Deducer.execute(saveName + " <- d(term=names(" + tempTotals + "), " + totalType + "=" + tempTotals +")");
+		cmd +=saveName + " <- d(term=names(" + tempTotals + "), " + totalType + "=" + tempTotals +")\n";
 		//delete the temporary variable
-		Deducer.execute("rm(" + tempTotals + ")");
+		//Deducer.execute("rm(" + tempTotals + ")");
+		cmd +="rm(" + tempTotals + ")";
+		Deducer.execute(cmd);
 
 	}
 	

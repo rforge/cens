@@ -240,11 +240,12 @@ public class WordCloudViewer extends AbstractTermFrequencyViewer
 	
 	public void executeView()
 	{
+		String cmd = "";
 		String tempFreq = Deducer.getUniqueName("tempFreq");
 		
-		Deducer.execute(tempFreq + "<-" + tfDialog.getTermFreqCall(this.getExtraTermFreqArgs()));
+		cmd += (tempFreq + "<-" + tfDialog.getTermFreqCall(this.getExtraTermFreqArgs()));
 		
-		Deducer.execute("wordcloud(" +
+		cmd+=("\nwordcloud(" +
 				"names("+ tempFreq + "), " + 
 				tempFreq +
 				", min.freq=0 " +
@@ -256,8 +257,8 @@ public class WordCloudViewer extends AbstractTermFrequencyViewer
 				", colors=" + WC_colors +
 				", rot.per=" + WC_rotatePercentage +")");
 		
-		Deducer.execute("rm(" + tempFreq + ")");
-		
+		cmd+=("\nrm(" + tempFreq + ")");
+		Deducer.execute(cmd);
 		Deducer.execute("dev.set()", false); //give the plot focus
 	}
 

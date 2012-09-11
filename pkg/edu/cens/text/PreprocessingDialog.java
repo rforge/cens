@@ -239,19 +239,20 @@ public class PreprocessingDialog extends JDialog
 		saveAsNameField.getText(); //use the new name
 	
 		int nEnabled = 0;
-		
+		String cmd = "";
 		for (int i = 0; i < ProcessCmd.values().length ; i++)
 		{
 			if (_table.isEnabled(i))
 			{
 				nEnabled ++;
 				ProcessCmd command = (ProcessCmd) _table.getAction(i);
-				Deducer.execute(t + "<- " + command.getRCmd(s) + ";\n");
+				cmd +=(t + "<- " + command.getRCmd(s) + "\n");
 				//System.out.println(t + "<- " + p._command.getRCmd(s) + ";\n");
 				s = t;
 			}
 			
 		}
+		Deducer.execute(cmd);
 	
 		if (nEnabled == 0) //
 		{

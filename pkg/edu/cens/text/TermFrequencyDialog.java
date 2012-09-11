@@ -51,7 +51,7 @@ import javax.swing.border.TitledBorder;
 import org.rosuda.deducer.Deducer;
 import org.rosuda.deducer.toolkit.HelpButton;
 
-public class TermFrequencyDialog extends JDialog
+public class TermFrequencyDialog extends JFrame
 {
 	private static final String HELP_URL = "index.php?n=Main.TextWordFrequencies";
 	public static final int BAR_CHART = 1;
@@ -87,7 +87,7 @@ public class TermFrequencyDialog extends JDialog
 	
 	public TermFrequencyDialog(JFrame parent)
 	{
-		super(parent, "Term Frequency");
+		super("Term Frequency");
 		useDocumentFrequency = false;
 
 		//TODO : should probably separate construction / action listener setting from GUI arrangement.

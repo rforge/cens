@@ -35,20 +35,22 @@ public class FrequencyBarChartViewer extends AbstractTermFrequencyViewer
 	{
 		//TODO add options to set font size, margins?
 		//barplot(words, las=2);
+		String cmd = "";
 		String opar = Deducer.getUniqueName("opar");
-		Deducer.execute(opar + " <- par()",false); //save the original margin parameters
-		Deducer.execute("par(mar=c(8, 4, 4, 0.5))",false); //give the plot more space at the bottom for long words.
-		Deducer.execute(
-				"barplot(" 
+		cmd += (opar + " <- par()"); //save the original margin parameters
+		cmd += ("\npar(mar=c(8, 4, 4, 0.5))"); //give the plot more space at the bottom for long words.
+		cmd += (
+				"\nbarplot(" 
 				+ 
 				tfDialog.getTermFreqCall(this.getExtraTermFreqArgs()) + "," 
 				+
 				"cex.names=0.8," //make the terms a bit smaller
 				+
 		" las=2);");
-
+		cmd += ("\npar("+ opar +")");
+		Deducer.execute(cmd);
 		Deducer.execute("dev.set()", false); //give the plot focus
-		Deducer.execute("par("+ opar +")",false);
+		
 		
 	}
 
