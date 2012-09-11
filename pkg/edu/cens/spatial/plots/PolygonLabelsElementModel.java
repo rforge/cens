@@ -21,7 +21,7 @@ public class PolygonLabelsElementModel extends ElementModel{
 	}
 	
 	public void init(){
-		rf = new RPolyFunction("text_plot");
+		rf = new RPolyFunction("spatialTextPlot");
 		rf.setViewType(null);
 		ParamSpatialVariable pv = new ParamSpatialVariable("text");
 		pv.setFormat(ParamSpatialVariable.FORMAT_WITH_DATA);

@@ -24,10 +24,10 @@ public class TextElementModel extends ElementModel{
 	}
 	
 	public void init(){
-		rf = new RPointFunction("text_plot");
+		rf = new RPointFunction("spatialTextPlot");
 		rf.setViewType(null);
 		ParamSpatialVariable pv = new ParamSpatialVariable("text");
-		pv.setFormat(ParamSpatialVariable.FORMAT_WITH_DATA);
+		pv.setFormat(ParamSpatialVariable.FORMAT_WITH_DATA_CHARACTER);
 		pv.setTitle("Text");
 		rf.add(pv);
 		
@@ -78,11 +78,12 @@ public class TextElementModel extends ElementModel{
 	
 	public String getDataFrameArgumentName()
 	{
-		return (String) rf.get(0).getValue();
+		return (String) ((ParamSpatialVariable) rf.get(0)).getData();
 	}
 	
 	public void setDataFrameArgumentName(String argName)
 	{
-		rf.get(0).setValue(argName);
+		((ParamSpatialVariable) rf.get(0)).setData(argName);
+		//rf.get(0).setValue(argName);
 	}
 }

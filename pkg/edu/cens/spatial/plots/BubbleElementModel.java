@@ -24,10 +24,10 @@ public class BubbleElementModel extends ElementModel{
 	}
 	
 	public void init(){
-		rf = new RPointFunction("bubble_plot");
+		rf = new RPointFunction("spatialBubblePlot");
 		rf.setViewType(null);
 		ParamSpatialVariable pv = new ParamSpatialVariable("z");
-		pv.setFormat(ParamSpatialVariable.FORMAT_WITH_DATA);
+		pv.setFormat(ParamSpatialVariable.FORMAT_WITH_DATA_CHARACTER);
 		pv.setTitle("Variable");//("Point size"); //Gail requested this name change
 		rf.add(pv);
 		

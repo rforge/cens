@@ -41,7 +41,7 @@ public class DeducerDataFrameNameField extends JTextField
 		{
 			try
 			{
-				ret = (Deducer.eval("as.name('" + this.getText() + "')")).asString();
+				ret = (Deducer.timedEval("as.name('" + this.getText() + "')")).asString();
 			}
 			catch (REXPMismatchException e)
 			{

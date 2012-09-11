@@ -65,7 +65,7 @@ public class CoordView extends DataViewerTab {
 			this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 			int l=0;
 			try {
-				l=Deducer.eval("length("+dat+")").asInteger();
+				l=Deducer.timedEval("length("+dat+")").asInteger();
 			} catch (REXPMismatchException e) {
 				e.printStackTrace();
 			}
@@ -102,6 +102,8 @@ public class CoordView extends DataViewerTab {
 	class ButtonListener implements ListSelectionListener{
 
 		public void valueChanged(ListSelectionEvent arg0) {
+			if(arg0.getValueIsAdjusting())
+				return;
 			String index = lis.getSelectedIndex()+"";
 			int i = -1;
 			//System.out.println("index:"+index);

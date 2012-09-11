@@ -17,7 +17,7 @@ public class SpatialVariableSource implements VariableSource{
 	public String[] getDataObjects() {
 		String[] vals = new String[]{};
 		try {
-			vals = Deducer.eval("get.objects('" +className + "',includeInherited=TRUE)" ).asStrings();
+			vals = Deducer.timedEval("get.objects('" +className + "',includeInherited=TRUE)" ).asStrings();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -27,7 +27,7 @@ public class SpatialVariableSource implements VariableSource{
 	public String[] getVariableNames(String data) {
 		String[] vals = new String[]{};
 		try {
-			vals = Deducer.eval("names("+data+"@data)" ).asStrings();
+			vals = Deducer.timedEval("names("+data+"@data)" ).asStrings();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

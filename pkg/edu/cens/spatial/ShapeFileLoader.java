@@ -17,7 +17,7 @@ import org.rosuda.deducer.toolkit.HelpButton;
 
 public class ShapeFileLoader extends FileSelector{
 	
-	private static final String HELP_URL = "index.php?n=Main.DeducerSpatial";
+	private static final String HELP_URL = "index.php?n=Main.SpatialLoadData";
 	private JTextField rDataNameField;
 	JTextField proj ;
 	public ShapeFileLoader(Frame f) {
@@ -32,7 +32,7 @@ public class ShapeFileLoader extends FileSelector{
 		proj.setText("+proj=longlat +datum=WGS84");
 		namePanel.add(proj);
 		namePanel.add(new HelpButton(HELP_URL));
-		this.addFooterPanel(namePanel);
+		//this.addFooterPanel(namePanel);
 		/*
 		 !path.toLowerCase().endsWith(".shp") &&
 				!path.toLowerCase().endsWith(".shp") &&
@@ -102,18 +102,22 @@ public class ShapeFileLoader extends FileSelector{
 			rName = (this.getFile().indexOf(".") <= 0 ? Deducer.getUniqueName(this.getFile()) : 
 					Deducer.getUniqueName(this.getFile().substring(0, this.getFile().indexOf("."))));
 		rName = RController.makeValidVariableName(rName);
-		String path =(this.getDirectory() + Deducer.addSlashes(this.getFile())).replace('\\', '/');
-		if(!path.toLowerCase().endsWith(".shp") &&
-				!path.toLowerCase().endsWith(".shp") &&
-				!path.toLowerCase().endsWith(".dbf") &&
-				!path.toLowerCase().endsWith(".prj") &&
-				!path.toLowerCase().endsWith(".sbn") &&
-				!path.toLowerCase().endsWith(".sbx")){
+		String fileName = Deducer.addSlashes(this.getFile());
+		String path =this.getDirectory().replace('\\', '/');
+		if(!fileName.toLowerCase().endsWith(".shp") &&
+				!fileName.toLowerCase().endsWith(".shp") &&
+				!fileName.toLowerCase().endsWith(".dbf") &&
+				!fileName.toLowerCase().endsWith(".prj") &&
+				!fileName.toLowerCase().endsWith(".sbn") &&
+				!fileName.toLowerCase().endsWith(".sbx")){
 			JOptionPane.showMessageDialog(this, "This does not appear to be a shape file.\nAcceptable extensions are: .shp,.dbf,.prj,.sbx,.sbn");
 			return false;
 		}
-		path = path.substring(0, path.length()-4);
-		String command =rName +" <- readShapeSpatial(\""+path+"\", proj=CRS('"+proj.getText()+"'))\n";
+		
+		String fileNoExt = fileName.substring(0, fileName.length()-4);
+		
+		String command =rName +" <- readOGR(\""+Deducer.addSlashes(path)+
+			"\", layer=\""+fileNoExt+"\")\n";
 		command += rName +" <- spTransform("+rName+",osm())";
 		Deducer.execute(command);
 		

@@ -12,6 +12,7 @@ import org.rosuda.deducer.widgets.param.ParamVariable;
 import org.rosuda.deducer.widgets.param.RFunction;
 import org.rosuda.deducer.widgets.param.RFunctionDialog;
 
+import edu.cens.spatial.DeducerSpatial;
 import edu.cens.spatial.plots.widgets.ParamSpatialVariable;
 import edu.cens.spatial.plots.widgets.RPointFunction;
 import edu.cens.spatial.plots.widgets.RSpatialFunctionView;
@@ -24,7 +25,7 @@ public class ColoredPointsElementModel extends ElementModel{
 	}
 	
 	public void init(){
-		rf = new RPointFunction("colored_points");
+		rf = new RPointFunction("spatialColoredPoints");
 		
 		//can't get this param
 		//so added this code:
@@ -37,7 +38,7 @@ public class ColoredPointsElementModel extends ElementModel{
 		
 		rf.setViewType(null);
 		ParamSpatialVariable pv = new ParamSpatialVariable("color_var");
-		pv.setFormat(ParamSpatialVariable.FORMAT_WITH_DATA);
+		pv.setFormat(ParamSpatialVariable.FORMAT_WITH_DATA_CHARACTER);
 		pv.setTitle("Color");
 		rf.add(pv);
 		
@@ -68,6 +69,8 @@ public class ColoredPointsElementModel extends ElementModel{
 		pn.setValue(1.0);
 		rf.add(pn);
 		
+		rf.add(DeducerSpatial.makeColorScaleParam());
+				
 		ParamCharacter pc = new ParamCharacter("legend.loc");
 		pc.setTitle("Legend location");
 		pc.setOptions(new String[]{"bottomleft","bottomright","topleft","topright"
@@ -77,6 +80,7 @@ public class ColoredPointsElementModel extends ElementModel{
 		pc.setValue("bottomleft");
 		rf.add(pc);
 		
+
 		pc = new ParamCharacter("legend.title");
 		pc.setTitle("Legend title");
 		rf.add(pc);

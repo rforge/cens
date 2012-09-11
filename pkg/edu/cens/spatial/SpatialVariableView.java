@@ -80,8 +80,7 @@ public class SpatialVariableView extends VariableView {
 						JOptionPane.QUESTION_MESSAGE);
 				if(confirm == JOptionPane.NO_OPTION)
 					return;
-				Deducer.eval("rm("+dataName + ")");
-				RController.refreshObjects();
+				Deducer.execute("rm("+dataName + ")");
 			}else if (cmd == "about")
 				new AboutDialog(null);
 			else if (cmd == "cut"){
@@ -102,8 +101,7 @@ public class SpatialVariableView extends VariableView {
 				String inputValue = JOptionPane.showInputDialog("Data Name: ");
 				inputValue = Deducer.getUniqueName(inputValue);
 				if(inputValue!=null){
-					Deducer.eval(inputValue.trim()+"<-data.frame(Var1=NA)");
-					RController.refreshObjects();
+					Deducer.execute(inputValue.trim()+"<-data.frame(Var1=NA)");
 				}
 			}else if (cmd == "loaddata"){
 				DataLoader dld= new DataLoader();

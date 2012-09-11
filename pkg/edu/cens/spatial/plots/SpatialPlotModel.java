@@ -218,11 +218,11 @@ public class SpatialPlotModel extends AbstractListModel
 					//output the subsetting code to the console, since eval won't,
 					//and we need the blocking call only available in eval.
 					//System.out.println could work too
-					Deducer.eval("cat(\""+printableSubsetCommand+"\\n\")");
+					Deducer.timedEval("cat(\""+printableSubsetCommand+"\\n\")");
 					
-					Deducer.eval(subsetCommand);
+					Deducer.timedEval(subsetCommand);
 					
-					if (Deducer.eval(subsettedCopy).isNull())
+					if (Deducer.timedEval(subsettedCopy).isNull())
 					{
 						//Deducer.execute(varName + " <- " + backupVar);
 						//Deducer.eval("print('"+ varName + " ignored')" + "\n" + "rm(" + subsettedCopy + ")");

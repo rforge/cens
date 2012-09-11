@@ -6,6 +6,7 @@ import org.rosuda.deducer.widgets.param.ParamVariable;
 public class ParamSpatialVariable extends ParamVariable{
 
 	public static String FORMAT_WITH_DATA = "wd";
+	public static String FORMAT_WITH_DATA_CHARACTER = "wdc";
 	public static String FORMAT_WITHOUT_DATA = "wod";
 	
 	public ParamSpatialVariable(){
@@ -27,7 +28,9 @@ public class ParamSpatialVariable extends ParamVariable{
 			if(format.equals(FORMAT_WITH_DATA)){
 			calls = new String[] {data,
 					(name!=null ? (name + " = ") : "") +data +"@data[,'"+variable+"']"};
-			}else{
+			}else if(format.equals(FORMAT_WITH_DATA_CHARACTER)){
+				calls = new String[] {data,"'"+variable+"'"};				
+			}else {
 				calls = new String[] {(name!=null ? (name + " = ") : "") +data +"@data[,'"+variable+"']"};				
 			}
 		}

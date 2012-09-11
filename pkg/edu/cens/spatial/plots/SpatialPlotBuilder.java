@@ -72,7 +72,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 		WindowListener
 {
 
-	private static final String HELP_URL = "http://www.deducer.org/pmwiki/index.php?n=Main.DeducerSpatial";
+	private static final String HELP_URL = "http://www.deducer.org/pmwiki/index.php?n=Main.SpatialPlotBuilder";
 	
 	private final JLayeredPane			_pane									= new JLayeredPane();
 	private final JPanel						_rightPanel						= new JPanel();
@@ -162,7 +162,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 						AnchorConstraint.ANCHOR_REL, AnchorConstraint.ANCHOR_ABS,
 						AnchorConstraint.ANCHOR_NONE, AnchorConstraint.ANCHOR_REL));
 				_pane.setLayer(_topPanel, 10);
-				_topPanel.setPreferredSize(new java.awt.Dimension(683, 122));
+				_topPanel.setPreferredSize(new java.awt.Dimension(683, 130));
 
 				
 				JPanel titlePanel = new JPanel(new BorderLayout());
@@ -616,30 +616,33 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 		{
 			// Deducer.eval("print('" + call + "')");
 			Deducer
-					.eval("Sys.setenv(\"JAVAGD_CLASS_NAME\"=\"edu/cens/spatial/plots/DeviceInterface\")");
+					.timedEval("Sys.setenv(\"JAVAGD_CLASS_NAME\"=\"edu/cens/spatial/plots/DeviceInterface\")");
 			if (devNr == -1)
 			{
-				Deducer.eval("JavaGD()");
-				Deducer.eval("par(list(bg=\"transparent\")");
+				Deducer.timedEval("JavaGD()");
+				Deducer.timedEval("par(list(bg=\"transparent\"))");
+				Deducer.timedEval("plot.new()");
+				tmp.refreshPlot();
 			}
 			else
 			{
-				Deducer.eval("dev.set(" + (devNr + 1) + ")");
+				Deducer.timedEval("dev.set(" + (devNr + 1) + ")");
 			}
 
 			// Deducer.eval(call);
 
 			String cmd = call; // call.replaceAll("[\\n\\t]", " ");
 			// System.out.println(cmd);
-			Deducer.eval(cmd);
+			Deducer.timedEval(cmd);
 			if (first)
 			{
-				Thread.sleep(2000);
+				//Thread.sleep(2000);
 				// System.out.println("refreshing...");
-				tmp.refreshPlot();
+				//tmp.refreshPlot();
 			}
+			//tmp.refreshPlot();
 			Deducer
-					.eval("Sys.setenv(\"JAVAGD_CLASS_NAME\"=\"org/rosuda/JGR/toolkit/JavaGD\")");
+					.timedEval("Sys.setenv(\"JAVAGD_CLASS_NAME\"=\"org/rosuda/JGR/toolkit/JavaGD\")");
 		}
 		catch (Exception e)
 		{

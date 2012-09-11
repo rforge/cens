@@ -121,8 +121,8 @@ public class SpatialDataView extends DataView implements ActionListener{
 						JOptionPane.QUESTION_MESSAGE);
 				if(confirm == JOptionPane.NO_OPTION)
 					return;
-				Deducer.eval("rm("+dataName + ")");
-				RController.refreshObjects();
+				Deducer.execute("rm("+dataName + ")");
+				//RController.refreshObjects();
 			}else if (cmd == "about")
 				new AboutDialog(null);
 			else if (cmd == "cut"){
@@ -143,8 +143,8 @@ public class SpatialDataView extends DataView implements ActionListener{
 				String inputValue = JOptionPane.showInputDialog("Data Name: ");
 				inputValue = Deducer.getUniqueName(inputValue);
 				if(inputValue!=null){
-					Deducer.eval(inputValue.trim()+"<-data.frame(Var1=NA)");
-					RController.refreshObjects();
+					Deducer.execute(inputValue.trim()+"<-data.frame(Var1=NA)");
+					//RController.refreshObjects();
 				}
 			}else if (cmd == "loaddata"){
 				DataLoader dld= new DataLoader();
@@ -218,11 +218,11 @@ public class SpatialDataView extends DataView implements ActionListener{
 				
 				JMenuItem sortItem = new JMenuItem ("Sort (Increasing)");
 				sortItem.addActionListener(this);
-				menu.add( sortItem );
+				//menu.add( sortItem );
 				sortItem = new JMenuItem ("Sort (Decreasing)");
 				sortItem.addActionListener(this);
-				menu.add( sortItem );
-				menu.add( new JSeparator() );
+				//menu.add( sortItem );
+				//menu.add( new JSeparator() );
 				JMenuItem copyItem = new JMenuItem ("Copy");
 				copyItem.addActionListener(this);
 				menu.add( copyItem );
@@ -262,15 +262,15 @@ public class SpatialDataView extends DataView implements ActionListener{
 				} else if(source.getText()=="Remove Column"){
 					table.removeColumn(vColIndex);
 				} else if(source.getText().equals("Sort (Increasing)")){
-					String cmd = dataName + " <- sort(" + dataName + ", by=~" +
-						table.getColumnName(vColIndex).trim() + ")";
-					Deducer.eval(cmd);
-					refresh();
+					JOptionPane.showMessageDialog(null, "Sorting not supported for spatial data");
+					//String cmd = dataName + " <- sort(" + dataName + ", by=~" +
+					//	table.getColumnName(vColIndex).trim() + ")";
+					//Deducer.execute(cmd);
 				} else if(source.getText().equals("Sort (Decreasing)")){
-					String cmd = dataName + " <- sort(" + dataName + ", by=~ -" +
-					table.getColumnName(vColIndex).trim() + ")";
-					Deducer.eval(cmd);
-					refresh();
+					JOptionPane.showMessageDialog(null, "Sorting not supported for spatial data");
+					//String cmd = dataName + " <- sort(" + dataName + ", by=~ -" +
+					//table.getColumnName(vColIndex).trim() + ")";
+					//Deducer.execute(cmd);
 				}
 				menu.setVisible(false);
 			}

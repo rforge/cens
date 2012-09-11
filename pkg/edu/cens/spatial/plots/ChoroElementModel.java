@@ -4,10 +4,12 @@ import javax.swing.JDialog;
 
 import org.rosuda.deducer.widgets.param.Param;
 import org.rosuda.deducer.widgets.param.ParamCharacter;
+import org.rosuda.deducer.widgets.param.ParamLogical;
 import org.rosuda.deducer.widgets.param.ParamNumeric;
 import org.rosuda.deducer.widgets.param.RFunction;
 import org.rosuda.deducer.widgets.param.RFunctionDialog;
 
+import edu.cens.spatial.DeducerSpatial;
 import edu.cens.spatial.plots.widgets.ParamSpatialVariable;
 import edu.cens.spatial.plots.widgets.RPointFunction;
 import edu.cens.spatial.plots.widgets.RPolyFunction;
@@ -22,19 +24,26 @@ public class ChoroElementModel extends ElementModel{
 	}
 	
 	public void init(){
-		rf = new RPolyFunction("choro_plot");
+		rf = new RPolyFunction("spatialChoropleth");
 		rf.setViewType(null);
-		ParamSpatialVariable pv = new ParamSpatialVariable("dem");
-		pv.setFormat(ParamSpatialVariable.FORMAT_WITH_DATA);
+		ParamSpatialVariable pv = new ParamSpatialVariable("color");
+		pv.setFormat(ParamSpatialVariable.FORMAT_WITH_DATA_CHARACTER);
 		pv.setTitle("Color");
 		rf.add(pv);
+
 		
+		ParamLogical pl = new ParamLogical("quantileBin",false);
+		pl.setTitle("Bin into groups");
+		rf.add(pl);
+		
+		rf.add(DeducerSpatial.makeColorScaleParam());
+
 		ParamNumeric pn = new ParamNumeric("alpha");
 		pn.setTitle("Alpha");
-		pn.setDefaultValue(.5);
+		pn.setDefaultValue(1);
 		pn.setLowerBound(0);
 		pn.setUpperBound(1);
-		pn.setValue(.5);
+		pn.setValue(1);
 		rf.add(pn);
 		
 		ParamCharacter pc = new ParamCharacter("legend.loc");
@@ -83,6 +92,7 @@ public class ChoroElementModel extends ElementModel{
 	
 	public void setDataFrameArgumentName(String argName)
 	{
-		rf.get(0).setValue(argName);
+		((ParamSpatialVariable) rf.get(0)).setData(argName);
+		//rf.get(0).setValue(argName);
 	}
 }

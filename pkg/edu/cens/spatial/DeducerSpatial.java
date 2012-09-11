@@ -1,6 +1,7 @@
 package edu.cens.spatial;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +16,13 @@ import javax.swing.JPanel;
 import org.rosuda.JGR.JGR;
 import org.rosuda.deducer.Deducer;
 import org.rosuda.deducer.data.DataViewerController;
+import org.rosuda.deducer.widgets.param.Param;
+import org.rosuda.deducer.widgets.param.ParamCharacter;
+import org.rosuda.deducer.widgets.param.ParamColor;
+import org.rosuda.deducer.widgets.param.ParamNumeric;
+import org.rosuda.deducer.widgets.param.ParamVector;
+import org.rosuda.deducer.widgets.param.RFunction;
+import org.rosuda.deducer.widgets.param.RFunctionList;
 import org.rosuda.ibase.toolkit.EzMenuSwing;
 
 import edu.cens.spatial.plots.ColoredPointsElementModel;
@@ -37,7 +45,10 @@ public class DeducerSpatial
 				int menuIndex = 6;
 				insertMenu(JGR.MAINRCONSOLE, "Spatial", menuIndex);
 				EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial", "Load shape file", "shape", cListener);
+				EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial","Load Census Data", "census", cListener);
+				EzMenuSwing.getMenu(JGR.MAINRCONSOLE, "Spatial").addSeparator();		
 				EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial","Convert data.frame", "conv_pnt", cListener);
+				EzMenuSwing.getMenu(JGR.MAINRCONSOLE, "Spatial").addSeparator();
 				EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial", "Spatial plot builder", "builder", cListener);
 			}
 			DataViewerController.init();
@@ -141,12 +152,124 @@ public class DeducerSpatial
 		f.setVisible(true);
 		//b.setVisible(true);
 	}
+	
+	public static Param makeColorScaleParam(){
+		RFunction rf;
+		ParamCharacter pc;
+		ParamNumeric pn;
+		ParamVector pv;
+		ParamColor p;
+		RFunctionList pfl = new RFunctionList();
+		pfl.setName("palette");
+		pfl.setTitle("Palette");
+		pfl.setRequired(false);
+		
+		
+		//// Brewer
+		rf = new RFunction("brewer_pal");
+		rf.setTitle("Color brewer");
+		pc = new ParamCharacter("palette");
+		pc.setViewType(Param.VIEW_COMBO);
+		pc.setValue("Blues");
+		pc.setDefaultValue("Blues");
+		pc.setOptions(new String[]{"YlOrRd","YlOrBr","YlGnBu","YlGn","Reds","RdPu",
+				"Pruples","PuRd","PuBuGn","PuBu","OrRd","Oranges","Greys","Greens",
+				"GnBu","BuPu","BuGn","Blues","","Set3","Set2","Set1","Pastel2","Pastel1",
+				"Paired","Dark2","Accent","","Spectral","RdYlGn","RdYlBu","RdGy",
+				"RdBu","PuOr","PRGn","PiYG","BrBG"});
+		rf.add(pc);
+		pfl.addRFunction("Color brewer", rf);
+		
+		
+		//// Hue
+		rf = new RFunction("hue_pal");
+		rf.setTitle("Hue");
+		pv = new ParamVector();
+		pv.setName("h");
+		pv.setTitle("Hue range");
+		pv.setViewType(Param.VIEW_TWO_VALUE_ENTER);
+		pv.setValue(new String[]{"15","375"});
+		pv.setDefaultValue(new String[]{"15","375"});
+		rf.add(pv);		
+		
+		pn = new ParamNumeric();
+		pn.setName("l");
+		pn.setTitle("Luminance [0, 100]");
+		pn.setViewType(Param.VIEW_ENTER);
+		pn.setValue(new Double(65));
+		pn.setDefaultValue(new Double(65));
+		pn.setLowerBound(new Double(0));
+		pn.setUpperBound(new Double(100));
+		rf.add(pn);
+		
+		pn = new ParamNumeric();
+		pn.setName("c");
+		pn.setTitle("Chroma");
+		pn.setViewType(Param.VIEW_ENTER);
+		pn.setValue(new Double(100));
+		pn.setDefaultValue(new Double(100));
+		pn.setLowerBound(new Double(0));
+		rf.add(pn);
+		
+		pn = new ParamNumeric();
+		pn.setName("h.start");
+		pn.setTitle("Hue start");
+		pn.setViewType(Param.VIEW_ENTER);
+		pn.setValue(new Double(0));
+		pn.setDefaultValue(new Double(0));
+		pn.setLowerBound(new Double(0));
+		rf.add(pn);
+
+		pn = new ParamNumeric();
+		pn.setName("direction");
+		pn.setTitle("Colour wheel direction");
+		pn.setViewType(Param.VIEW_COMBO);
+		pn.setValue(new Double(1.0));
+		pn.setDefaultValue(new Double(1.0));
+		pn.setOptions(new String[] {"1.0","-1.0"});
+		pn.setLabels(new String[] {"clockwise","counter clockwise"});
+		rf.add(pn);
+		pfl.addRFunction("Hue", rf);
+
+		////sequential
+		rf = new RFunction("seq_gradient_pal");
+		rf.setTitle("Sequential");
+		
+		p = new ParamColor();
+		p.setName("low");
+		p.setTitle("Low");
+		p.setViewType(Param.VIEW_COLOR);
+		p.setValue(Color.decode("#132B43"));
+		p.setDefaultValue(Color.decode("#132B43"));
+		rf.add(p);
+
+		p = new ParamColor();
+		p.setName("high");
+		p.setTitle("High");
+		p.setViewType(Param.VIEW_COLOR);
+		p.setValue(Color.decode("#56B1F7"));
+		p.setDefaultValue(Color.decode("#56B1F7"));
+		rf.add(p);
+		
+		pc = new ParamCharacter();
+		pc.setName("space");
+		pc.setTitle("Space");
+		pc.setViewType(Param.VIEW_COMBO);
+		pc.setValue("rgb");
+		pc.setDefaultValue("rgb");
+		pc.setOptions(new String[] {"rgb","Lab"});
+		rf.add(pc);
+		pfl.addRFunction("Sequential", rf);
+		
+		return pfl;
+	}
+	
 }
 
 class SpatialMenuListener implements ActionListener
 {
 
-	@Override
+
 	public void actionPerformed(ActionEvent act)
 	{
 		String cmd = act.getActionCommand();
@@ -171,6 +294,8 @@ class SpatialMenuListener implements ActionListener
 			
 			SpatialPlotBuilder b = new SpatialPlotBuilder();
 			b.setVisible(true);
+		}else if(cmd.equals("census")){
+			Deducer.timedEval(".getDialog(\"Load Census Data\")$run()");
 		}
 //		else if (cmd.equals("subset"))
 //		{

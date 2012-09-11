@@ -47,6 +47,8 @@ MouseMotionListener, MouseWheelListener, ActionListener, ChangeListener
 	protected SpatialPlotBuilder builder;
 
 	protected Point lastDragPoint;
+	
+	protected boolean hasDragged = false;
 
 	protected boolean isMoving = false;
 
@@ -89,7 +91,8 @@ MouseMotionListener, MouseWheelListener, ActionListener, ChangeListener
 				int diffx = lastDragPoint.x - p.x;
 				int diffy = lastDragPoint.y - p.y;
 				map.moveMap(diffx, diffy);
-				builder.updatePlot();
+				//builder.updatePlot();
+				hasDragged = true;
 			}
 			lastDragPoint = p;
 		}
@@ -185,8 +188,10 @@ MouseMotionListener, MouseWheelListener, ActionListener, ChangeListener
 				subsetBoxState = SubsetBoxState.ACCEPT_DIALOG;
 				new AcceptSubsetDialog(this.builder, this).setVisible(true);
 			}
-
-			builder.updatePlot();
+			if(hasDragged){
+				builder.updatePlot();
+				hasDragged=false;
+			}
 		}
 	}
 

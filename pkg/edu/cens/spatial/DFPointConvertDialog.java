@@ -12,7 +12,7 @@ import org.rosuda.deducer.widgets.*;
 
 public class DFPointConvertDialog extends RDialog implements ActionListener{
 
-	private static final String HELP_URL = "index.php?n=Main.DeducerSpatial";
+	private static final String HELP_URL = "index.php?n=Main.SpatialConvertData";
 	
 	private VariableSelectorWidget variableSelector;
 	private SingleVariableWidget yaxis;
@@ -90,34 +90,28 @@ public class DFPointConvertDialog extends RDialog implements ActionListener{
 							*/
 			
 			//Filter out any rows w/o valid lat/lon
+			String runCmd = "";
 			String filteredData = Deducer.getUniqueName(data + "_temp");
 
-			Deducer.execute(filteredData + " <- " + data);
+			runCmd += filteredData + " <- " + data + "\n";
 			
-			Deducer.execute("if (class(" + data + "[, '" + xvar +"']) == 'factor') {");
-			Deducer.execute(filteredData + "[,'" + xvar + "'] <- as.numeric(as.character("+ filteredData + "[, '"+xvar+"']))");
-			Deducer.execute("}");
+			runCmd += "if (class(" + data + "[, '" + xvar +"']) == 'factor') {\n\t"+
+				filteredData + "[,'" + xvar + "'] <- as.numeric(as.character("+ filteredData + "[, '"+xvar+"']))\n" +
+				"}\n";
 			
-			Deducer.execute("if (class(" + data + "[, '" + yvar +"']) == 'factor') {");
-			Deducer.execute(filteredData + "[,'" + yvar + "'] <- as.numeric(as.character("+ filteredData + "[, '"+yvar+"']))");
-			Deducer.execute("}");
-			
-		Deducer.execute(filteredData + " <- subset(" + filteredData + ",  \n" +
-		"!is.na(" + xvar + ")  & !is.na("+yvar+") )");
+			runCmd += "if (class(" + data + "[, '" + yvar +"']) == 'factor') {\n\t"+
+				filteredData + "[,'" + yvar + "'] <- as.numeric(as.character("+ filteredData + "[, '"+yvar+"']))\n" +
+				"}\n";
 			
 			
-//			Deducer.execute(filteredData + " <- subset(" + data + ",  \n" +
-//					"!is.na(as.numeric(as.character(" + xvar + "))) \n" +
-//							"&\n" +
-//							"!is.na(as.numeric(as.character("+yvar+"))) \n" +
-//									")");
+			runCmd += filteredData + " <- subset(" + filteredData + ",  " +
+				"!is.na(" + xvar + ")  & !is.na("+yvar+") )\n";
 			
-			String command = name + " <- SpatialPointsDataFrame(" + filteredData + "[,c('"+xvar+"', '"+yvar+"')], data="+filteredData+",proj4string=CRS('+proj=longlat +datum=WGS84'))";
-			command += "\n"+name+" <- spTransform("+name+",osm())";
-			
-			Deducer.execute(command);		//execute command as if it had been entered into the console
-			
-			Deducer.execute("rm(" + filteredData + ")");	
+			runCmd += name + " <- SpatialPointsDataFrame(" + filteredData + "[,c('"+xvar+"', '"+yvar+"')], data="+filteredData+",proj4string=CRS('+proj=longlat +datum=WGS84'))\n"+
+			 name+" <- spTransform("+name+",osm())\n";
+			runCmd +="rm(" + filteredData + ")";
+			Deducer.execute(runCmd);		//execute command as if it had been entered into the console
+				
 			
 			this.setVisible(false);
 			completed();	//dialog completed
