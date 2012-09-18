@@ -44,12 +44,15 @@ public class DeducerSpatial
 			{
 				int menuIndex = 6;
 				insertMenu(JGR.MAINRCONSOLE, "Spatial", menuIndex);
-				EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial", "Load shape file", "shape", cListener);
+				EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial", "Load Shape File", "shape", cListener);
 				EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial","Load Census Data", "census", cListener);
 				EzMenuSwing.getMenu(JGR.MAINRCONSOLE, "Spatial").addSeparator();		
-				EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial","Convert data.frame", "conv_pnt", cListener);
+				EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial","Data -> Spatial", 
+						"conv_pnt", cListener);
+				EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial","Spatial -> Data", 
+						"conv_df", cListener);
 				EzMenuSwing.getMenu(JGR.MAINRCONSOLE, "Spatial").addSeparator();
-				EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial", "Spatial plot builder", "builder", cListener);
+				EzMenuSwing.addJMenuItem(JGR.MAINRCONSOLE, "Spatial", "Spatial Plot Builder", "builder", cListener);
 			}
 			DataViewerController.init();
 			DataViewerController.addDataType("SpatialPointsDataFrame", "sp-p");
@@ -264,6 +267,8 @@ public class DeducerSpatial
 		return pfl;
 	}
 	
+	
+	
 }
 
 class SpatialMenuListener implements ActionListener
@@ -296,6 +301,8 @@ class SpatialMenuListener implements ActionListener
 			b.setVisible(true);
 		}else if(cmd.equals("census")){
 			Deducer.timedEval(".getDialog(\"Load Census Data\")$run()");
+		}else if(cmd.equals("conv_df")){
+			ConvertToDataFrame.runConvertDialog();
 		}
 //		else if (cmd.equals("subset"))
 //		{

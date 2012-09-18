@@ -36,7 +36,7 @@ public class AcceptSubsetDialog extends JDialog
 		setModal(false); //should be able to drag around and stuff
 		//this.setAlwaysOnTop(true);
 		nameField = new DeducerDataFrameNameField();
-		
+		nameField.setText("tmp");
 		this.addWindowListener(new WindowAdapter() 
 		{
 		  public void windowClosing(WindowEvent e)
@@ -158,12 +158,8 @@ public class AcceptSubsetDialog extends JDialog
 				{
 					setCursor(new Cursor(Cursor.WAIT_CURSOR));
 				
-					boolean wasSuccessful = mc.executeSubsetting(keepSelected, nameField.getText());
-					
-					if (wasSuccessful)
-					{
-						thisPtr.setVisible(false);
-					}
+					mc.executeSubsetting(keepSelected, nameField.getText());
+					thisPtr.setVisible(false);
 				}
 				finally
 				{

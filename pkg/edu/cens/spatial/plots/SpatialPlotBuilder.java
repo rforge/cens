@@ -535,7 +535,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 			int zoom = _vp.getZoom();
 			cmd += "\nplot(openmap(c(" + ul.get(0) + "," + ul.get(1) + "),c("
 					+ lr.get(0) + "," + lr.get(1) + ")," + zoom + ",'"
-					+ _vp.getTileSourceType() + "'),add=TRUE)";
+					+ _vp.getTileSourceType() + "'),add=TRUE,raster=TRUE)";
 		}
 
 		cmd += modelCall;
@@ -1185,23 +1185,31 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 	}
 
 	// TODO wait cursor doesn't work.
-	public boolean executeSubsetting(double minLat, double minLon, double maxLat,
-			double maxLon, boolean keepSelected, String subsetName)
+	public void executeSubsetting(final double minLat,final double minLon,final double maxLat,
+			final double maxLon,final boolean keepSelected,final String subsetName)
 	{
-		boolean wasSuccessful = true;
+		
 		try
 		{
-			Component gp = getRootPane().getGlassPane();
+			final Component gp = getRootPane().getGlassPane();
 			gp.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 			gp.setVisible(true);
 
 			//Deducer.eval("print('subsetting...')");
-			wasSuccessful = this._model.executeSubsetting(minLat, minLon, maxLat, maxLon, keepSelected, subsetName);
-			updatePlot();
-			//Deducer.eval("print('done subsetting')");
-			
-			gp.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-			gp.setVisible(false);
+			new Thread(new Runnable(){
+
+				public void run() {
+					// TODO Auto-generated method stub
+					SpatialPlotBuilder.this._model.executeSubsetting(minLat, minLon, maxLat, maxLon, keepSelected, subsetName);
+					updatePlot();
+					//Deducer.eval("print('done subsetting')");
+					
+					gp.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+					gp.setVisible(false);					
+				}
+				
+			}).start();
+
 		}
 		finally
 		{
@@ -1214,7 +1222,7 @@ public class SpatialPlotBuilder extends TJFrame implements ActionListener,
 //				this.getGlassPane().setVisible(false);
 //			}
 		}
-		return wasSuccessful;
+
 	}
 
 	// TODO put all cursor changes in try/finally patterns

@@ -93,6 +93,6 @@ public class LinesElementModel extends ElementModel{
 	
 	public void setDataFrameArgumentName(String argName)
 	{
-		 ((ParamSpatialVariable) rf.get(0)).setData(argName);
+		rf.get(0).setValue(argName);
 	}
 }

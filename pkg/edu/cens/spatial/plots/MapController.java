@@ -338,7 +338,7 @@ MouseMotionListener, MouseWheelListener, ActionListener, ChangeListener
 		this.subsetBoxState = SubsetBoxState.READY;
 	}
 
-	public boolean executeSubsetting(boolean keepSelected, String subsetName)
+	public void executeSubsetting(boolean keepSelected, String subsetName)
 	{
 		//1: Find all the plotted points (worry about other objects later)
 		//2: Find which points lie inside the shape
@@ -350,16 +350,13 @@ MouseMotionListener, MouseWheelListener, ActionListener, ChangeListener
 		double maxLat = Math.max(subsetCorner1.getLat(), subsetCorner2.getLat());
 		double maxLon = Math.max(subsetCorner1.getLon(), subsetCorner2.getLon());
 
-		boolean wasSuccessful =	this.builder.executeSubsetting(minLat, minLon, maxLat, maxLon, keepSelected, subsetName);
+		this.builder.executeSubsetting(minLat, minLon, maxLat, maxLon, keepSelected, subsetName);
 
-		if (wasSuccessful)
-		{
 			this.subsetBoxState = SubsetBoxState.DISABLED;
 			((MapPanel) map).clearSubsetRectangle();
 			map.repaint();
-		}
 
-		return wasSuccessful;
+
 		//4: Redraw the plot
 	}
 

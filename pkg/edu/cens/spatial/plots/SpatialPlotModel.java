@@ -159,11 +159,11 @@ public class SpatialPlotModel extends AbstractListModel
 						spc.getModel() instanceof ChoroElementModel
 						)
 				{
-					subsetFunction = ".subsetPoly";
+					subsetFunction = "DeducerSpatial:::.subsetPoly";
 				}
 				else if (spc.getModel() instanceof LinesElementModel)
 				{
-					subsetFunction = ".subsetLines";
+					subsetFunction = "DeducerSpatial:::.subsetLines";
 				}
 				else if (
 						spc.getModel() instanceof PointsElementModel
@@ -173,7 +173,7 @@ public class SpatialPlotModel extends AbstractListModel
 						spc.getModel() instanceof BubbleElementModel
 						)
 				{
-					subsetFunction = ".subsetPoints";
+					subsetFunction = "DeducerSpatial:::.subsetPoints";
 				}
 				else
 				{
@@ -196,7 +196,7 @@ public class SpatialPlotModel extends AbstractListModel
 //					backupVar = Deducer.getUniqueName(backupVar);
 //					
 //					Deducer.execute(backupVar + " <- " + varName);
-				
+					String rem = keepSelected ? "FALSE" : "TRUE";
 					String subsetCommand = 
 						subsettedCopy + " <- " + varName + "\n" +
 						subsettedCopy + " <- " +
@@ -206,7 +206,7 @@ public class SpatialPlotModel extends AbstractListModel
 						maxLat  + "," + 
 						maxLon  + "," + 
 						varName + "," +
-						"removeSelection=" + (""+keepSelected).toUpperCase() + ")";
+						"removeSelection=" + rem + ")";
 					
 					String printableSubsetCommand = subsetCommand;
 					printableSubsetCommand.replace("\n", "\\n");
@@ -219,7 +219,7 @@ public class SpatialPlotModel extends AbstractListModel
 					//and we need the blocking call only available in eval.
 					//System.out.println could work too
 					Deducer.timedEval("cat(\""+printableSubsetCommand+"\\n\")");
-					
+		
 					Deducer.timedEval(subsetCommand);
 					
 					if (Deducer.timedEval(subsettedCopy).isNull())

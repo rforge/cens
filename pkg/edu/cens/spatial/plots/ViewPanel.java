@@ -158,7 +158,11 @@ public class ViewPanel extends JPanel implements ComponentListener{
     public void setTileSource(String type){
     	if("bing".equals(type)){
     		tp = "bing";
+    		try{
     		map.setTileSource(new BingAerialTileSource());
+    		}catch(Exception e){
+    			//do nothing. throws error about attribution image. not really a problem...
+    		}
     	}else if("osm".equals(type)){
     		tp="osm";
     		map.setTileSource(new OsmTileSource.Mapnik());
