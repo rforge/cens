@@ -31,7 +31,7 @@ projectMercator <- function(lat,long,drop=TRUE){
 }
 
 
-#'get an open street map tile. tpe can be "osm" or "bing"
+#'get an open street map tile. type can be "osm" or "bing"
 #' @param x location in osm native coordinates
 #' @param y location in osm native coordinates
 #' @param zoom zoom level
@@ -195,7 +195,7 @@ plot.OpenStreetMap <- function(x,y=NULL,add=FALSE,removeMargin=FALSE, ...){
 #' @param x an osmtile
 #' @param ... unused
 setMethod("raster","osmtile",function(x, ...){
-	library(raster)
+
 	rgbCol <- col2rgb(x$colorData)
 	
 	red <- matrix(rgbCol[1,],nrow=x$xres,byrow=TRUE)

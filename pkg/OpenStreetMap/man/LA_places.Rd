@@ -5,6 +5,9 @@
 \description{
   Places of interest in Los Angeles
 }
+\author{
+Los Angeles County
+}
 \keyword{data}
 \keyword{datasets}
 

@@ -16,7 +16,7 @@ Here are some trouble shooting tips:
 
 1. Run 
 \tR CMD javareconf
-in the terminal. If you are using Mac OS X 10.7 you may want to try
+in the terminal. If you are using Mac OS X >= 10.7 you may want to try
 \tR CMD javareconf JAVA_CPPFLAGS=-I/System/Library/Frameworks/JavaVM.framework/Headers
 instead.
 "
@@ -36,7 +36,7 @@ instead.
 			install.packages('rgdal',repos="http://www.stats.ox.ac.uk/pub/RWin")
 		else
 			install.packages("rgdal")
-		return(.tryRgdal())
+		return(.requireRgdal())
 	}
 	stop("rgdal is required but not installed")
 }
@@ -45,6 +45,17 @@ instead.
 	if(.isMac() && !.jniInitialized)
 		Sys.setenv(NOAWT=1)
 
-	.jpackage(pkgname, lib.loc=libname)  
+	ty <- try(.jpackage(pkgname, lib.loc=libname) )
+	if(inherits(ty,"try-error")){
+		stop(
+				"Java classes could not be loaded. Most likely because Java is not set up with your R installation.
+Here are some trouble shooting tips:					
+1. Run 
+\tR CMD javareconf
+in the terminal. If you are using Mac OS X >= 10.7 you may want to try
+\tR CMD javareconf JAVA_CPPFLAGS=-I/System/Library/Frameworks/JavaVM.framework/Headers
+instead."
+		)
+	}	
 }
 
