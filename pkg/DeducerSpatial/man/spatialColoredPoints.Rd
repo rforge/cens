@@ -1,16 +1,18 @@
-\name{colored_points}
-\alias{colored_points}
+\name{spatialColoredPoints}
+\alias{spatialColoredPoints}
 \title{plot spatial points with colors}
 \usage{
-  colored_points(x, color_var, pch = 1,
-    legend.loc = "bottomleft", legend.title = NULL, ...)
+spatialColoredPoints(x, color_var, pch=1, palette , legend.loc="bottomleft",
+		legend.title,...)
 }
 \arguments{
   \item{x}{a SpatialPointsDataFrame}
 
-  \item{color_var}{a vector}
+  \item{color_var}{the name of the variable in x, or a vector}
 
   \item{pch}{plotting symbol}
+  
+  \item{palette}{A color scale (See the scales package)}
 
   \item{legend.loc}{the location of the legend}
 

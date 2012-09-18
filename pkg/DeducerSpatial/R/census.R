@@ -24,7 +24,7 @@ loadCensusData <- function(state,level=c("county","tract","blkgrp","blk","cdp"),
 			do.call(paste("install.",level,sep=""),list(x=os))
 		else
 			install.packages(pkg)
-		if(!require(pkg))
+		if(!require(pkg,character.only=TRUE))
 			stop("Package failed to install. Ensure that you are connected to the internet")
 	}
 	dataName <- paste(state,".",level,if(year=="2010") "10" else "",sep="")
@@ -82,6 +82,7 @@ loadCensusData <- function(state,level=c("county","tract","blkgrp","blk","cdp"),
 	rfd <- new(RFunctionDialog, rf)
 	rfd$setSize(280L,200L)
 	rfd$setLocationRelativeTo(.jnull())
+	#try(rfd$setLocationRelativeTo(J("org.rosuda.JGR.JGR")$MAINRCONSOLE))
 	
 	hb <- rfd$getHelpButton()
 	hb$setVisible(TRUE)

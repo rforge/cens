@@ -43,7 +43,7 @@
 	minMerc <- projectMercator(minLat, minLon)
 	maxMerc <- projectMercator(maxLat, maxLon)
 	# The XOR inverts the function in any easy way w/o if/else statements
-	.contained <- function(poly){return(xor(!removeSelection, .containedBy2(minMerc, maxMerc, poly)))}
+	.contained <- function(poly){return(xor(removeSelection, .containedBy2(minMerc, maxMerc, poly)))}
 	
 	nr <- nrow(polyDf)
 	indices <- rep(FALSE,nr)
@@ -58,8 +58,10 @@
 }
 
 .subsetLines <- function (minLat, minLon, maxLat, maxLon, polyDf, removeSelection) {
+	minMerc <- projectMercator(minLat, minLon)
+	maxMerc <- projectMercator(maxLat, maxLon)
 	# The XOR inverts the function in any easy way w/o if/else statements
-	.contained <- function(poly){return(xor(!removeSelection, .containedBy(minLat, minLon, maxLat, maxLon, poly@coords)))}
+	.contained <- function(poly){return(xor(removeSelection, .containedBy2(minMerc, maxMerc, poly@coords)))}
 	
 	dupDf <- polyDf
 	
@@ -82,11 +84,12 @@
 }
 
 .subsetPoints <- function (minLat, minLon, maxLat, maxLon, pointsDf, removeSelection) {
-	
+	minMerc <- projectMercator(minLat, minLon)
+	maxMerc <- projectMercator(maxLat, maxLon)
 	dupDf <- pointsDf
 	
 	.contained <- function(x) {
-		return(xor(!removeSelection, .containedBy(minLat, minLon, maxLat, maxLon, dupDf[x,]@coords) ) )
+		return(xor(removeSelection, .containedBy2(minMerc, maxMerc, dupDf[x,]@coords) ) )
 	}
 	
 	indices <- 1:length(pointsDf)
@@ -106,7 +109,7 @@
 
 
 .onLoad <- function(libname, pkgname) {
-	
+
 	deducerLoaded <- try(.deducer != .jnull(),silent=TRUE)
 	if(inherits(deducerLoaded,"try-error") || !deducerLoaded)
 		return(NULL)

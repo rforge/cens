@@ -14,7 +14,7 @@ spatialColoredPoints<-function(x, color_var, pch=1, palette , legend.loc="bottom
 		if(missing(palette))
 			palette <- function(n)rainbow(n,v=.8)
 		if(length(palette(3))<=1)
-			palette <- manual_pal(pallete(1:length(levels(color_var))))
+			palette <- manual_pal(palette(1:length(levels(color_var))))
 		clrs <- palette(length(levels(color_var)))
 		org <- levels(color_var) 
 		levels(color_var) <- clrs

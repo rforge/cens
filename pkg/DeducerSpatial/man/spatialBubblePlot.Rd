@@ -1,14 +1,14 @@
-\name{bubble_plot}
-\alias{bubble_plot}
+\name{spatialBubblePlot}
+\alias{spatialBubblePlot}
 \title{bubble plot}
 \usage{
-  bubble_plot(x, z, minRadius = 0.01, maxRadius = 0.05,
-    color = "#F75252", ...)
+spatialBubblePlot(x,z,minRadius=.01,
+		maxRadius=.05,color="#F75252", ...)
 }
 \arguments{
   \item{x}{a SpatialPointsDataFrame}
 
-  \item{z}{a vector to be mapped to size}
+  \item{z}{The name of the variable in x or a vector to be mapped to size}
 
   \item{minRadius}{smallest point size}
 
