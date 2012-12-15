@@ -7,7 +7,7 @@ Description: A Deducer plug-in for spatial data analysis. Includes The
     ability to plot and explore open street map and Bing satellite
     images.
 SystemRequirements: Java (>= 1.5), JRI
-Version: 0.5
+Version: 0.6
 URL: http://www.deducer.org/pmwiki/pmwiki.php?n=Main.DeducerSpatial http://www.fellstat.com
     http://research.cens.ucla.edu/
 Date: 2012-02-21

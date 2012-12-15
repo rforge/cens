@@ -13,9 +13,12 @@ spatialColoredPoints<-function(x, color_var, pch=1, palette , legend.loc="bottom
 	if(is.factor(color_var)){
 		if(missing(palette))
 			palette <- function(n)rainbow(n,v=.8)
-		if(length(palette(3))<=1)
-			palette <- manual_pal(palette(1:length(levels(color_var))))
-		clrs <- palette(length(levels(color_var)))
+		nlevs <- length(levels(color_var))
+		if(length(palette(3))<=1){
+			pal <- palette(1:nlevs/nlevs)
+			palette <- manual_pal(pal)
+		}
+		clrs <- palette(nlevs)
 		org <- levels(color_var) 
 		levels(color_var) <- clrs
 		color_var <- as.character(color_var)
@@ -25,8 +28,10 @@ spatialColoredPoints<-function(x, color_var, pch=1, palette , legend.loc="bottom
 		#color_var <- as.numeric(color_var)
 		if(missing(palette))
 			palette <- gradient_n_pal(heat.colors(20))
-		if(length(palette(3))>1)
-			palette <- gradient_n_pal(palette(9))
+		if(length(palette(3))>1){
+			pal <- palette(9)
+			palette <- gradient_n_pal(pal)
+		}
 		clrs <- cscale(color_var,palette)
 
 		qnt <- rev(quantile(color_var,type=1,na.rm=TRUE))
@@ -36,7 +41,8 @@ spatialColoredPoints<-function(x, color_var, pch=1, palette , legend.loc="bottom
 		#leg.val <- c(.01,.25,.50,1)*(max(color_var,na.rm=TRUE)-min(color_var,na.rm=TRUE)) + min(color_var,na.rm=TRUE)
 		#leg.val <- format(leg.val,digits=3)
 		plot(x,col=clrs,add=TRUE,pch=pch,...)
-		legend(legend.loc,,formatC(qnt,digits=4),col=qntclrs,pch=pch,title=legend.title)
+		legend(legend.loc,,formatC(qnt,digits=4),col=qntclrs,
+				pch=pch,title=legend.title, bg = "white")
 	}
 }
 
