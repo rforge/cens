@@ -22,7 +22,7 @@ library(maps)
 
 #plot map in native mercator coords
 map <- openmap(c(70,-179),
-		c(-70,179),zoom=2,type='bing')
+		c(-70,179),zoom=1,type='bing')
 plot(map)
 
 #using longlat projection lets us combine with the maps library
@@ -36,13 +36,12 @@ map_robinson <- openproj(map_longlat, projection=
 plot(map_robinson)
 
 
-map <- openmap(c(70,-179),
-		c(40,179),zoom=2,type='bing')
-map_longlat <- openproj(map)
+upperMap <- openmap(c(70,-179),
+		c(40,179),zoom=1,type='bing')
 #Lambert Conic Conformal (takes some time...)
-map_llc <- openproj(map_longlat, projection=
+map_llc <- openproj(upperMap, projection=
 				"+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96")
-plot(map_llc,raster=TRUE)
+plot(map_llc,removeMargin=TRUE)
 #add choropleth
 data(states)
 st_llc <- spTransform(states,CRS("+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96"))

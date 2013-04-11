@@ -3,10 +3,7 @@
 \alias{states}
 \title{The United States}
 \description{
-  A map of the United States.
-}
-\author{
-U.S. Geological Survey
+  The United States
 }
 \keyword{data}
 \keyword{datasets}

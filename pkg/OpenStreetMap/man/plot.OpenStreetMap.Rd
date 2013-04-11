@@ -21,7 +21,6 @@
 }
 \examples{
 \dontrun{
-library(rgdal)
 m <- c(25.7738889,-80.1938889)
 j <- c(58.3019444,-134.4197222)
 miami <- projectMercator(25.7738889,-80.1938889)
@@ -38,20 +37,23 @@ coords <- coordinates(LA_places)
 x <- coords[,1]
 y <- coords[,2]
 txt <- slot(LA_places,"data")[,'NAME']
-plot(longBeachHarbor,removeMargins=TRUE,raster=TRUE)
+plot(longBeachHarbor,removeMargin=TRUE)
 points(x,y,col="red")
 text(x,y,txt,col="white",adj=0)
 
- library(UScensus2000)
+if(require(UScensus2010)){
+		#install with: install.tract("linux")
+		if(require(UScensus2010tract)){
+			lat <- c(43.834526782236814,30.334953881988564)
+			lon <- c(-131.0888671875  ,-107.8857421875)
+			southwest <- openmap(c(lat[1],lon[1]),c(lat[2],lon[2]),5,'osm')
+			data(california.tract10)
+			cali <- spTransform(california.tract10,osm())
 
- lat <- c(43.834526782236814,30.334953881988564)
- lon <- c(-131.0888671875  ,-107.8857421875)
- southwest <- openmap(c(lat[1],lon[1]),c(lat[2],lon[2]),5,'osm')
- data(california.tract)
- california.tract <- spTransform(california.tract,osm())
-
- plot(southwest,removeMargin=TRUE)
- plot(california.tract,add=TRUE)
+			plot(southwest,removeMargin=TRUE)
+			plot(cali,add=TRUE)
+		}
+}
 
 }
 }

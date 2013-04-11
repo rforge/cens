@@ -18,7 +18,6 @@ longlat <- function(){
 #' @param long a vector of longitudes
 #' @param drop drop to lowest dimension
 projectMercator <- function(lat,long,drop=TRUE){
-	.requireRgdal()
 	df <- data.frame(long=long,lat=lat)
 	coordinates(df) <- ~long+lat
 	proj4string(df) <- CRS("+proj=longlat +datum=WGS84")
@@ -66,7 +65,7 @@ osmtile <- function(x,y,zoom,type="osm"){
 #' @param raster use raster image
 #' @param ... additional parameters to image or rasterImage
 #' @method plot osmtile
-plot.osmtile <- function(x, y=NULL, add=TRUE, raster=FALSE, ...){
+plot.osmtile <- function(x, y=NULL, add=TRUE, raster=TRUE, ...){
 	xres <- x$xres
 	yres <- x$yres
 	if(!raster)
@@ -89,17 +88,34 @@ plot.osmtile <- function(x, y=NULL, add=TRUE, raster=FALSE, ...){
 #' @param upperLeft the upper left lat and long
 #' @param lowerRight the lower right lat and long
 #' @param zoom the zoom level. If null, it is determined automatically
-#' @param type 'osm' for mapnik open street map, or 'bing' for bing aerial
+#' @param type the tile server from which to get the map
 #' @param minNumTiles If zoom is null, zoom will be chosen such that
 #' 					the number of map tiles is greater than or equal 
 #' 					to this number.
+#' @param mergeTiles should map tiles be merged into one tile
 #' @examples \dontrun{
 #' #Korea
 #' map <- openmap(c(43.46886761482925,119.94873046875),
 #' 				c(33.22949814144951,133.9892578125),type='osm')
-#' plot(map,raster=TRUE)
+#' plot(map)
 #' }
-openmap <- function(upperLeft,lowerRight,zoom=NULL,type="osm",minNumTiles=9L){
+openmap <- function(upperLeft,lowerRight,zoom=NULL,type=c("osm","osm-bw","maptoolkit-topo",
+				"waze","mapquest","mapquest-aerial","bing","stamen-toner","stamen-terrain"
+						,"stamen-watercolor","osm-german","osm-wanderreitkarte","mapbox",
+						"esri","esri-topo","nps","apple-iphoto","skobbler","cloudmade-<id>",
+						"hillshade","opencyclemap","osm-transport","osm-public-transport",
+						"osm-bbike","osm-bbike-german"),
+		minNumTiles=9L, mergeTiles=TRUE){
+	type <- type[1]
+	if(substr(type,1,9) != "cloudmade" && !(type %in% c("osm","osm-bw","maptoolkit-topo",
+				"waze","mapquest","mapquest-aerial","bing","stamen-toner","stamen-terrain"
+						,"stamen-watercolor","osm-german","osm-wanderreitkarte","mapbox",
+						"esri","esri-topo","nps","apple-iphoto","skobbler",
+						"hillshade","opencyclemap","osm-transport","osm-public-transport",
+						"osm-bbike","osm-bbike-german"))){
+		stop("unknown map type")
+		
+	}
 	.tryJava()
 	autoZoom <- is.null(zoom)
 	if(autoZoom)
@@ -131,7 +147,7 @@ openmap <- function(upperLeft,lowerRight,zoom=NULL,type="osm",minNumTiles=9L){
 	map$bbox <- list(p1=projectMercator(upperLeft[1],upperLeft[2]),p2=projectMercator(lowerRight[1],lowerRight[2]))
 	class(map) <- "OpenStreetMap"
 	attr(map,"zoom") <- zoom
-	map
+	if(mergeTiles) .mergeTiles(map) else map
 }
 
 #'plot the map in mercator coordinates. see osm().
@@ -142,7 +158,6 @@ openmap <- function(upperLeft,lowerRight,zoom=NULL,type="osm",minNumTiles=9L){
 #' @param ... additional parameters to be passed to plot
 #' @method plot OpenStreetMap
 #' @examples \dontrun{
-#' library(rgdal)
 #' m <- c(25.7738889,-80.1938889)
 #' j <- c(58.3019444,-134.4197222)
 #' miami <- projectMercator(25.7738889,-80.1938889)
@@ -159,20 +174,23 @@ openmap <- function(upperLeft,lowerRight,zoom=NULL,type="osm",minNumTiles=9L){
 #' x <- coords[,1]
 #' y <- coords[,2]
 #' txt <- slot(LA_places,"data")[,'NAME']
-#' plot(longBeachHarbor,removeMargins=TRUE,raster=TRUE)
+#' plot(longBeachHarbor,removeMargin=TRUE)
 #' points(x,y,col="red")
 #' text(x,y,txt,col="white",adj=0)
 #' 
-#'  library(UScensus2000)
-#'  
-#'  lat <- c(43.834526782236814,30.334953881988564)
-#'  lon <- c(-131.0888671875  ,-107.8857421875)
-#'  southwest <- openmap(c(lat[1],lon[1]),c(lat[2],lon[2]),5,'osm')
-#'  data(california.tract)
-#'  california.tract <- spTransform(california.tract,osm())
-#'  
-#'  plot(southwest,removeMargin=TRUE)
-#'  plot(california.tract,add=TRUE)
+#' if(require(UScensus2010)){
+#' 		#install with: install.tract("linux")
+#' 		if(require(UScensus2010tract)){
+#' 			lat <- c(43.834526782236814,30.334953881988564)
+#' 			lon <- c(-131.0888671875  ,-107.8857421875)
+#' 			southwest <- openmap(c(lat[1],lon[1]),c(lat[2],lon[2]),5,'osm')
+#' 			data(california.tract10)
+#' 			cali <- spTransform(california.tract10,osm())
+#' 			
+#' 			plot(southwest,removeMargin=TRUE)
+#' 			plot(cali,add=TRUE)
+#' 		}
+#' }
 #' 
 #' }
 plot.OpenStreetMap <- function(x,y=NULL,add=FALSE,removeMargin=FALSE, ...){
@@ -195,7 +213,6 @@ plot.OpenStreetMap <- function(x,y=NULL,add=FALSE,removeMargin=FALSE, ...){
 #' @param x an osmtile
 #' @param ... unused
 setMethod("raster","osmtile",function(x, ...){
-
 	rgbCol <- col2rgb(x$colorData)
 	
 	red <- matrix(rgbCol[1,],nrow=x$xres,byrow=TRUE)
@@ -218,15 +235,27 @@ setMethod("raster","osmtile",function(x, ...){
 #' create a RasterLayer from an OpenStreetMap
 #' @param x an OpenStreetMap
 #' @param ... unused
+#' @examples \dontrun{
+#' longBeachHarbor <- openmap(c(33.760525217369974,-118.22052955627441),
+#' 		c(33.73290566922855,-118.17521095275879),14,'bing')
+#' ras <- raster(longBeachHarbor)
+#' plotRGB(ras)
+#' }
 setMethod("raster","OpenStreetMap",function(x, ...){
-	rasterImg <- NULL
-	for(i in 1:length(x$tiles)){
-		if(i==1)
-			rasterImg <- raster(x$tiles[[i]])
-		else
-			rasterImg <- raster::merge(rasterImg,raster(x$tiles[[i]]))
-	}	
-	rasterImg
+	tiles <- length(x$tiles)
+	if (tiles > 1) {
+		rasterImg <- list()
+		for (i in 1:length(x$tiles)) {
+			rasterImg[i] <- raster(x$tiles[[i]]) 
+		}
+		# single calls to merge, and overlap=F for efficiency.
+		rasterImg$overlap <- FALSE
+		rasterImg <- do.call(raster::merge, rasterImg)
+	} else {
+		rasterImg <- raster(x$tiles[[1]]) 
+	}
+	ext <- extent(x$bbox$p1[1],x$bbox$p2[1],x$bbox$p2[2],x$bbox$p1[2])
+	crop(rasterImg,ext)
 }
 )
 
@@ -240,7 +269,7 @@ setMethod("raster","OpenStreetMap",function(x, ...){
 #' 
 #' #plot map in native mercator coords
 #' map <- openmap(c(70,-179),
-#' 		c(-70,179),zoom=2,type='bing')
+#' 		c(-70,179),zoom=1,type='bing')
 #' plot(map)
 #' 
 #' #using longlat projection lets us combine with the maps library
@@ -254,13 +283,12 @@ setMethod("raster","OpenStreetMap",function(x, ...){
 #' plot(map_robinson)			
 #' 
 #' 
-#' map <- openmap(c(70,-179),
-#' 		c(40,179),zoom=2,type='bing')
-#' map_longlat <- openproj(map)
+#' upperMap <- openmap(c(70,-179),
+#' 		c(40,179),zoom=1,type='bing')
 #' #Lambert Conic Conformal (takes some time...)
-#' map_llc <- openproj(map_longlat, projection=
+#' map_llc <- openproj(upperMap, projection=
 #' 				"+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96")
-#' plot(map_llc,raster=TRUE)
+#' plot(map_llc,removeMargin=TRUE)
 #' #add choropleth
 #' data(states)
 #' st_llc <- spTransform(states,CRS("+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96"))
@@ -297,6 +325,32 @@ openproj <- function(x,projection = "+proj=longlat",...){
 	osm
 }
 
+.mergeTiles <- function(x,...){
+	ras2 <- raster(x)
+	ext <- extent(x$bbox$p1[1],x$bbox$p2[1],x$bbox$p2[2],x$bbox$p1[2])
+	ras2 <- crop(ras2,ext)
+	vals <- values(ras2)
+	vals <- pmin(pmax(vals,0L),255L)
+	flag <- apply(vals,1,function(a)any(!is.finite(a)))
+	vals1 <- vals
+	vals1[!is.finite(vals)] <- 0L
+	colors <- ifelse(flag,NA,rgb(vals1[,1],vals1[,2],vals1[,3],maxColorValue=255L))
+	
+	result <- list()
+	result$colorData <- colors
+	result$bbox <- list(p1 = c(ext@xmin,ext@ymax), p2 = c(ext@xmax,ext@ymin))
+	result$projection <- x$tiles[[1]]$projection
+	result$xres <- dim(ras2)[1]
+	result$yres <- dim(ras2)[2]
+	class(result) <- "osmtile"
+	
+	osm <- list(tiles=list(result))
+	osm$bbox <- result$bbox
+	attr(osm,"zoom") <- attr(x,"zoom")
+	class(osm) <- "OpenStreetMap"
+	osm
+}
+
 
 #'print map
 #' @param x the OpenStreetMap
@@ -305,4 +359,40 @@ openproj <- function(x,projection = "+proj=longlat",...){
 print.OpenStreetMap <- function(x,...){
 	print(str(x))
 }
+
+#' launches a helper GUI.
+#' @usage note for Mac OS X users: 
+#' On the mac this can only be run from a java console such as JGR.
+launchMapHelper <- function(){
+	.tryJava()
+	new(J("org.openstreetmap.gui.jmapviewer.Demo"))$setVisible(TRUE)
+}
+
+#' Sets the user identification key for cloudmade.com
+#' @param key The key. Obtain a free map key at http://www.cloudmade.com
+setCloudMadeKey <- function(key){
+	if(!missing(key)){
+		J("edu.cens.spatial.RTileController")$setCloudMadeKey(as.character(key))
+	}
+	J("org.openstreetmap.gui.jmapviewer.tilesources.OsmTileSource")$cloudMadeKey
+}
+
+#' returns a table with relevant info for each map type
+#' 
+getMapInfo <- function(){
+	J("edu.cens.spatial.RTileController")$getInstance("osm")
+	s <- J("edu.cens.spatial.RTileController")$sources
+	n <- length(s)
+	name <- sapply(s,function(x)x$getName())
+	name[name=="Bing Aerial Maps"] <- "bing"
+	url <- sapply(s,function(x)x$getAttributionLinkURL())
+	attributionTerms <- sapply(s,function(x)x$getTermsOfUseURL())
+	attribution <- sapply(s,function(x)x$getAttributionText(1L,
+						.jnull("org.openstreetmap.gui.jmapviewer.Coordinate"),
+						.jnull("org.openstreetmap.gui.jmapviewer.Coordinate")))
+	cbind(name,url,attribution,attributionTerms)
+}
+
+
+
 

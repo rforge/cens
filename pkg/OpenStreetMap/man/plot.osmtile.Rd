@@ -3,7 +3,7 @@
 \title{add tile to plot}
 \usage{
   \method{plot}{osmtile} (x, y = NULL, add = TRUE,
-    raster = FALSE, ...)
+    raster = TRUE, ...)
 }
 \arguments{
   \item{x}{the tile}

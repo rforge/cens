@@ -20,7 +20,6 @@
 \dontrun{
 require(maps)
 require(ggplot2)
-require(rgdal)
 gpclibPermit()
 
 mp <- openmap(c(53.38332836757155,-130.517578125),

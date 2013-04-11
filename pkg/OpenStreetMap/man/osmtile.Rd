@@ -1,6 +1,6 @@
 \name{osmtile}
 \alias{osmtile}
-\title{get an open street map tile. tpe can be "osm" or "bing"}
+\title{get an open street map tile. type can be "osm" or "bing"}
 \usage{
   osmtile(x, y, zoom, type = "osm")
 }
@@ -18,6 +18,6 @@
   a tile
 }
 \description{
-  get an open street map tile. tpe can be "osm" or "bing"
+  get an open street map tile. type can be "osm" or "bing"
 }
 
