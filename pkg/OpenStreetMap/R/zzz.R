@@ -1,7 +1,3 @@
-# TODO: Add comment
-# 
-# Author: ianfellows
-###############################################################################
 
 .isMac <- function(){
 	length(grep("^darwin",R.version$os))>0
@@ -27,9 +23,19 @@ instead.
 
 
 .onLoad <- function(libname, pkgname) {
-	if(.isMac() && !.jniInitialized)
+	.jni <- try(get(".jniInitialized"),silent=TRUE)
+	if(inherits(.jni,"try-error"))
+		.jni <- FALSE
+	if(.isMac() && !.jni)
 		Sys.setenv(NOAWT=1)
-
+	if(!.jni){
+		jp <- getOption("java.parameters")
+		if(!is.null(jp))
+			jp <- paste(jp,"-Xrs")
+		else
+			jp <- "-Xrs"
+		options(java.parameters=jp)
+	}
 	ty <- try(.jpackage(pkgname, lib.loc=libname) )
 	if(inherits(ty,"try-error")){
 		stop(

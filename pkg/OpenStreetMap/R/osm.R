@@ -1,9 +1,5 @@
-# TODO: Add comment
-# 
-# Author: ianfellows
-###############################################################################
 
-#' open street map (and google) mercator projection
+#' Open street map (and google) mercator projection
 osm <- function(){
 	CRS("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs")
 }
@@ -13,7 +9,7 @@ longlat <- function(){
 	CRS("+proj=longlat +datum=WGS84")
 }
 
-#'maps long lat values to the open street map mercator projection
+#'Maps long lat values to the open street map mercator projection
 #' @param lat a vector of latitudes
 #' @param long a vector of longitudes
 #' @param drop drop to lowest dimension
@@ -30,11 +26,11 @@ projectMercator <- function(lat,long,drop=TRUE){
 }
 
 
-#'get an open street map tile. type can be "osm" or "bing"
+#'Get an open street map tile.
 #' @param x location in osm native coordinates
 #' @param y location in osm native coordinates
 #' @param zoom zoom level
-#' @param type osm for mapnik open street map, or 'bing' for bing aerial
+#' @param type the map type (see getMapInfo)
 #' @return a tile
 osmtile <- function(x,y,zoom,type="osm"){
 	.tryJava()
@@ -58,7 +54,7 @@ osmtile <- function(x,y,zoom,type="osm"){
 	res
 }
 
-#'add tile to plot
+#'Add tile to plot
 #' @param x the tile
 #' @param y ignored
 #' @param add add to current plot (if raster, then image is always added)
@@ -84,7 +80,7 @@ plot.osmtile <- function(x, y=NULL, add=TRUE, raster=TRUE, ...){
 				...)
 }
 
-#' get a map based on lat long coordinates 
+#' Get a map based on lat long coordinates 
 #' @param upperLeft the upper left lat and long
 #' @param lowerRight the lower right lat and long
 #' @param zoom the zoom level. If null, it is determined automatically
@@ -94,10 +90,32 @@ plot.osmtile <- function(x, y=NULL, add=TRUE, raster=TRUE, ...){
 #' 					to this number.
 #' @param mergeTiles should map tiles be merged into one tile
 #' @examples \dontrun{
+#' #show some of the maps available
+#' nm <- c("osm", "maptoolkit-topo", "mapquest", 
+#' 		"mapquest-aerial", "bing", "stamen-toner", 
+#' 		"stamen-watercolor", "esri", "esri-topo", 
+#' 		"nps", "apple-iphoto", "skobbler")
+#' par(mfrow=c(3,4))
 #' #Korea
-#' map <- openmap(c(43.46886761482925,119.94873046875),
-#' 				c(33.22949814144951,133.9892578125),type='osm')
-#' plot(map)
+#' for(i in 1:length(nm)){
+#' 	map <- openmap(c(43.46886761482925,119.94873046875),
+#' 			c(33.22949814144951,133.9892578125),
+#'			minNumTiles=3,type=nm[i])
+#'	plot(map)
+#'}
+#'
+#'#cloudMade has thousands of map types, and requires a key.
+#'#A default key is provided with the package, but you
+#'#should get your own at http://ww.cloudmade.com and
+#'#apply it with:
+#'#setCloudMadeKey("< your key >")
+#'
+#'#plot Korea with a cloudmade map and ggplot2.
+#'library(ggplot2)
+#'map <- openmap(c(43.46886761482925,119.94873046875),
+#'		c(33.22949814144951,133.9892578125),
+#'		minNumTiles=4,type="cloudmade-1960")
+#'autoplot(map)
 #' }
 openmap <- function(upperLeft,lowerRight,zoom=NULL,type=c("osm","osm-bw","maptoolkit-topo",
 				"waze","mapquest","mapquest-aerial","bing","stamen-toner","stamen-terrain"
@@ -150,7 +168,7 @@ openmap <- function(upperLeft,lowerRight,zoom=NULL,type=c("osm","osm-bw","maptoo
 	if(mergeTiles) .mergeTiles(map) else map
 }
 
-#'plot the map in mercator coordinates. see osm().
+#'Plot an OpenStreetMap object.
 #' @param x the OpenStreetMap
 #' @param y ignored
 #' @param add add to current plot
@@ -158,42 +176,66 @@ openmap <- function(upperLeft,lowerRight,zoom=NULL,type=c("osm","osm-bw","maptoo
 #' @param ... additional parameters to be passed to plot
 #' @method plot OpenStreetMap
 #' @examples \dontrun{
-#' m <- c(25.7738889,-80.1938889)
-#' j <- c(58.3019444,-134.4197222)
-#' miami <- projectMercator(25.7738889,-80.1938889)
-#' jun <- projectMercator(58.3019444,-134.4197222)
-#' data(states)
-#' map <- openmap(j,m,4)
-#' plot(map,removeMargin=TRUE)
-#' plot(states,add=TRUE)
-#' 
-#' data(LA_places)
-#' longBeachHarbor <- openmap(c(33.760525217369974,-118.22052955627441),
-#' 		c(33.73290566922855,-118.17521095275879),14,'bing')
-#' coords <- coordinates(LA_places)
-#' x <- coords[,1]
-#' y <- coords[,2]
-#' txt <- slot(LA_places,"data")[,'NAME']
-#' plot(longBeachHarbor,removeMargin=TRUE)
-#' points(x,y,col="red")
-#' text(x,y,txt,col="white",adj=0)
-#' 
-#' if(require(UScensus2010)){
-#' 		#install with: install.tract("linux")
-#' 		if(require(UScensus2010tract)){
-#' 			lat <- c(43.834526782236814,30.334953881988564)
-#' 			lon <- c(-131.0888671875  ,-107.8857421875)
-#' 			southwest <- openmap(c(lat[1],lon[1]),c(lat[2],lon[2]),5,'osm')
-#' 			data(california.tract10)
-#' 			cali <- spTransform(california.tract10,osm())
-#' 			
-#' 			plot(southwest,removeMargin=TRUE)
-#' 			plot(cali,add=TRUE)
-#' 		}
+#' #
+#' #	The following examples
+#' #	plot using native mercator coordinates,
+#' #	transforming the data where needed
+#' #
+#'m <- c(25.7738889,-80.1938889)
+#'j <- c(58.3019444,-134.4197222)
+#'miami <- projectMercator(25.7738889,-80.1938889)
+#'jun <- projectMercator(58.3019444,-134.4197222)
+#'data(states)
+#'map <- openmap(j,m,4,type="stamen-terrain")
+#'plot(map,removeMargin=FALSE)
+#'plot(states,add=TRUE)
+#'
+#'data(LA_places)
+#'longBeachHarbor <- openmap(c(33.760525217369974,-118.22052955627441),
+#'		c(33.73290566922855,-118.17521095275879),14,'bing')
+#'coords <- coordinates(LA_places)
+#'x <- coords[,1]
+#'y <- coords[,2]
+#'txt <- slot(LA_places,"data")[,'NAME']
+#'plot(longBeachHarbor)
+#'points(x,y,col="red")
+#'text(x,y,txt,col="white",adj=0)
+#'
+#'if(require(UScensus2010)){
+#'	#install with: install.tract("linux")
+#'	if(require(UScensus2010tract)){
+#'		lat <- c(43.834526782236814,30.334953881988564)
+#'		lon <- c(-131.0888671875  ,-107.8857421875)
+#'		southwest <- openmap(c(lat[1],lon[1]),c(lat[2],lon[2]),5,'osm')
+#'		data(california.tract10)
+#'		cali <- spTransform(california.tract10,osm())
+#'		
+#'		plot(southwest)
+#'		plot(cali,add=TRUE)
+#'	}
+#'}
+#'
+#'#
+#'#	The same plot using apple's maps and long-lat coordinates, 
+#'#   transforming the raster map.
+#'#
+#'if(require(UScensus2010)){
+#'	#install with: install.tract("linux")
+#'	if(require(UScensus2010tract)){
+#'		lat <- c(43.834526782236814,30.334953881988564)
+#'		lon <- c(-131.0888671875  ,-107.8857421875)
+#'		southwest <- openmap(c(lat[1],lon[1]),
+#'				c(lat[2],lon[2]),5,"apple-iphoto")
+#'		southwest_longlat <- openproj(southwest)
+#'		data(california.tract10)
+#'		plot(southwest_longlat)
+#'		plot(california.tract10,add=TRUE)
+#'	}
+#'}
+
 #' }
-#' 
-#' }
-plot.OpenStreetMap <- function(x,y=NULL,add=FALSE,removeMargin=FALSE, ...){
+plot.OpenStreetMap <- function(x,y=NULL,add=FALSE,removeMargin=TRUE, ...){
+	mar <- par("mar")
 	if(add==FALSE){
 		plot.new()
 		if(removeMargin)
@@ -203,13 +245,14 @@ plot.OpenStreetMap <- function(x,y=NULL,add=FALSE,removeMargin=FALSE, ...){
 	}
 	for(tile in x$tiles)
 		plot(tile,...)
+	par(mar=mar)
 }
 
 
 
 
 
-#' create a RasterLayer from a tile
+#' Create a RasterLayer from a tile
 #' @param x an osmtile
 #' @param ... unused
 setMethod("raster","osmtile",function(x, ...){
@@ -232,7 +275,7 @@ setMethod("raster","osmtile",function(x, ...){
 }
 )
 
-#' create a RasterLayer from an OpenStreetMap
+#' Create a RasterLayer from an OpenStreetMap
 #' @param x an OpenStreetMap
 #' @param ... unused
 #' @examples \dontrun{
@@ -259,41 +302,42 @@ setMethod("raster","OpenStreetMap",function(x, ...){
 }
 )
 
+
+
 #' Projects the open street map to an alternate coordinate system
 #' @param x an OpenStreetMap object
 #' @param projection a proj4 character string or CRS object
 #' @param ... additional parameters for projectRaster
 #' @examples \dontrun{
-#' library(rgdal)
-#' library(maps)
-#' 
-#' #plot map in native mercator coords
-#' map <- openmap(c(70,-179),
-#' 		c(-70,179),zoom=1,type='bing')
-#' plot(map)
-#' 
-#' #using longlat projection lets us combine with the maps library
-#' map_longlat <- openproj(map)
-#' plot(map_longlat,raster=TRUE)
-#' map("world",col="red",add=TRUE)
-#' 
-#' #robinson projection. good for whole globe viewing.
-#' map_robinson <- openproj(map_longlat, projection=
-#' 				"+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
-#' plot(map_robinson)			
-#' 
-#' 
-#' upperMap <- openmap(c(70,-179),
-#' 		c(40,179),zoom=1,type='bing')
-#' #Lambert Conic Conformal (takes some time...)
-#' map_llc <- openproj(upperMap, projection=
-#' 				"+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96")
-#' plot(map_llc,removeMargin=TRUE)
-#' #add choropleth
-#' data(states)
-#' st_llc <- spTransform(states,CRS("+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96"))
-#' plot(st_llc,add=T,col=heat.colors(48,.4)[slot(st_llc,"data")[["ORDER_ADM"]]])
-#' 
+#'library(maps)
+#'
+#'#plot mapquest map in native mercator coords
+#'map <- openmap(c(70,-179),
+#'		c(-70,179),zoom=1,type='mapquest-aerial')
+#'plot(map)
+#'
+#'#using longlat projection lets us combine with the maps library
+#'map_longlat <- openproj(map)
+#'plot(map_longlat)
+#'map("world",col="red",add=TRUE)
+#'
+#'#robinson projection. good for whole globe viewing.
+#'map_robinson <- openproj(map_longlat, projection=
+#'				"+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
+#'plot(map_robinson)
+#'
+#'#national parks service images
+#'upperMap <- openmap(c(70,-179),
+#'		c(10,50),zoom=2,type='nps')
+#'#Lambert Conic Conformal
+#'map_llc <- openproj(upperMap, projection=
+#'				"+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96")
+#'plot(map_llc,removeMargin=TRUE)
+#'#add choropleth
+#'data(states)
+#'st_llc <- spTransform(states,CRS("+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96"))
+#'plot(st_llc,add=T,col=heat.colors(48,.4)[slot(st_llc,"data")[["ORDER_ADM"]]])
+#'
 #' }
 openproj <- function(x,projection = "+proj=longlat",...){
 	if(!is.character(projection))
@@ -352,7 +396,7 @@ openproj <- function(x,projection = "+proj=longlat",...){
 }
 
 
-#'print map
+#'Print map
 #' @param x the OpenStreetMap
 #' @param ... ignored
 #' @method print OpenStreetMap
@@ -360,8 +404,8 @@ print.OpenStreetMap <- function(x,...){
 	print(str(x))
 }
 
-#' launches a helper GUI.
-#' @usage note for Mac OS X users: 
+#' Launches a Java helper GUI.
+#' @details note for Mac OS X users: 
 #' On the mac this can only be run from a java console such as JGR.
 launchMapHelper <- function(){
 	.tryJava()
@@ -377,7 +421,7 @@ setCloudMadeKey <- function(key){
 	J("org.openstreetmap.gui.jmapviewer.tilesources.OsmTileSource")$cloudMadeKey
 }
 
-#' returns a table with relevant info for each map type
+#' Returns a table with relevant source and attribution info for each map type
 #' 
 getMapInfo <- function(){
 	J("edu.cens.spatial.RTileController")$getInstance("osm")

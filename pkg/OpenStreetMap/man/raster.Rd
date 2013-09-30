@@ -1,6 +1,6 @@
 \name{raster}
 \alias{raster}
-\title{create a RasterLayer from a tile}
+\title{Create a RasterLayer from a tile}
 \arguments{
   \item{x}{an osmtile}
 
@@ -11,9 +11,9 @@
   \item{...}{unused}
 }
 \description{
-  create a RasterLayer from a tile
+  Create a RasterLayer from a tile
 
-  create a RasterLayer from an OpenStreetMap
+  Create a RasterLayer from an OpenStreetMap
 }
 \examples{
 \dontrun{

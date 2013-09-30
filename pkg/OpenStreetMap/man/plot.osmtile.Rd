@@ -1,6 +1,6 @@
 \name{plot.osmtile}
 \alias{plot.osmtile}
-\title{add tile to plot}
+\title{Add tile to plot}
 \usage{
   \method{plot}{osmtile} (x, y = NULL, add = TRUE,
     raster = TRUE, ...)
@@ -18,6 +18,6 @@
   \item{...}{additional parameters to image or rasterImage}
 }
 \description{
-  add tile to plot
+  Add tile to plot
 }
 
