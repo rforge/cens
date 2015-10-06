@@ -1,2 +1,6 @@
 exportPattern("^[[:alpha:]]+")
+importFrom("graphics", rasterImage)
+importFrom("raster", raster)
+import(raster)
+import(sp)
 import(rJava)

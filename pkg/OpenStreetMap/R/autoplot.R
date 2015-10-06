@@ -1,11 +1,11 @@
 
+
 #' Plots an open street map tile using ggplot2
 #' @param data an osmtile
 #' @param plot if false only the annotation_raster is returned
 #' @param ... not used
 #' @method autoplot osmtile
 autoplot.osmtile <- function(data,plot=FALSE,...){
-	library(ggplot2)
 	a <- b <- NULL
 	x <- data
 	p1 <- x$bbox$p1
@@ -34,7 +34,6 @@ autoplot.osmtile <- function(data,plot=FALSE,...){
 #' @examples \dontrun{
 #' require(maps)
 #' require(ggplot2)
-#' gpclibPermit()
 #' 
 #' mp <- openmap(c(53.38332836757155,-130.517578125),
 #' 		c(15.792253570362446,-67.939453125),4,'stamen-watercolor')
